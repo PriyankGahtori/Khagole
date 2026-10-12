@@ -30,18 +30,18 @@ All three registries use Trusted Publishing (OIDC), so no long-lived token is st
 crates.io and npm can only trust a workflow for a package that already exists, so the
 first release uses short-lived tokens instead:
 
-1. Create the `release`, `pypi` and `npm` environments in the repository settings
+1. Create the `crates-io`, `pypi` and `npm` environments in the repository settings
    (optionally with required reviewers).
 2. **crates.io**: create an API token scoped to `publish-new` and `publish-update` for the
    crate `astroceleste-engine`, with a short expiry, and store it as the
-   `CARGO_REGISTRY_TOKEN` secret of the `release` environment.
+   `CARGO_REGISTRY_TOKEN` secret of the `crates-io` environment.
 3. **npm**: create a granular access token with publish rights and a short expiry, and store
    it as the `NPM_TOKEN` secret of the `npm` environment.
 4. **PyPI**: add a *pending* trusted publisher for project `astroceleste-engine` (workflow
    `release.yml`, environment `pypi`). No token is needed.
 5. Push the `vX.Y.Z` tag for the version in `Cargo.toml`.
 6. Once the packages exist, add the trusted publisher on crates.io (crate settings →
-   *Trusted Publishing*: this repository, workflow `release.yml`, environment `release`)
+   *Trusted Publishing*: this repository, workflow `release.yml`, environment `crates-io`)
    and on npm (package settings: workflow `release.yml`, environment `npm`). Then delete
    both secrets and revoke the tokens. The workflow prefers OIDC whenever it is available.
 
