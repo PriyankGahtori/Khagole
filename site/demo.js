@@ -35,7 +35,13 @@ const CITY_PRESETS = {
   delhi: { lat: 28.6139, lon: 77.209, tz: "+05:30" },
   mumbai: { lat: 19.076, lon: 72.8777, tz: "+05:30" },
   bengaluru: { lat: 12.9716, lon: 77.5946, tz: "+05:30" },
+  chennai: { lat: 13.0827, lon: 80.2707, tz: "+05:30" },
+  kolkata: { lat: 22.5726, lon: 88.3639, tz: "+05:30" },
   ujjain: { lat: 23.1765, lon: 75.7885, tz: "+05:30" },
+  varanasi: { lat: 25.3176, lon: 82.9739, tz: "+05:30" },
+  london: { lat: 51.5074, lon: -0.1278, tz: "+00:00" },
+  newyork: { lat: 40.7128, lon: -74.006, tz: "-05:00" },
+  tokyo: { lat: 35.6762, lon: 139.6503, tz: "+09:00" },
   greenwich: { lat: 51.4769, lon: 0, tz: "+00:00" },
 };
 
@@ -581,9 +587,38 @@ $("style-south").addEventListener("click", () => {
   if (lastVedicData) renderVedicCharts(lastVedicData);
 });
 
+const citySelect = $("city-select");
+if (citySelect) {
+  citySelect.addEventListener("change", (e) => {
+    const val = e.target.value;
+    if (val === "custom") {
+      const adv = $("advanced-drawer");
+      if (adv) adv.open = true;
+      return;
+    }
+    const city = CITY_PRESETS[val];
+    if (city) {
+      form.elements.latitude.value = city.lat;
+      form.elements.longitude.value = city.lon;
+      form.elements.tz_preset.value = city.tz;
+      syncTzCustom();
+    }
+  });
+}
+
 for (const btn of form.querySelectorAll("[data-preset]")) {
   btn.addEventListener("click", () => {
-    fillForm(PRESETS[btn.dataset.preset]());
+    form.querySelectorAll("[data-preset]").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const pName = btn.dataset.preset;
+    fillForm(PRESETS[pName]());
+    if (citySelect) {
+      if (pName === "modi") citySelect.value = "vadnagar";
+      else if (pName === "delhi") citySelect.value = "delhi";
+      else if (pName === "now") citySelect.value = "greenwich";
+      else if (pName === "y2k") citySelect.value = "greenwich";
+      else citySelect.value = "custom";
+    }
     compute();
   });
 }
@@ -595,6 +630,7 @@ for (const chip of form.querySelectorAll("[data-city]")) {
       form.elements.latitude.value = city.lat;
       form.elements.longitude.value = city.lon;
       form.elements.tz_preset.value = city.tz;
+      if (citySelect) citySelect.value = chip.dataset.city;
       syncTzCustom();
     }
   });

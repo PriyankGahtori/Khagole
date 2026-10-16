@@ -534,30 +534,97 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
   const balM = Math.floor((balYearsFloat - balY) * 12);
   const balD = Math.floor(((balYearsFloat - balY) * 12 - balM) * 30.4);
 
+  // Calculate total span for timeline
+  const firstJd = dashaList[0].start_jd || birthJd;
+  const lastJd = dashaList[dashaList.length - 1].end_jd || (firstJd + 120 * 365.256363);
+  const totalDays = Math.max(1, lastJd - firstJd);
+
+  // Today's Julian day approx
+  const nowMs = Date.now();
+  const todayJd = 2440587.5 + nowMs / 86400000;
+  let todayPercent = ((todayJd - firstJd) / totalDays) * 100;
+  const showTodayMarker = todayPercent >= 0 && todayPercent <= 100;
+
+  // Build 120-year timeline segments
+  let timelineSegments = "";
+  for (const md of dashaList) {
+    const mdSpan = (md.end_jd - md.start_jd);
+    const pct = Math.max(2, (mdSpan / totalDays) * 100);
+    const info = PLANET_INFO[md.planet] || { color: "var(--accent)", abbr: md.planet.slice(0, 2) };
+    const isMdActive = todayStr >= md.start_date && todayStr < md.end_date;
+    timelineSegments += `
+      <div class="dasha-timeline-seg ${isMdActive ? 'active' : ''}" 
+           style="width:${pct.toFixed(2)}%; background-color:${info.color}33; border-color:${info.color}88"
+           title="${md.planet} Mahadasha (${md.start_date} to ${md.end_date})">
+        <span class="seg-label" style="color:${info.color}">${info.abbr}</span>
+      </div>
+    `;
+  }
+
   let html = `
     <div class="dasha-overview">
-      <div class="dasha-summary-card">
-        <div>
-          <span class="dasha-meta-label">Moon Nakshatra</span>
-          <strong>${nakInfo ? `${nakInfo.name} (Pada ${nakInfo.pada})` : "–"}</strong>
-          <small>Birth Lord: ${nakInfo ? nakInfo.lord : "–"}</small>
+      ${
+        activeMd
+          ? `
+      <div class="dasha-hero-banner">
+        <div class="dasha-hero-left">
+          <span class="dasha-hero-pill">● Current Active Dasha</span>
+          <div class="dasha-hero-title">
+            <span class="graha-pill md-graha" style="border-color:${(PLANET_INFO[activeMd.planet]||{}).color}77; color:${(PLANET_INFO[activeMd.planet]||{}).color}">
+              ${activeMd.planet}
+            </span>
+            <span class="graha-arrow">→</span>
+            <span class="graha-pill ad-graha" style="border-color:${(PLANET_INFO[activeAd?.planet]||{}).color}77; color:${(PLANET_INFO[activeAd?.planet]||{}).color}">
+              ${activeAd ? activeAd.planet : "–"}
+            </span>
+            <span class="graha-arrow">→</span>
+            <span class="graha-pill pd-graha" style="border-color:${(PLANET_INFO[activePd?.planet]||{}).color}77; color:${(PLANET_INFO[activePd?.planet]||{}).color}">
+              ${activePd ? activePd.planet : "–"}
+            </span>
+          </div>
+          <p class="dasha-hero-sub">
+            Mahadasha: <strong>${activeMd.planet}</strong> (${activeMd.start_date} to ${activeMd.end_date})<br>
+            Antardasha: <strong>${activeAd ? activeAd.planet : "–"}</strong> (${activeAd?.start_date || "–"} to ${activeAd?.end_date || "–"})
+            ${activePd ? `· Pratyantar: <strong>${activePd.planet}</strong> (until ${activePd.end_date})` : ""}
+          </p>
         </div>
-        <div>
-          <span class="dasha-meta-label">Balance at Birth</span>
-          <strong>${balY}y ${balM}m ${balD}d</strong>
-          <small>Remaining of ${firstMd.planet} Mahadasha</small>
+        <div class="dasha-hero-stats">
+          <div class="stat-box">
+            <span class="stat-label">Birth Balance</span>
+            <span class="stat-value">${balY}y ${balM}m ${balD}d</span>
+            <span class="stat-sub">${firstMd.planet} Dasha</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Moon Nakshatra</span>
+            <span class="stat-value">${nakInfo ? nakInfo.name : "–"}</span>
+            <span class="stat-sub">Pada ${nakInfo ? nakInfo.pada : "–"} · Lord ${nakInfo ? nakInfo.lord : "–"}</span>
+          </div>
         </div>
-        ${
-          activeMd
-            ? `
-        <div class="dasha-active-badge">
-          <span class="dasha-meta-label">Current Running Dasha</span>
-          <strong class="dasha-current-text">${activeMd.planet} → ${activeAd ? activeAd.planet : ""} → ${activePd ? activePd.planet : ""}</strong>
-          <small>Active period as of today (${todayStr})</small>
+      </div>
+      `
+          : ""
+      }
+
+      <div class="dasha-timeline-card">
+        <div class="timeline-header">
+          <span class="timeline-title">120-Year Vimshottari Life Cycle</span>
+          <span class="timeline-legend">TSSY Standard · 9 Planetary Periods</span>
         </div>
-        `
-            : ""
-        }
+        <div class="dasha-timeline-bar-wrap">
+          <div class="dasha-timeline-bar">
+            ${timelineSegments}
+          </div>
+          ${
+            showTodayMarker
+              ? `
+          <div class="timeline-today-marker" style="left:${todayPercent.toFixed(2)}%">
+            <span class="marker-pin">▼</span>
+            <span class="marker-label">Today</span>
+          </div>
+          `
+              : ""
+          }
+        </div>
       </div>
     </div>
 

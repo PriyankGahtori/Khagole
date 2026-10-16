@@ -16,256 +16,298 @@
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="#top" aria-label="astroceleste-engine home">
-        <img src="favicon.svg" alt="" width="28" height="28">
-        <span>astroceleste<span class="brand-dim">-engine</span></span>
+      <a class="brand" href="#top" aria-label="AstroCeleste home">
+        <img src="favicon.svg" alt="" width="26" height="26">
+        <span>AstroCeleste <span class="brand-badge">WASM · DE440s</span></span>
       </a>
+      <div class="mode-switcher" role="tablist" aria-label="Astrology System">
+        <button type="button" id="tab-vedic" class="tab-btn active" role="tab" aria-selected="true">🪔 Vedic Kundli</button>
+        <button type="button" id="tab-western" class="tab-btn" role="tab" aria-selected="false">🌐 Western Wheel</button>
+      </div>
       <nav aria-label="Main">
-        <a href="#demo">Demo</a>
         <a href="#features">Features</a>
-        <a href="#docs">Docs</a>
-        <a href="https://github.com/ffalcinelli/astroceleste-engine">GitHub</a>
+        <a href="#docs">API</a>
+        <a href="https://github.com/PriyankGahtori/astroceleste-engine" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
   </header>
 
   <main id="top">
-    <section class="hero">
+    <section class="section app-hero-section">
       <div class="wrap">
-        <p class="eyebrow">Pure Rust · NASA JPL ephemerides · Python &amp; WebAssembly</p>
-        <h1>The same chart,<br>on every platform.</h1>
-        <p class="lede">
-          astroceleste-engine computes complete astrological charts from JPL ephemerides.
-          One core runs on the server, in desktop and mobile apps and in the browser, and every
-          number matches its reference implementation to within 10<sup>−9</sup>.
-        </p>
-        <div class="cta">
-          <a class="button primary" href="#demo">Try it in your browser</a>
-          <a class="button" href="https://docs.rs/astroceleste-engine">API reference</a>
-        </div>
-        <ul class="install" aria-label="Install">
-          <li><span>Rust</span><code>cargo add astroceleste-engine</code></li>
-          <li><span>Python</span><code>pip install astroceleste-engine</code></li>
-          <li><span>JS</span><code>npm install astroceleste-engine</code></li>
-        </ul>
-        <p class="note">Experimental (0.0.x): the API may change in any release. Pin an exact version.</p>
-      </div>
-    </section>
-
-    <section id="demo" class="section">
-      <div class="wrap">
-        <div class="demo-header">
-          <h2>Interactive Astrology Engine</h2>
-          <p class="section-lede">
-            Pure client-side WebAssembly calculation powered by NASA JPL ephemerides.
-            Nothing is sent to a server: computed directly on your device from an 11 MB excerpt of JPL DE440s (1950–2050).
-          </p>
-          <div class="mode-switcher" role="tablist" aria-label="Astrology System">
-            <button type="button" id="tab-vedic" class="tab-btn active" role="tab" aria-selected="true">🪔 Vedic Astrology (Kundli)</button>
-            <button type="button" id="tab-western" class="tab-btn" role="tab" aria-selected="false">🌐 Western Chart Wheel</button>
+        <div class="app-hero-header">
+          <div class="hero-text-block">
+            <span class="hero-eyebrow">NASA JPL DE440s · Pure Rust WebAssembly · Sub-Arcsecond Precision</span>
+            <h1>Vedic Chart &amp; Vimshottari Dasha Engine</h1>
+            <p class="hero-lede">
+              Compute D1 (Rasi) &amp; D9 (Navamsha) divisional charts, Panchanga five limbs, and True Sidereal Solar Year (TSSY) Vimshottari dasha in under 2ms — computed 100% on your device with complete privacy.
+            </p>
           </div>
         </div>
 
         <div class="demo">
-          <form id="chart-form" class="panel" autocomplete="off">
-            <fieldset class="presets">
-              <legend>Presets &amp; Examples</legend>
-              <button type="button" data-preset="modi">Narendra Modi (1950)</button>
-              <button type="button" data-preset="delhi">New Delhi (Now)</button>
-              <button type="button" data-preset="now">Greenwich (Now)</button>
-              <button type="button" data-preset="rome">Rome (1987)</button>
-              <button type="button" data-preset="y2k">Y2K (2000)</button>
-            </fieldset>
+          <form id="chart-form" class="panel chart-input-panel" autocomplete="off">
+            <!-- Quick Presets -->
+            <div class="presets-row">
+              <span class="presets-label">Quick Presets:</span>
+              <div class="presets-chips">
+                <button type="button" class="preset-chip active" data-preset="modi">👑 Narendra Modi (1950)</button>
+                <button type="button" class="preset-chip" data-preset="delhi">📍 New Delhi (Now)</button>
+                <button type="button" class="preset-chip" data-preset="now">⏱️ Greenwich (Now)</button>
+                <button type="button" class="preset-chip" data-preset="rome">🏛️ Rome (1987)</button>
+                <button type="button" class="preset-chip" data-preset="y2k">🌐 Y2K (2000)</button>
+              </div>
+            </div>
 
-            <div class="grid-2">
-              <label>Date
+            <!-- Main Input Bar -->
+            <div class="form-hero-grid">
+              <label class="form-group">
+                <span class="group-label">Birth Date</span>
                 <input type="date" name="date" required value="1950-09-17">
               </label>
-              <label>Time
+
+              <label class="form-group">
+                <span class="group-label">Birth Time <small>(Local)</small></span>
                 <input type="time" name="time" required step="1" value="09:34:00">
               </label>
 
-              <label class="span-2">Timezone
+              <label class="form-group">
+                <span class="group-label">City Quick-Pick</span>
+                <select id="city-select">
+                  <option value="vadnagar" selected>Vadnagar, Gujarat</option>
+                  <option value="delhi">New Delhi, India</option>
+                  <option value="mumbai">Mumbai, Maharashtra</option>
+                  <option value="bengaluru">Bengaluru, Karnataka</option>
+                  <option value="chennai">Chennai, Tamil Nadu</option>
+                  <option value="kolkata">Kolkata, West Bengal</option>
+                  <option value="ujjain">Ujjain (Avantika), MP</option>
+                  <option value="varanasi">Varanasi (Kashi), UP</option>
+                  <option value="london">London, UK</option>
+                  <option value="newyork">New York, USA</option>
+                  <option value="tokyo">Tokyo, Japan</option>
+                  <option value="greenwich">Greenwich, UK</option>
+                  <option value="custom">Custom Coordinates...</option>
+                </select>
+              </label>
+
+              <label class="form-group">
+                <span class="group-label">Timezone</span>
                 <select name="tz_preset" id="tz-preset">
-                  <option value="+05:30" selected>IST (UTC+05:30 — India Standard Time)</option>
+                  <option value="+05:30" selected>IST (UTC+05:30 — India)</option>
                   <option value="+00:00">UTC / GMT (+00:00)</option>
                   <option value="local">Local Browser Timezone</option>
                   <option value="-05:00">EST (UTC-05:00 — US East)</option>
                   <option value="-08:00">PST (UTC-08:00 — US West)</option>
-                  <option value="+01:00">CET (UTC+01:00 — Central Europe)</option>
+                  <option value="+01:00">CET (UTC+01:00 — Europe)</option>
                   <option value="+09:00">JST (UTC+09:00 — Japan)</option>
                   <option value="custom">Custom Offset...</option>
                 </select>
               </label>
 
-              <label id="tz-custom-wrap" class="span-2" hidden>Custom UTC Offset <small>(±HH:MM)</small>
-                <input type="text" name="tz_custom" value="+05:30" placeholder="+05:30">
-              </label>
-
-              <label>Latitude <small>(° north +)</small>
-                <input type="number" name="latitude" required min="-90" max="90" step="any" value="23.784">
-              </label>
-              <label>Longitude <small>(° east +)</small>
-                <input type="number" name="longitude" required min="-180" max="180" step="any" value="72.636">
-              </label>
-
-              <div class="city-quick-picks span-2">
-                <span>Quick Cities:</span>
-                <button type="button" class="btn-chip" data-city="vadnagar">Vadnagar</button>
-                <button type="button" class="btn-chip" data-city="delhi">New Delhi</button>
-                <button type="button" class="btn-chip" data-city="mumbai">Mumbai</button>
-                <button type="button" class="btn-chip" data-city="bengaluru">Bengaluru</button>
-                <button type="button" class="btn-chip" data-city="ujjain">Ujjain</button>
-                <button type="button" class="btn-chip" data-city="greenwich">Greenwich</button>
+              <div class="form-group btn-group">
+                <button type="submit" class="button primary compute-btn-hero" id="compute-btn">
+                  <span>Calculate Horoscope</span>
+                </button>
               </div>
-
-              <!-- Vedic specific fields -->
-              <label class="vedic-field span-2">Ayanamsa <small>(Sidereal Mode)</small>
-                <select name="vedic_ayanamsa">
-                  <option value="lahiri" selected>Lahiri (Chitra Paksha) — Standard Parashari</option>
-                  <option value="raman">B.V. Raman</option>
-                  <option value="krishnamurti">Krishnamurti (KP)</option>
-                  <option value="true_citra">True Chitra</option>
-                  <option value="fagan_bradley">Fagan-Bradley</option>
-                  <option value="yukteshwar">Sri Yukteswar</option>
-                  <option value="galcent_0sag">Galactic Center (0° Sagittarius)</option>
-                </select>
-              </label>
-
-              <label class="vedic-field">House System
-                <select name="vedic_house_system">
-                  <option value="W" selected>Whole Sign (Rashi Bhava)</option>
-                  <option value="S">Sripati (Traditional Bhava Chalita)</option>
-                  <option value="E">Equal House</option>
-                  <option value="P">Placidus</option>
-                </select>
-              </label>
-
-              <label class="vedic-field">Position Mode
-                <select name="vedic_position_mode">
-                  <option value="true" selected>True / Geometric (Parashari standard)</option>
-                  <option value="apparent">Apparent (with light-time/aberration)</option>
-                </select>
-              </label>
-
-              <label class="vedic-field">Lunar Nodes (Rahu &amp; Ketu)
-                <select name="vedic_node_type">
-                  <option value="mean" selected>Mean Node (Canonical Parashari)</option>
-                  <option value="true">True Node (Osculating Orbit)</option>
-                </select>
-              </label>
-
-              <label class="vedic-field">Dasha Year Standard
-                <select name="vedic_year_type">
-                  <option value="tssy" selected>TSSY (True Sidereal Solar Year) — Default</option>
-                  <option value="sidereal">Sidereal Year (365.2564 days)</option>
-                  <option value="savana">Savana Year (360 days)</option>
-                  <option value="tropical">Tropical Year (365.2422 days)</option>
-                  <option value="julian">Julian Year (365.25 days)</option>
-                </select>
-              </label>
-
-              <!-- Western specific fields -->
-              <label class="western-field" hidden>Houses
-                <select name="house_system">
-                  <option value="P">Placidus</option>
-                  <option value="W">Whole Sign</option>
-                  <option value="E">Equal</option>
-                  <option value="K">Koch</option>
-                  <option value="R">Regiomontanus</option>
-                  <option value="C">Campanus</option>
-                  <option value="T">Topocentric</option>
-                  <option value="B">Alcabitius</option>
-                  <option value="M">Morinus</option>
-                  <option value="O">Porphyry</option>
-                  <option value="V">Vehlow</option>
-                </select>
-              </label>
-              <label class="western-field" hidden>Zodiac
-                <select name="zodiac_type">
-                  <option value="tropical">Tropical</option>
-                  <option value="sidereal">Sidereal</option>
-                </select>
-              </label>
-              <label class="western-field span-2" hidden>Ayanamsa <small>(sidereal only)</small>
-                <select name="ayanamsa" disabled>
-                  <option value="lahiri">Lahiri (Chitra Paksha)</option>
-                  <option value="fagan_bradley">Fagan-Bradley</option>
-                  <option value="krishnamurti">Krishnamurti (KP)</option>
-                  <option value="raman">B.V. Raman</option>
-                  <option value="true_citra">True Chitra</option>
-                  <option value="yukteshwar">Sri Yukteswar</option>
-                  <option value="deluce">De Luce</option>
-                  <option value="ushashashi">Usha-Shashi</option>
-                  <option value="jn_bhasin">J.N. Bhasin</option>
-                  <option value="aldebaran_15tau">Aldebaran 15° Taurus</option>
-                  <option value="hipparchos">Hipparchos</option>
-                  <option value="sassanian">Sassanian</option>
-                  <option value="galcent_0sag" selected>Galactic Center 0° Sagittarius</option>
-                  <option value="j2000">J2000.0 Epoch</option>
-                </select>
-              </label>
-              <label class="western-field span-2" hidden>Dignities <small>(triplicities and bounds)</small>
-                <select name="dignity_scheme">
-                  <option value="lilly" selected>Lilly (Ptolemaic terms)</option>
-                  <option value="dorothean">Dorothean (Egyptian bounds)</option>
-                </select>
-              </label>
             </div>
 
+            <!-- Advanced Astrological Parameters (Collapsible) -->
+            <details class="advanced-params-drawer" id="advanced-drawer">
+              <summary class="advanced-summary">
+                <span class="summary-text">⚙️ Customize Coordinates &amp; Astrological Systems</span>
+                <span class="summary-hint">Ayanamsa, TSSY Dasha Standard, Houses, Coordinates</span>
+              </summary>
+              <div class="advanced-grid">
+                <label>
+                  <span class="field-label">Latitude <small>(° north +)</small></span>
+                  <input type="number" name="latitude" required min="-90" max="90" step="any" value="23.784">
+                </label>
+                <label>
+                  <span class="field-label">Longitude <small>(° east +)</small></span>
+                  <input type="number" name="longitude" required min="-180" max="180" step="any" value="72.636">
+                </label>
+                <label id="tz-custom-wrap" class="span-2" hidden>
+                  <span class="field-label">Custom UTC Offset <small>(±HH:MM)</small></span>
+                  <input type="text" name="tz_custom" value="+05:30" placeholder="+05:30">
+                </label>
+
+                <div class="city-quick-picks span-2" style="display:none;">
+                  <button type="button" class="btn-chip" data-city="vadnagar">Vadnagar</button>
+                  <button type="button" class="btn-chip" data-city="delhi">New Delhi</button>
+                  <button type="button" class="btn-chip" data-city="mumbai">Mumbai</button>
+                  <button type="button" class="btn-chip" data-city="bengaluru">Bengaluru</button>
+                  <button type="button" class="btn-chip" data-city="ujjain">Ujjain</button>
+                  <button type="button" class="btn-chip" data-city="greenwich">Greenwich</button>
+                </div>
+
+                <!-- Vedic specific fields -->
+                <label class="vedic-field">
+                  <span class="field-label">Ayanamsa</span>
+                  <select name="vedic_ayanamsa">
+                    <option value="lahiri" selected>Lahiri (Chitra Paksha) — Standard Parashari</option>
+                    <option value="raman">B.V. Raman</option>
+                    <option value="krishnamurti">Krishnamurti (KP)</option>
+                    <option value="true_citra">True Chitra</option>
+                    <option value="fagan_bradley">Fagan-Bradley</option>
+                    <option value="yukteshwar">Sri Yukteswar</option>
+                    <option value="galcent_0sag">Galactic Center (0° Sagittarius)</option>
+                  </select>
+                </label>
+
+                <label class="vedic-field">
+                  <span class="field-label">Dasha Year Standard</span>
+                  <select name="vedic_year_type">
+                    <option value="tssy" selected>TSSY (True Sidereal Solar Year) — Default</option>
+                    <option value="sidereal">Sidereal Year (365.2564 days)</option>
+                    <option value="savana">Savana Year (360 days)</option>
+                    <option value="tropical">Tropical Year (365.2422 days)</option>
+                    <option value="julian">Julian Year (365.25 days)</option>
+                  </select>
+                </label>
+
+                <label class="vedic-field">
+                  <span class="field-label">House System</span>
+                  <select name="vedic_house_system">
+                    <option value="W" selected>Whole Sign (Rashi Bhava)</option>
+                    <option value="S">Sripati (Traditional Bhava Chalita)</option>
+                    <option value="E">Equal House</option>
+                    <option value="P">Placidus</option>
+                  </select>
+                </label>
+
+                <label class="vedic-field">
+                  <span class="field-label">Position Mode</span>
+                  <select name="vedic_position_mode">
+                    <option value="true" selected>True / Geometric (Parashari standard)</option>
+                    <option value="apparent">Apparent (with light-time/aberration)</option>
+                  </select>
+                </label>
+
+                <label class="vedic-field">
+                  <span class="field-label">Lunar Nodes (Rahu &amp; Ketu)</span>
+                  <select name="vedic_node_type">
+                    <option value="mean" selected>Mean Node (Canonical Parashari)</option>
+                    <option value="true">True Node (Osculating Orbit)</option>
+                  </select>
+                </label>
+
+                <!-- Western specific fields -->
+                <label class="western-field" hidden>
+                  <span class="field-label">Houses</span>
+                  <select name="house_system">
+                    <option value="P">Placidus</option>
+                    <option value="W">Whole Sign</option>
+                    <option value="E">Equal</option>
+                    <option value="K">Koch</option>
+                    <option value="R">Regiomontanus</option>
+                    <option value="C">Campanus</option>
+                    <option value="T">Topocentric</option>
+                    <option value="B">Alcabitius</option>
+                    <option value="M">Morinus</option>
+                    <option value="O">Porphyry</option>
+                    <option value="V">Vehlow</option>
+                  </select>
+                </label>
+                <label class="western-field" hidden>
+                  <span class="field-label">Zodiac</span>
+                  <select name="zodiac_type">
+                    <option value="tropical">Tropical</option>
+                    <option value="sidereal">Sidereal</option>
+                  </select>
+                </label>
+                <label class="western-field span-2" hidden>
+                  <span class="field-label">Ayanamsa <small>(sidereal only)</small></span>
+                  <select name="ayanamsa" disabled>
+                    <option value="lahiri">Lahiri (Chitra Paksha)</option>
+                    <option value="fagan_bradley">Fagan-Bradley</option>
+                    <option value="krishnamurti">Krishnamurti (KP)</option>
+                    <option value="raman">B.V. Raman</option>
+                    <option value="true_citra">True Chitra</option>
+                    <option value="yukteshwar">Sri Yukteswar</option>
+                    <option value="deluce">De Luce</option>
+                    <option value="ushashashi">Usha-Shashi</option>
+                    <option value="jn_bhasin">J.N. Bhasin</option>
+                    <option value="aldebaran_15tau">Aldebaran 15° Taurus</option>
+                    <option value="hipparchos">Hipparchos</option>
+                    <option value="sassanian">Sassanian</option>
+                    <option value="galcent_0sag" selected>Galactic Center 0° Sagittarius</option>
+                    <option value="j2000">J2000.0 Epoch</option>
+                  </select>
+                </label>
+                <label class="western-field span-2" hidden>
+                  <span class="field-label">Dignities <small>(triplicities and bounds)</small></span>
+                  <select name="dignity_scheme">
+                    <option value="lilly" selected>Lilly (Ptolemaic terms)</option>
+                    <option value="dorothean">Dorothean (Egyptian bounds)</option>
+                  </select>
+                </label>
+              </div>
+            </details>
+
             <p class="hint" id="form-hint">Time is in selected timezone: converted to UTC internally for ephemeris calculation.</p>
-            <button type="submit" class="button primary wide" id="compute-btn">Calculate Vedic Horoscope</button>
             <p id="status" class="status" role="status" aria-live="polite"></p>
           </form>
 
           <!-- Vedic Results View -->
-          <div id="vedic-result" class="result">
-            <!-- Panchanga Limbs Bar -->
+          <div id="vedic-result" class="vedic-results-root">
+            <!-- 1. Panchanga Limbs Bar -->
             <div id="vedic-panchang"></div>
 
-            <!-- Dual Charts D1 & D9 -->
-            <div class="panel">
-              <div class="chart-toolbar">
-                <div class="chart-style-toggle">
-                  <span>Chart Style:</span>
-                  <button type="button" id="style-north" class="btn-chip active">North Indian (Diamond)</button>
-                  <button type="button" id="style-south" class="btn-chip">South Indian (Box)</button>
+            <!-- 2. Dual Workspace Grid (Charts on Left, Dasha on Right) -->
+            <div class="vedic-workspace-grid">
+              <!-- Left Column: Charts -->
+              <div class="panel charts-col-panel">
+                <div class="chart-toolbar">
+                  <div class="chart-panel-heading">
+                    <h3>Kundli Charts</h3>
+                    <span class="chart-panel-sub">D1 Rasi &amp; D9 Navamsha</span>
+                  </div>
+                  <div class="chart-style-toggle">
+                    <button type="button" id="style-north" class="btn-chip active">North Indian</button>
+                    <button type="button" id="style-south" class="btn-chip">South Indian</button>
+                  </div>
+                </div>
+                <div class="vedic-charts-grid">
+                  <div class="chart-card">
+                    <div class="chart-header">
+                      <h4>D1 · Rasi Chart</h4>
+                      <span class="chart-sub">Radix / Physical Reality</span>
+                    </div>
+                    <svg id="chart-d1" viewBox="0 0 400 400" role="img" aria-label="D1 Rasi Chart"></svg>
+                  </div>
+                  <div class="chart-card">
+                    <div class="chart-header">
+                      <h4>D9 · Navamsha Chart</h4>
+                      <span class="chart-sub">Dharma / Soul Potential</span>
+                    </div>
+                    <svg id="chart-d9" viewBox="0 0 400 400" role="img" aria-label="D9 Navamsha Chart"></svg>
+                  </div>
                 </div>
               </div>
-              <div class="vedic-charts-grid">
-                <div class="chart-card">
-                  <div class="chart-header">
-                    <h3>D1 · Rasi Chart</h3>
-                    <span class="chart-sub">Radix / Physical Reality</span>
-                  </div>
-                  <svg id="chart-d1" viewBox="0 0 400 400" role="img" aria-label="D1 Rasi Chart"></svg>
+
+              <!-- Right Column: Vimshottari Dasha -->
+              <div class="panel dasha-col-panel">
+                <div class="dasha-panel-header">
+                  <h3>Vimshottari Dasha (विंशोत्तरी दशा)</h3>
+                  <span class="dasha-panel-sub">120-Year Parashari Cycle · TSSY Keplerian Solar Return</span>
                 </div>
-                <div class="chart-card">
-                  <div class="chart-header">
-                    <h3>D9 · Navamsha Chart</h3>
-                    <span class="chart-sub">Dharma / Soul Potential</span>
-                  </div>
-                  <svg id="chart-d9" viewBox="0 0 400 400" role="img" aria-label="D9 Navamsha Chart"></svg>
-                </div>
+                <div id="vedic-dasha"></div>
               </div>
             </div>
 
-            <!-- Planetary Positions Table -->
-            <div class="panel tables">
-              <h3>Vedic Planetary Positions (Navagrahas &amp; Lagna)</h3>
+            <!-- 3. Planetary Positions Table -->
+            <div class="panel tables planets-panel">
+              <div class="planets-panel-header">
+                <h3>Vedic Planetary Positions (Navagrahas &amp; Lagna)</h3>
+                <span class="planets-panel-sub">Sidereal Longitudes, Nakshatras, Padas &amp; Divisional Rulers</span>
+              </div>
               <div class="table-scroll"><table id="vedic-planets"></table></div>
             </div>
 
-            <!-- Vimshottari Dasha Explorer -->
-            <div class="panel">
-              <h3>Vimshottari Dasha (विंशोत्तरी दशा · 120-Year Parashari Cycle)</h3>
-              <div id="vedic-dasha"></div>
-            </div>
-
-            <!-- Raw JSON -->
+            <!-- 4. Raw JSON -->
             <details class="raw">
-              <summary>Raw JSON <small>(D1, D9, Panchanga, Vimshottari &amp; Planetary Data)</small></summary>
-              <button type="button" id="copy-vedic-json" class="button small">Copy</button>
+              <summary>Raw JSON Data <small>(D1, D9, Panchanga, Vimshottari &amp; Planetary Data)</small></summary>
+              <button type="button" id="copy-vedic-json" class="button small">Copy JSON</button>
               <pre id="vedic-json"></pre>
             </details>
           </div>
@@ -291,8 +333,8 @@
             </div>
           </div>
         </div>
-      </div>
     </section>
+
 
     <section class="section alt">
       <div class="wrap">
