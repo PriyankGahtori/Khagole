@@ -260,3 +260,150 @@ td.num { text-align: right; }
   html { scroll-behavior: auto; }
   .progress i { transition: none; }
 }
+
+/* ---------------------------------------------------------------------------- Vedic Styles */
+.demo-header { margin-bottom: 24px; }
+.mode-switcher {
+  display: inline-flex; gap: 8px; padding: 4px; border-radius: 12px;
+  background: var(--panel-2); border: 1px solid var(--border); margin-top: 16px;
+}
+.tab-btn {
+  font: inherit; font-size: 0.95rem; font-weight: 500; padding: 8px 18px; border-radius: 8px;
+  border: none; background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s ease;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active {
+  background: var(--panel); color: var(--accent); font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2); border: 1px solid var(--border);
+}
+
+.city-quick-picks {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0 8px; font-size: 0.85rem; color: var(--dim);
+}
+.btn-chip {
+  font: inherit; font-size: 0.8rem; padding: 3px 8px; border-radius: 6px;
+  background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+}
+.btn-chip:hover { border-color: var(--accent); color: var(--text); }
+.btn-chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+/* Panchanga Bar */
+.panchang-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px;
+}
+.panchang-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px;
+}
+.panchang-item {
+  display: flex; flex-direction: column; gap: 2px;
+  border-left: 2px solid var(--accent); padding-left: 10px;
+}
+.panchang-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); }
+.panchang-val { font-size: 0.98rem; color: var(--text); }
+.panchang-sub { font-size: 0.8rem; color: var(--muted); }
+
+/* Charts Layout */
+.chart-toolbar {
+  display: flex; justify-content: flex-end; align-items: center; margin-bottom: 16px;
+}
+.chart-style-toggle {
+  display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted);
+}
+.vedic-charts-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;
+}
+.chart-card {
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.chart-header { width: 100%; text-align: center; margin-bottom: 12px; }
+.chart-header h3 { margin: 0; font-size: 1.15rem; color: var(--accent); }
+.chart-sub { font-size: 0.8rem; color: var(--dim); }
+
+#chart-d1, #chart-d9 {
+  width: 100%; max-width: 380px; height: auto; aspect-ratio: 1 / 1;
+  border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* North Indian SVG */
+.ni-bg { fill: var(--panel-2); }
+.ni-border { fill: none; stroke: var(--border); stroke-width: 2; }
+.ni-line { stroke: var(--border); stroke-width: 1.2; }
+.ni-diamond { fill: none; stroke: var(--border); stroke-width: 1.6; }
+.ni-sign-num {
+  font-family: var(--font-body); font-size: 12px; fill: var(--dim); font-weight: 600;
+}
+.ni-sign-num.kendra { fill: var(--accent); }
+.ni-planet {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+}
+.ni-planet.ni-lagna { font-weight: 700; fill: var(--accent); }
+.ni-title { font-size: 10px; fill: var(--dim); font-weight: 600; }
+
+/* South Indian SVG */
+.si-bg { fill: var(--panel-2); }
+.si-border { fill: none; stroke: var(--border); stroke-width: 2; }
+.si-line { stroke: var(--border); stroke-width: 1.2; }
+.si-center { fill: var(--panel); stroke: var(--border); stroke-width: 1; }
+.si-center-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; fill: var(--accent); }
+.si-center-sub { font-family: var(--font-body); font-size: 11px; fill: var(--muted); }
+.si-sign-label { font-family: var(--font-body); font-size: 10px; fill: var(--dim); font-weight: 500; }
+.si-sign-label.is-lagna { fill: var(--accent); font-weight: 700; }
+.si-lagna-slash { stroke: var(--accent); stroke-width: 2; }
+.si-planet { font-family: var(--font-mono); font-size: 11px; font-weight: 500; }
+.si-lagna-text { fill: var(--accent); font-weight: 700; }
+
+/* Vimshottari Dasha Tree */
+.dasha-overview { margin-bottom: 16px; }
+.dasha-summary-card {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px;
+}
+.dasha-summary-card div { display: flex; flex-direction: column; gap: 2px; }
+.dasha-meta-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--dim); }
+.dasha-active-badge { border-left: 2px solid var(--accent); padding-left: 10px; }
+.dasha-current-text { color: var(--accent); font-size: 1.05rem; }
+
+.dasha-tree { display: flex; flex-direction: column; gap: 8px; }
+.dasha-node {
+  border: 1px solid var(--border); border-radius: 8px; background: var(--panel);
+  overflow: hidden; transition: border-color 0.15s ease;
+}
+.dasha-node.active { border-color: var(--accent); box-shadow: 0 0 10px rgba(224, 179, 90, 0.12); }
+.dasha-node.past { opacity: 0.85; }
+.dasha-node-summary {
+  display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+  cursor: pointer; user-select: none; font-size: 0.92rem;
+}
+.dasha-node-summary:hover { background: var(--panel-2); }
+.dasha-node-summary.sub { padding: 8px 12px; font-size: 0.88rem; background: var(--panel-2); }
+.dasha-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; border: 1px solid transparent;
+}
+.dasha-badge.small { font-size: 0.72rem; padding: 1px 6px; }
+.dasha-period-name { min-width: 140px; }
+.dasha-dates { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; flex: 1; }
+.dasha-status-tag {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
+  padding: 2px 6px; border-radius: 4px;
+}
+.dasha-status-tag.active { background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent); }
+.dasha-status-tag.past { color: var(--dim); }
+.dasha-status-tag.future { color: var(--muted); }
+
+.dasha-children { padding: 8px 12px 12px 28px; display: flex; flex-direction: column; gap: 6px; }
+.dasha-children.sub { padding: 6px 8px 10px 20px; }
+
+/* Pratyantardasha Grid */
+.pd-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; margin-top: 6px;
+}
+.pd-item {
+  display: flex; flex-direction: column; gap: 2px; padding: 6px 8px;
+  border: 1px solid var(--border); border-radius: 6px; background: var(--panel); font-size: 0.8rem;
+}
+.pd-item.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.pd-dates { color: var(--dim); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.pd-active-dot { color: var(--accent); font-size: 0.75rem; font-weight: 700; }
+

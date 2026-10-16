@@ -10,17 +10,22 @@ use crate::frames::Orientation;
 use crate::pyfloat;
 use crate::time::Time;
 
+/// Position and kinematic state of a celestial body or astrological point.
 #[derive(Debug, Clone, PartialEq)]
 pub struct BodyPosition {
+    /// Common name of the body (e.g. "Sun", "Moon", "Mars").
     pub name: &'static str,
+    /// Astronomical or astrological glyph symbol (e.g. "☉", "☽").
     pub symbol: &'static str,
     /// Degrees, tropical or sidereal as requested.
     pub longitude: f64,
+    /// Ecliptic latitude in degrees.
     pub latitude: f64,
-    /// au
+    /// Distance from Earth center in astronomical units (au).
     pub distance: f64,
-    /// Degrees per day.
+    /// Daily apparent motion speed in degrees per day.
     pub speed: f64,
+    /// Whether the body is currently in retrograde motion.
     pub is_retrograde: bool,
 }
 
@@ -46,6 +51,7 @@ pub fn require_kernel(kernels: &KernelSet, jd: f64) -> Result<&Kernel, EngineErr
     })
 }
 
+/// A collection of computed celestial body positions.
 pub struct Planets {
     /// Bodies that could not be computed (e.g. Chiron outside its table) are left out.
     pub bodies: Vec<BodyPosition>,

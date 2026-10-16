@@ -9,20 +9,33 @@ use std::f64::consts::PI;
 
 use crate::pyfloat;
 
+/// Supported astrological house systems.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum HouseSystem {
+    /// Placidus semi-arc system.
     Placidus,
+    /// Koch birthplace system.
     Koch,
+    /// Regiomontanus rational house system.
     Regiomontanus,
+    /// Campanus prime vertical system.
     Campanus,
+    /// Topocentric time-based system.
     Topocentric,
+    /// Alcabitius semi-arc system.
     Alcabitius,
+    /// Morinus equatorial system.
     Morinus,
+    /// Porphyry quadrant trisecting system.
     Porphyry,
+    /// Equal houses from Ascendant.
     Equal,
+    /// Vehlow equal house system with Ascendant at midpoint of 1st house.
     Vehlow,
+    /// Whole Sign house system (standard in Hellenistic and Vedic Rashi charts).
     WholeSign,
+    /// Sripati house system (traditional Indian Bhava Chalita).
     Sripati,
 }
 
@@ -47,11 +60,14 @@ impl HouseSystem {
     }
 }
 
+/// The calculated astrological houses and chart angles.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Houses {
     /// Cusps 1-12, degrees.
     pub cusps: [f64; 12],
+    /// Ascendant ecliptic longitude in degrees.
     pub ascendant: f64,
+    /// Midheaven (Medium Coeli) ecliptic longitude in degrees.
     pub midheaven: f64,
 }
 
