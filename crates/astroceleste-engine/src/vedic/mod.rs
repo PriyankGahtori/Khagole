@@ -3,6 +3,7 @@
 pub mod dasha;
 pub mod divisional;
 pub mod nakshatra;
+pub mod panchang;
 
 pub use dasha::{calc_vimshottari_dasha, DashaNode, YearType};
 pub use divisional::{
@@ -10,3 +11,6 @@ pub use divisional::{
     DivisionalPosition,
 };
 pub use nakshatra::{nakshatra_info, NakshatraInfo};
+pub use panchang::{
+    calc_panchang, KaranaInfo, PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YogaInfo,
+};

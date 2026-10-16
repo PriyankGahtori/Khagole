@@ -25,14 +25,14 @@ pub const NAKSHATRA_SPAN: f64 = 360.0 / 27.0;
 pub const PADA_SPAN: f64 = 360.0 / 108.0;
 
 /// Information about a nakshatra placement.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NakshatraInfo {
     /// 0-based index of the nakshatra (0..26).
     pub index: usize,
     /// Name of the nakshatra (Ashwini..Revati).
-    pub name: &'static str,
+    pub name: String,
     /// Vimshottari lord of the nakshatra (Ketu..Mercury).
-    pub lord: &'static str,
+    pub lord: String,
     /// Pada (quarter) of the nakshatra (1..4).
     pub pada: u8,
 }
@@ -45,8 +45,8 @@ pub fn nakshatra_info(lon: f64) -> NakshatraInfo {
 
     NakshatraInfo {
         index,
-        name: NAKSHATRAS[index],
-        lord: NAKSHATRA_LORDS[index],
+        name: NAKSHATRAS[index].to_string(),
+        lord: NAKSHATRA_LORDS[index].to_string(),
         pada,
     }
 }
