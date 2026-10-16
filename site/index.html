@@ -18,12 +18,8 @@
     <div class="wrap topbar-inner">
       <a class="brand" href="#top" aria-label="AstroCeleste home">
         <img src="favicon.svg" alt="" width="26" height="26">
-        <span>AstroCeleste <span class="brand-badge">WASM · DE440s</span></span>
+        <span>AstroCeleste <span class="brand-badge">Vedic Jyotish · DE440s</span></span>
       </a>
-      <div class="mode-switcher" role="tablist" aria-label="Astrology System">
-        <button type="button" id="tab-vedic" class="tab-btn active" role="tab" aria-selected="true">🪔 Vedic Kundli</button>
-        <button type="button" id="tab-western" class="tab-btn" role="tab" aria-selected="false">🌐 Western Wheel</button>
-      </div>
       <nav aria-label="Main">
         <a href="#features">Features</a>
         <a href="#about">About</a>
@@ -41,7 +37,7 @@
             <span class="hero-eyebrow">NASA JPL DE440s · Pure Rust WebAssembly · Sub-Arcsecond Precision</span>
             <h1>Vedic Chart &amp; Vimshottari Dasha Engine</h1>
             <p class="hero-lede">
-              Compute D1 (Rasi) &amp; D9 (Navamsha) divisional charts, Panchanga five limbs, and True Sidereal Solar Year (TSSY) Vimshottari dasha in under 2ms — computed 100% on your device with complete privacy.
+              Compute D1 (Rashi) &amp; D9 (Navamsha) divisional charts, Panchanga five limbs, and True Sidereal Solar Year (TSSY) Vimshottari dasha in under 2ms — computed 100% on your device with complete privacy.
             </p>
           </div>
         </div>
@@ -54,9 +50,8 @@
               <div class="presets-chips">
                 <button type="button" class="preset-chip active" data-preset="delhi">📍 New Delhi (Now)</button>
                 <button type="button" class="preset-chip" data-preset="modi">👑 Narendra Modi (1950)</button>
-                <button type="button" class="preset-chip" data-preset="now">⏱️ Greenwich (Now)</button>
-                <button type="button" class="preset-chip" data-preset="rome">🏛️ Rome (1987)</button>
-                <button type="button" class="preset-chip" data-preset="y2k">🌐 Y2K (2000)</button>
+                <button type="button" class="preset-chip" data-preset="ujjain">🔱 Ujjain (Avantika)</button>
+                <button type="button" class="preset-chip" data-preset="varanasi">🪔 Varanasi (Kashi)</button>
               </div>
             </div>
 
@@ -204,56 +199,6 @@
                   </select>
                 </label>
 
-                <!-- Western specific fields -->
-                <label class="western-field" hidden>
-                  <span class="field-label">Houses</span>
-                  <select name="house_system">
-                    <option value="W" selected>Whole Sign</option>
-                    <option value="P">Placidus</option>
-                    <option value="E">Equal</option>
-                    <option value="K">Koch</option>
-                    <option value="R">Regiomontanus</option>
-                    <option value="C">Campanus</option>
-                    <option value="T">Topocentric</option>
-                    <option value="B">Alcabitius</option>
-                    <option value="M">Morinus</option>
-                    <option value="O">Porphyry</option>
-                    <option value="V">Vehlow</option>
-                  </select>
-                </label>
-                <label class="western-field" hidden>
-                  <span class="field-label">Zodiac</span>
-                  <select name="zodiac_type">
-                    <option value="sidereal" selected>Sidereal</option>
-                    <option value="tropical">Tropical</option>
-                  </select>
-                </label>
-                <label class="western-field span-2" hidden>
-                  <span class="field-label">Ayanamsa <small>(sidereal)</small></span>
-                  <select name="ayanamsa">
-                    <option value="lahiri" selected>Lahiri (Chitra Paksha)</option>
-                    <option value="fagan_bradley">Fagan-Bradley</option>
-                    <option value="krishnamurti">Krishnamurti (KP)</option>
-                    <option value="raman">B.V. Raman</option>
-                    <option value="true_citra">True Chitra</option>
-                    <option value="yukteshwar">Sri Yukteswar</option>
-                    <option value="deluce">De Luce</option>
-                    <option value="ushashashi">Usha-Shashi</option>
-                    <option value="jn_bhasin">J.N. Bhasin</option>
-                    <option value="aldebaran_15tau">Aldebaran 15° Taurus</option>
-                    <option value="hipparchos">Hipparchos</option>
-                    <option value="sassanian">Sassanian</option>
-                    <option value="galcent_0sag">Galactic Center 0° Sagittarius</option>
-                    <option value="j2000">J2000.0 Epoch</option>
-                  </select>
-                </label>
-                <label class="western-field span-2" hidden>
-                  <span class="field-label">Dignities <small>(triplicities and bounds)</small></span>
-                  <select name="dignity_scheme">
-                    <option value="lilly" selected>Lilly (Ptolemaic terms)</option>
-                    <option value="dorothean">Dorothean (Egyptian bounds)</option>
-                  </select>
-                </label>
               </div>
             </details>
 
@@ -314,27 +259,6 @@
               <pre id="vedic-json"></pre>
             </details>
           </div>
-
-          <!-- Western Results View -->
-          <div id="result" class="result" hidden>
-            <div class="panel wheel-panel">
-              <svg id="wheel" viewBox="0 0 400 400" role="img" aria-label="Chart wheel"></svg>
-              <dl id="summary" class="summary"></dl>
-            </div>
-            <div class="panel tables">
-              <h3>Planets and points</h3>
-              <div class="table-scroll"><table id="planets"></table></div>
-              <h3>Houses</h3>
-              <div class="table-scroll"><table id="houses"></table></div>
-              <h3>Aspects</h3>
-              <div class="table-scroll tall"><table id="aspects"></table></div>
-              <details class="raw">
-                <summary>Raw JSON <small>(the same JSON as Rust and Python)</small></summary>
-                <button type="button" id="copy-json" class="button small">Copy</button>
-                <pre id="json"></pre>
-              </details>
-            </div>
-          </div>
         </div>
     </section>
 
@@ -343,7 +267,7 @@
       <div class="wrap">
         <h2>One engine, three languages</h2>
         <p class="section-lede">
-          The Rust crate, the Python wheel and the npm package share one core and one version.
+          The Rust crate, the Python package and the npm package share one core and one version.
           Their results are the same JSON, down to the key order.
         </p>
         <div class="code-grid">
@@ -351,14 +275,18 @@
             <figcaption>Rust</figcaption>
 <pre><code>use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
 use astroceleste_engine::{calculate_chart, ChartRequest, UtcInstant};
+use astroceleste_engine::vedic::{calculate_divisional, calculate_panchang};
 
 let mut kernels = KernelSet::new();
 kernels.push(Kernel::new("de440s.bsp",
     Spk::open("kernels/de440s.bsp")?)?);
 
-let request = ChartRequest::new(
-    UtcInstant::parse("1987-05-17T14:30:00Z")?, 41.9, 12.5);
-let chart = calculate_chart(&amp;kernels, &amp;request)?;</code></pre>
+let mut req = ChartRequest::new(
+    UtcInstant::parse("1950-09-17T04:04:00Z")?, 23.784, 72.636);
+req.zodiac_type = "sidereal".into();
+req.ayanamsa = "lahiri".into();
+let chart = calculate_chart(&amp;kernels, &amp;req)?;
+let d1 = calculate_divisional(&amp;chart, chart.houses[0].ecliptic_longitude, "D1")?;</code></pre>
           </figure>
           <figure class="code-card">
             <figcaption>Python</figcaption>
@@ -366,16 +294,17 @@ let chart = calculate_chart(&amp;kernels, &amp;request)?;</code></pre>
 
 engine = ace.Engine(["de440s.bsp"])
 chart = engine.chart(
-    "1987-05-17T14:30:00Z", 41.9, 12.5,
-    house_system="P",
+    "1950-09-17T04:04:00Z", 23.784, 72.636,
+    house_system="W",
     zodiac_type="sidereal",
     ayanamsa="lahiri",
 )
-chart["planets"][0]["sign"]   # 'Taurus'</code></pre>
+d1 = ace.calc_divisional(chart, chart["houses"][0]["ecliptic_longitude"], "D1")
+d1["lagna"]["sign"]   # 'Scorpio'</code></pre>
           </figure>
           <figure class="code-card">
             <figcaption>JavaScript</figcaption>
-<pre><code>import init, { Engine } from "astroceleste-engine";
+<pre><code>import init, { Engine, calcDivisional, calcPanchang } from "astroceleste-engine";
 
 await init();
 const engine = new Engine();
@@ -384,9 +313,11 @@ engine.addKernel("de440s.bsp",
   new Uint8Array(await res.arrayBuffer()));
 
 const chart = engine.chart({
-  utc: "1987-05-17T14:30:00Z",
-  latitude: 41.9, longitude: 12.5,
-});</code></pre>
+  utc: "1950-09-17T04:04:00Z",
+  latitude: 23.784, longitude: 72.636,
+  zodiac_type: "sidereal", ayanamsa: "lahiri"
+});
+const d1 = calcDivisional(chart, chart.houses[0].ecliptic_longitude, "D1");</code></pre>
           </figure>
         </div>
       </div>
@@ -397,8 +328,8 @@ const chart = engine.chart({
         <h2>What it computes</h2>
         <div class="feature-grid">
           <article>
-            <h3>🪔 Vedic Jyotish &amp; Divisional Vargas</h3>
-            <p>Computes D1 (Rasi), D9 (Navamsha), and all 16 Shodashavarga charts (D2 to D60). Rendered in high-contrast North Indian (diamond) and South Indian (box) SVGs with Kendra fills and Lagna highlights.</p>
+            <h3>🪔 Vedic Kundli &amp; Divisional Vargas</h3>
+            <p>Computes D1 (Rashi), D9 (Navamsha), and all 16 Shodashavarga charts (D2 to D60). Rendered in high-contrast North Indian (diamond) and South Indian (box) SVGs with Kendra fills and Lagna highlights.</p>
           </article>
           <article>
             <h3>⏳ Vimshottari Dasha (Canonical TSSY)</h3>
@@ -413,36 +344,20 @@ const chart = engine.chart({
             <p>Search any city across the globe with instant autocomplete geocoding. Automatically derives latitude, longitude, and historical/daylight-saving UTC timezone offsets.</p>
           </article>
           <article>
-            <h3>Planets and points</h3>
-            <p>Sun to Pluto, the lunar nodes, Chiron and Black Moon Lilith, with speed and retrograde status, and the Ascendant and Midheaven.</p>
+            <h3>🪐 Navagrahas &amp; Lagna Precision</h3>
+            <p>Surya to Ketu, outer planets, with instantaneous daily speed and retrograde status (Vakri), and exact Ascendant (Lagna) degrees from JPL DE440s ephemerides.</p>
           </article>
           <article>
-            <h3>Houses</h3>
-            <p>Eleven house systems (Placidus, Koch, Regiomontanus, Campanus, Topocentric, Alcabitius, Morinus, Porphyry, Equal, Vehlow, Whole Sign) and the house of every point.</p>
+            <h3>🏛️ Vedic House Systems</h3>
+            <p>Whole Sign (Rashi Bhava) standard Parashari, traditional Sripati (Bhava Chalita), Equal House, and cuspal systems with exact planet-to-house mappings.</p>
           </article>
           <article>
-            <h3>Tropical and sidereal</h3>
-            <p>14 ayanamsas, including Chitrapaksha Lahiri (canonical Vedic default), True Chitra, Fagan-Bradley, Krishnamurti, Raman, and Galactic Center.</p>
+            <h3>☸️ Canonical Vedic Ayanamsas</h3>
+            <p>Supports Chitrapaksha Lahiri (standard Vedic default), True Chitra / Invariable Plane, B.V. Raman, Krishnamurti (KP), Sri Yukteswar, and Fagan-Bradley.</p>
           </article>
           <article>
-            <h3>Aspects and orbs</h3>
-            <p>The five major aspects plus semi-sextile and quincunx, with configurable orbs and moiety methods.</p>
-          </article>
-          <article>
-            <h3>Fixed stars and lots</h3>
-            <p>Fixed-star conjunctions with precession, and the Arabic parts with day and night formulas.</p>
-          </article>
-          <article>
-            <h3>Temperament and Moon</h3>
-            <p>Traditional temperament from the primary qualities, and the lunar phase, illumination, dignity and mansion.</p>
-          </article>
-          <article>
-            <h3>Horary &amp; Elections</h3>
-            <p>Planetary day and hour from actual sunrise and sunset, significators, void of course Moon, considerations before judgment, and electional window searches.</p>
-          </article>
-          <article>
-            <h3>Chinese Astrology</h3>
-            <p>Solar terms, lunar and leap months; the Four Pillars on true solar time with Ten Gods and luck pillars; and the Zi Wei Dou Shu chart with its stars and transformations.</p>
+            <h3>📐 Classical Parashari Standards</h3>
+            <p>Mean nodes (Rahu/Ketu strictly 180° opposite), geometric true ephemeris positions, and exact Moon-longitude Mahadasha balance at birth.</p>
           </article>
         </div>
       </div>

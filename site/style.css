@@ -19,7 +19,24 @@
   --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "DejaVu Sans Mono", monospace;
   --font-glyph: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols", "Noto Sans Symbols 2", "DejaVu Sans", sans-serif;
-  --chart-halo: rgba(11, 16, 32, 0.9);
+  --chart-bg: #0d0a1e;
+  --chart-table-bg: #100c22;
+  --chart-border: #5b4a9c;
+  --chart-cell-border: #493a80;
+  --chart-sub-border: #5b4a9c;
+  --chart-lagna-bg: rgba(217, 119, 6, 0.14);
+  --chart-lagna-text: #f59e0b;
+  --chart-center-bg: #100c22;
+  --chart-center-border: #4a3880;
+  --chart-text: #e9d5ff;
+  --chart-muted: #a78bfa;
+  --chart-corner-bg: #1e1840;
+  --chart-axis-bg: #18122e;
+  --chart-dasha-highlight: #2d2460;
+  --chart-halo: rgba(13, 10, 30, 0.95);
+  --dasha-current-bg: #2e1800;
+  --dasha-current-text: #fcd34d;
+  --dasha-current-accent: #f59e0b;
   color-scheme: dark;
 }
 
@@ -40,7 +57,23 @@
     --hard: #c93c3c;
     --neutral: #8a6d1f;
     --star: transparent;
-    --chart-halo: rgba(255, 255, 255, 0.95);
+    --chart-bg: #fdf9f3;
+    --chart-table-bg: #fafafa;
+    --chart-border: #9c8560;
+    --chart-cell-border: #c2ab84;
+    --chart-sub-border: #9c8560;
+    --chart-lagna-bg: #fef9e7;
+    --chart-lagna-text: #b45309;
+    --chart-center-bg: #fdf9f3;
+    --chart-center-border: #9c8560;
+    --chart-text: #3d2010;
+    --chart-muted: #8a6848;
+    --chart-corner-bg: #f5f0e8;
+    --chart-axis-bg: #f8f4ee;
+    --chart-halo: rgba(253, 249, 243, 0.95);
+    --dasha-current-bg: #fef9e7;
+    --dasha-current-text: #b45309;
+    --dasha-current-accent: #d97706;
     color-scheme: light;
   }
 }
@@ -217,14 +250,6 @@ select:disabled { opacity: 0.55; }
 .progress { display: block; height: 4px; margin-top: 6px; border-radius: 2px; background: var(--border); overflow: hidden; }
 .progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 0.15s; }
 
-.result { display: grid; gap: 24px; min-width: 0; }
-.wheel-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 220px); gap: 20px; align-items: center; }
-#wheel { width: 100%; height: auto; max-width: 440px; margin: 0 auto; display: block; }
-.summary { margin: 0; display: grid; gap: 12px; }
-.summary div { border-left: 2px solid var(--accent); padding-left: 10px; }
-.summary dt { color: var(--dim); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; }
-.summary dd { margin: 0; }
-
 .tables h3 { margin-top: 24px; }
 .tables h3:first-child { margin-top: 0; }
 .table-scroll { overflow-x: auto; }
@@ -248,27 +273,6 @@ td.num { text-align: right; }
   margin: 0; max-height: 420px; overflow: auto; padding: 12px;
   background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px; font-size: 0.8rem;
 }
-
-/* Wheel (SVG) */
-.w-ring { fill: none; stroke: var(--border); stroke-width: 1; }
-.w-zodiac { fill: var(--panel-2); stroke: var(--border); }
-.w-sign-line { stroke: var(--border); }
-.w-sign { fill: var(--muted); font-family: var(--font-glyph); font-size: 15px; text-anchor: middle; dominant-baseline: central; }
-.w-sign.fire { fill: #e0795a; }
-.w-sign.earth { fill: #8fae5c; }
-.w-sign.air { fill: #d6b64f; }
-.w-sign.water { fill: #5f9fd6; }
-.w-cusp { stroke: var(--dim); stroke-width: 0.8; }
-.w-axis { stroke: var(--accent); stroke-width: 1.6; }
-.w-house-num { fill: var(--dim); font-size: 9px; text-anchor: middle; dominant-baseline: central; font-family: var(--font-body); }
-.w-tick { stroke: var(--text); stroke-width: 1; }
-.w-leader { stroke: var(--dim); stroke-width: 0.6; }
-.w-planet { fill: var(--text); font-family: var(--font-glyph); font-size: 15px; text-anchor: middle; dominant-baseline: central; }
-.w-planet.angle { fill: var(--accent); font-family: var(--font-body); font-size: 9px; font-weight: 700; }
-.w-aspect { stroke-width: 1; opacity: 0.8; }
-.w-aspect.harmonious { stroke: var(--harmonious); }
-.w-aspect.hard { stroke: var(--hard); }
-.w-aspect.minor { stroke-dasharray: 3 3; opacity: 0.6; }
 
 /* Code cards */
 .code-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
@@ -317,7 +321,6 @@ td.num { text-align: right; }
   .topbar nav a:nth-child(2) { display: none; }
   .hero { padding: 40px 0 32px; }
   .section { padding: 40px 0; }
-  .wheel-panel { grid-template-columns: minmax(0, 1fr); }
   .feature-grid, .link-grid { grid-template-columns: minmax(0, 1fr); }
   .form-hero-grid { grid-template-columns: 1fr; }
   .btn-group { grid-column: 1; }
@@ -349,19 +352,6 @@ td.num { text-align: right; }
 
 /* ---------------------------------------------------------------------------- Vedic Styles */
 .demo-header { margin-bottom: 24px; }
-.mode-switcher {
-  display: inline-flex; gap: 6px; padding: 3px; border-radius: 10px;
-  background: var(--panel-2); border: 1px solid var(--border);
-}
-.tab-btn {
-  font: inherit; font-size: 0.88rem; font-weight: 500; padding: 6px 14px; border-radius: 6px;
-  border: none; background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s ease;
-}
-.tab-btn:hover { color: var(--text); }
-.tab-btn.active {
-  background: var(--panel); color: var(--accent); font-weight: 600;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.2); border: 1px solid var(--border);
-}
 
 /* City Search, Geocoding Autocomplete & Location Badge (Google Material 3) */
 .city-search-section {
@@ -745,67 +735,63 @@ td.num { text-align: right; }
 .planets-panel-header h3 { margin: 0; font-size: 1.15rem; color: var(--text); }
 .planets-panel-sub { font-size: 0.78rem; color: var(--dim); }
 
-/* North Indian SVG - High Legibility & Halo effect */
-.ni-bg { fill: var(--panel-2); }
-.ni-border { fill: none; stroke: var(--border); stroke-width: 2.2; }
-.ni-line { stroke: color-mix(in srgb, var(--border) 80%, transparent); stroke-width: 1.4; }
-.ni-diamond { fill: none; stroke: var(--border); stroke-width: 1.8; }
-.ni-kendra-fill {
-  fill: color-mix(in srgb, var(--accent) 9%, var(--panel-2));
+/* hora-prakash Chart Geometry & Visual Styling */
+.ni-bg, .si-bg { fill: var(--chart-bg); }
+.ni-border, .si-border { fill: none; stroke: var(--chart-border); stroke-width: 2.5; }
+.ni-border-inset, .si-border-inset { fill: none; stroke: var(--chart-border); stroke-width: 1.2; }
+.ni-line, .si-line { stroke: var(--chart-cell-border); stroke-width: 1.5; }
+.ni-diamond { fill: none; stroke: var(--chart-cell-border); stroke-width: 1.6; }
+.ni-kendra-fill, .si-kendra-fill, .si-lagna-cell-fill {
+  fill: var(--chart-lagna-bg);
 }
 .ni-sign-num {
-  font-family: var(--font-body); font-size: 14.5px; fill: var(--muted); font-weight: 700;
+  font-family: var(--font-body); font-size: 14.5px; fill: var(--chart-muted); font-weight: 700;
   user-select: none;
   paint-order: stroke fill; stroke: var(--chart-halo); stroke-width: 2px;
 }
-.ni-sign-num.kendra { fill: var(--accent); font-size: 15.5px; font-weight: 800; }
+.ni-sign-num.kendra { fill: var(--chart-lagna-text); font-size: 15.5px; font-weight: 800; }
 .ni-planet {
   font-family: var(--font-mono); font-size: 13.5px; font-weight: 700;
   cursor: default; user-select: none;
   letter-spacing: -0.01em;
   paint-order: stroke fill; stroke: var(--chart-halo); stroke-width: 2.4px; stroke-linejoin: round;
 }
-.ni-planet.retro { font-weight: 800; fill: #f87171 !important; }
-.ni-planet.ni-lagna { font-weight: 800; fill: var(--accent); font-size: 13px; }
+.ni-planet.retro { font-weight: 800; fill: #ef4444 !important; }
+.ni-planet.ni-lagna { font-weight: 800; fill: var(--chart-lagna-text); font-size: 13px; }
 .ni-lagna-badge-bg {
-  fill: color-mix(in srgb, var(--accent) 24%, var(--panel-2));
-  stroke: color-mix(in srgb, var(--accent) 70%, transparent);
+  fill: var(--chart-lagna-bg);
+  stroke: var(--chart-lagna-text);
   stroke-width: 1.2;
 }
-.ni-title { font-size: 12px; fill: var(--dim); font-weight: 700; font-family: var(--font-body); }
+.ni-title { font-size: 12px; fill: var(--chart-muted); font-weight: 700; font-family: var(--font-body); }
 
-/* South Indian SVG - High Legibility & Halo effect */
-.si-bg { fill: var(--panel-2); }
-.si-border { fill: none; stroke: var(--border); stroke-width: 2.2; }
-.si-line { stroke: color-mix(in srgb, var(--border) 80%, transparent); stroke-width: 1.4; }
-.si-center { fill: var(--panel); stroke: var(--border); stroke-width: 1.2; }
-.si-center-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; fill: var(--accent); }
-.si-center-sub { font-family: var(--font-body); font-size: 12.5px; fill: var(--muted); }
-.si-kendra-fill {
-  fill: color-mix(in srgb, var(--accent) 7%, var(--panel-2));
-}
+/* South Indian SVG - hora-prakash Styling */
+.si-center { fill: var(--chart-center-bg); stroke: var(--chart-center-border); stroke-width: 1.5; }
+.si-center-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; fill: var(--chart-lagna-text); }
+.si-center-sub { font-family: var(--font-body); font-size: 13px; font-weight: 500; fill: var(--chart-muted); }
+.si-cell-divider { stroke: var(--chart-cell-border); stroke-width: 0.8; }
 .si-sign-label {
-  font-family: var(--font-body); font-size: 12.5px; fill: var(--dim); font-weight: 700; user-select: none;
+  font-family: var(--font-body); font-size: 12.5px; fill: var(--chart-text); font-weight: 700; user-select: none;
   paint-order: stroke fill; stroke: var(--chart-halo); stroke-width: 2px;
 }
-.si-sign-label.is-lagna { fill: var(--accent); font-weight: 800; font-size: 13.5px; }
+.si-sign-label.is-lagna { fill: var(--chart-lagna-text); font-weight: 800; font-size: 13.5px; }
 .si-house-tag {
-  font-family: var(--font-mono); font-size: 11.5px; fill: var(--dim); font-weight: 700; user-select: none;
+  font-family: var(--font-mono); font-size: 12px; fill: var(--chart-muted); font-weight: 700; user-select: none;
   paint-order: stroke fill; stroke: var(--chart-halo); stroke-width: 2px;
 }
-.si-house-tag.kendra { fill: var(--accent); font-weight: 800; }
-.si-lagna-slash { stroke: var(--accent); stroke-width: 2.5; }
+.si-house-tag.kendra { fill: var(--chart-lagna-text); font-weight: 800; }
+.si-lagna-slash { stroke: var(--chart-lagna-text); stroke-width: 2.4; }
 .si-planet {
   font-family: var(--font-mono); font-size: 13px; font-weight: 700; cursor: default;
   letter-spacing: -0.01em; user-select: none;
   paint-order: stroke fill; stroke: var(--chart-halo); stroke-width: 2.4px; stroke-linejoin: round;
 }
-.si-planet.retro { font-weight: 800; fill: #f87171 !important; }
-.si-lagna-text { fill: var(--accent); font-weight: 800; font-size: 13px; }
+.si-planet.retro { font-weight: 800; fill: #ef4444 !important; }
+.si-lagna-text { fill: var(--chart-lagna-text); font-weight: 800; font-size: 13px; }
 .si-lagna-badge-bg {
-  fill: color-mix(in srgb, var(--accent) 24%, var(--panel-2));
-  stroke: color-mix(in srgb, var(--accent) 60%, transparent);
-  stroke-width: 1;
+  fill: var(--chart-lagna-bg);
+  stroke: var(--chart-lagna-text);
+  stroke-width: 1.2;
 }
 
 /* Vimshottari Dasha Enhanced Styles */

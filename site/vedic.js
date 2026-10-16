@@ -19,22 +19,22 @@ export const VEDIC_SIGNS = [
 
 export const PLANET_INFO = {
   Ascendant: { abbr: "Asc", sa: "Lagna", sym: "Asc", color: "#f59e0b" },
-  Sun: { abbr: "Su", sa: "Surya", sym: "☉", color: "#fbbf24" },
-  Moon: { abbr: "Mo", sa: "Chandra", sym: "☽", color: "#f8fafc" },
-  Mars: { abbr: "Ma", sa: "Mangala", sym: "♂", color: "#f87171" },
-  Mercury: { abbr: "Me", sa: "Budha", sym: "☿", color: "#34d399" },
-  Jupiter: { abbr: "Ju", sa: "Guru", sym: "♃", color: "#fde047" },
-  Venus: { abbr: "Ve", sa: "Shukra", sym: "♀", color: "#f472b6" },
-  Saturn: { abbr: "Sa", sa: "Shani", sym: "♄", color: "#93c5fd" },
-  "North Node": { abbr: "Ra", sa: "Rahu", sym: "☊", color: "#c084fc" },
-  "South Node": { abbr: "Ke", sa: "Ketu", sym: "☋", color: "#fb923c" },
+  Sun: { abbr: "Su", sa: "Surya", sym: "☉", color: "#f59e0b" },
+  Moon: { abbr: "Mo", sa: "Chandra", sym: "☽", color: "#6366f1" },
+  Mars: { abbr: "Ma", sa: "Mangala", sym: "♂", color: "#ef4444" },
+  Mercury: { abbr: "Me", sa: "Budha", sym: "☿", color: "#10b981" },
+  Jupiter: { abbr: "Ju", sa: "Guru", sym: "♃", color: "#f97316" },
+  Venus: { abbr: "Ve", sa: "Shukra", sym: "♀", color: "#ec4899" },
+  Saturn: { abbr: "Sa", sa: "Shani", sym: "♄", color: "#64748b" },
+  "North Node": { abbr: "Ra", sa: "Rahu", sym: "☊", color: "#7c3aed" },
+  "South Node": { abbr: "Ke", sa: "Ketu", sym: "☋", color: "#0891b2" },
   Uranus: { abbr: "Ur", sa: "Uranus", sym: "♅", color: "#38bdf8" },
   Neptune: { abbr: "Ne", sa: "Neptune", sym: "♆", color: "#818cf8" },
   Pluto: { abbr: "Pl", sa: "Pluto", sym: "♇", color: "#e879f9" },
 };
 
 export const VARGA_LIST = [
-  { code: "D1", name: "D1 · Rasi (Radix)", desc: "Physical Body & General Destiny" },
+  { code: "D1", name: "D1 · Rashi", desc: "Physical Body & General Destiny" },
   { code: "D2", name: "D2 · Hora", desc: "Wealth, Finances & Prosperity" },
   { code: "D3", name: "D3 · Drekkana", desc: "Siblings, Courage & Vitality" },
   { code: "D4", name: "D4 · Chaturthamsa", desc: "Home, Real Estate & Fortune" },
@@ -229,23 +229,24 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
     return el;
   };
 
-  // Background and outer border
-  add("rect", { x: 0, y: 0, width: W, height: H, class: "ni-bg" });
-  add("rect", { x: 2, y: 2, width: W - 4, height: H - 4, class: "ni-border" });
+  // Background and Double outer frame (matching hora-prakash)
+  add("rect", { x: 0, y: 0, width: W, height: H, rx: 4, class: "ni-bg" });
+  add("rect", { x: 1.5, y: 1.5, width: W - 3, height: H - 3, rx: 4, class: "ni-border" });
+  add("rect", { x: 6, y: 6, width: W - 12, height: H - 12, rx: 2, class: "ni-border-inset" });
 
   // Kendra house subtle elevation fills (1, 4, 7, 10)
-  add("polygon", { points: "200,0 300,100 200,200 100,100", class: "ni-kendra-fill" });
-  add("polygon", { points: "0,200 100,100 200,200 100,300", class: "ni-kendra-fill" });
-  add("polygon", { points: "200,200 300,300 200,400 100,300", class: "ni-kendra-fill" });
-  add("polygon", { points: "300,100 400,200 300,300 200,200", class: "ni-kendra-fill" });
+  add("polygon", { points: `200,6 300,100 200,200 100,100`, class: "ni-kendra-fill" });
+  add("polygon", { points: `6,200 100,100 200,200 100,300`, class: "ni-kendra-fill" });
+  add("polygon", { points: `200,200 300,300 200,${H - 6} 100,300`, class: "ni-kendra-fill" });
+  add("polygon", { points: `300,100 ${W - 6},200 300,300 200,200`, class: "ni-kendra-fill" });
 
-  // Outer diagonals
-  add("line", { x1: 0, y1: 0, x2: W, y2: H, class: "ni-line" });
-  add("line", { x1: W, y1: 0, x2: 0, y2: H, class: "ni-line" });
+  // Inner diagonals connecting to inset frame
+  add("line", { x1: 6, y1: 6, x2: W - 6, y2: H - 6, class: "ni-line" });
+  add("line", { x1: W - 6, y1: 6, x2: 6, y2: H - 6, class: "ni-line" });
 
   // Inner diamond
   add("polygon", {
-    points: `200,0 ${W},200 200,${H} 0,200`,
+    points: `200,6 ${W - 6},200 200,${H - 6} 6,200`,
     class: "ni-diamond",
   });
 
@@ -348,9 +349,9 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
 
       if (p.is_retrograde) {
         const tspanRetro = document.createElementNS(SVG_NS, "tspan");
-        tspanRetro.setAttribute("fill", "#f87171");
+        tspanRetro.setAttribute("fill", "#ef4444");
         tspanRetro.setAttribute("font-weight", "800");
-        tspanRetro.textContent = " ℞";
+        tspanRetro.textContent = " ᴿ";
         textEl.appendChild(tspanRetro);
       }
 
@@ -394,17 +395,18 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     return el;
   };
 
-  // Background and outer border
-  add("rect", { x: 0, y: 0, width: W, height: H, class: "si-bg" });
-  add("rect", { x: 2, y: 2, width: W - 4, height: H - 4, class: "si-border" });
+  // Background and Double outer frame (matching hora-prakash)
+  add("rect", { x: 0, y: 0, width: W, height: H, rx: 4, class: "si-bg" });
+  add("rect", { x: 1.5, y: 1.5, width: W - 3, height: H - 3, rx: 4, class: "si-border" });
+  add("rect", { x: 6, y: 6, width: W - 12, height: H - 12, rx: 2, class: "si-border-inset" });
 
   const lagnaSign = divChart.lagna.sign;
   const lagnaSignObj = VEDIC_SIGNS[lagnaSign - 1];
 
   // Grid lines
   for (let i = 1; i < 4; i++) {
-    add("line", { x1: 0, y1: i * CELL, x2: W, y2: i * CELL, class: "si-line" });
-    add("line", { x1: i * CELL, y1: 0, x2: i * CELL, y2: H, class: "si-line" });
+    add("line", { x1: 6, y1: i * CELL, x2: W - 6, y2: i * CELL, class: "si-line" });
+    add("line", { x1: i * CELL, y1: 6, x2: i * CELL, y2: H - 6, class: "si-line" });
   }
 
   // Clear center (2x2)
@@ -413,6 +415,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     y: CELL + 1,
     width: CELL * 2 - 2,
     height: CELL * 2 - 2,
+    rx: 4,
     class: "si-center",
   });
 
@@ -455,8 +458,16 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     const houseFromLagna = ((s - lagnaSign + 12) % 12) + 1;
     const isKendra = houseFromLagna === 1 || houseFromLagna === 4 || houseFromLagna === 7 || houseFromLagna === 10;
 
-    // Kendra subtle highlight in South Indian box
-    if (isKendra) {
+    // Kendra / Lagna highlight in South Indian box
+    if (isLagna) {
+      add("rect", {
+        x: x0 + 1,
+        y: y0 + 1,
+        width: CELL - 2,
+        height: CELL - 2,
+        class: "si-lagna-cell-fill",
+      });
+    } else if (isKendra) {
       add("rect", {
         x: x0 + 1,
         y: y0 + 1,
@@ -468,9 +479,18 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
 
     // Lagna slash in corner if this is the Lagna sign
     if (isLagna) {
-      add("line", { x1: x0 + 2, y1: y0 + 2, x2: x0 + 24, y2: y0 + 24, class: "si-lagna-slash" });
-      add("line", { x1: x0 + 2, y1: y0 + 8, x2: x0 + 18, y2: y0 + 24, class: "si-lagna-slash" });
+      add("line", { x1: x0 + 2, y1: y0 + 2, x2: x0 + 22, y2: y0 + 22, class: "si-lagna-slash" });
+      add("line", { x1: x0 + 2, y1: y0 + 7, x2: x0 + 17, y2: y0 + 22, class: "si-lagna-slash" });
     }
+
+    // Horizontal divider line under header (matching hora-prakash)
+    add("line", {
+      x1: x0 + 2,
+      y1: y0 + 24,
+      x2: x0 + CELL - 2,
+      y2: y0 + 24,
+      class: "si-cell-divider",
+    });
 
     // Sign name label in cell
     const signLabel = add(
@@ -480,7 +500,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
         y: y0 + 16,
         class: `si-sign-label ${isLagna ? "is-lagna" : ""}`,
       },
-      `${signObj.sa} ${signObj.sym}`,
+      `${signObj.sa.slice(0, 3)} ${s}`,
     );
     signLabel.append(
       Object.assign(document.createElementNS(SVG_NS, "title"), {
@@ -497,7 +517,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
         class: `si-house-tag ${isKendra ? "kendra" : ""}`,
         "text-anchor": "end",
       },
-      isLagna ? "H1 (Lg)" : `H${houseFromLagna}`,
+      isLagna ? "H1 (Lg)" : `${houseFromLagna}`,
     );
     houseLabel.append(
       Object.assign(document.createElementNS(SVG_NS, "title"), {
@@ -511,7 +531,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
 
     const count = planets.length;
     const renderSiPlanet = (p, px, py) => {
-      const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), color: "#e8e9f3" };
+      const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), color: "var(--chart-text)" };
       const degStr = p.degree !== undefined
         ? (count >= 4 ? `${Math.floor(p.degree)}°` : `${formatCompactDegMin(p.degree)}`)
         : "";
@@ -553,15 +573,15 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
         textEl.setAttribute("dominant-baseline", "central");
 
         const tspanName = document.createElementNS(SVG_NS, "tspan");
-        tspanName.setAttribute("fill", info.color || "var(--text)");
+        tspanName.setAttribute("fill", info.color || "var(--chart-text)");
         tspanName.textContent = `${info.abbr} ${degStr}`;
         textEl.appendChild(tspanName);
 
         if (p.is_retrograde) {
           const tspanRetro = document.createElementNS(SVG_NS, "tspan");
-          tspanRetro.setAttribute("fill", "#f87171");
+          tspanRetro.setAttribute("fill", "#ef4444");
           tspanRetro.setAttribute("font-weight", "800");
-          tspanRetro.textContent = " ℞";
+          tspanRetro.textContent = " ᴿ";
           textEl.appendChild(tspanRetro);
         }
 
