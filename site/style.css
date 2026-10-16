@@ -302,7 +302,8 @@ td.num { text-align: right; }
 .footer .dim { color: var(--dim); }
 
 @media (max-width: 1024px) {
-  .vedic-workspace-grid { grid-template-columns: minmax(0, 1fr); }
+  .vedic-details-grid { grid-template-columns: minmax(0, 1fr); }
+  .vedic-charts-grid { grid-template-columns: minmax(0, 1fr); }
   .form-hero-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
   .btn-group { grid-column: 1 / -1; }
 }
@@ -651,12 +652,66 @@ td.num { text-align: right; }
 .panchang-val { font-size: 0.95rem; color: var(--text); font-weight: 600; }
 .panchang-sub { font-size: 0.78rem; color: var(--muted); }
 
-/* Vedic Results Workspace (2-Column Desktop Grid) */
+/* Vedic Results Workspace */
 .vedic-results-root { display: flex; flex-direction: column; gap: 24px; width: 100%; }
-.vedic-workspace-grid {
-  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
-  gap: 24px; align-items: start;
+
+/* Full-Width Primary Kundli Charts */
+.full-width-charts {
+  width: 100%;
 }
+
+.vedic-charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 24px;
+  width: 100%;
+}
+
+/* 2-Column Grid for Details (Dasha on Left, Planetary Positions on Right) */
+.vedic-details-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.chart-loading-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 380px;
+  width: 100%;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.chart-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.varga-select-static {
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+  width: fit-content;
+}
+
 .charts-col-panel { display: flex; flex-direction: column; gap: 16px; }
 .dasha-col-panel { display: flex; flex-direction: column; gap: 16px; }
 
@@ -684,10 +739,6 @@ td.num { text-align: right; }
   display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: var(--muted);
 }
 
-.vedic-charts-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;
-  width: 100%;
-}
 .chart-card {
   background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px 16px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;

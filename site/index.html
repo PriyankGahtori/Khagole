@@ -10,8 +10,8 @@
   <meta property="og:description" content="Astrological charts on NASA JPL ephemerides, in pure Rust: identical results in Rust, Python and the browser.">
   <meta property="og:type" content="website">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
-  <script type="module" src="demo.js"></script>
+  <link rel="stylesheet" href="style.css?v=2.2.0">
+  <script type="module" src="demo.js?v=2.2.0"></script>
 </head>
 <body>
   <header class="topbar">
@@ -211,29 +211,53 @@
             <!-- 1. Panchanga Limbs Bar -->
             <div id="vedic-panchang"></div>
 
-            <!-- 2. Dual Workspace Grid (Charts on Left, Dasha on Right) -->
-            <div class="vedic-workspace-grid">
-              <!-- Left Column: Charts -->
-              <div class="panel charts-col-panel">
-                <div class="chart-toolbar">
-                  <div class="chart-panel-heading">
-                    <h3>Kundli Charts</h3>
-                    <span class="chart-panel-sub">Divisional Vargas (D1–D60)</span>
-                  </div>
-                  <div class="chart-toolbar-actions">
-                    <button type="button" id="btn-add-chart" class="btn-add-chart" title="Add another divisional chart">+ Add Chart</button>
-                    <div class="chart-style-toggle">
-                      <button type="button" id="style-north" class="btn-chip active">North Indian</button>
-                      <button type="button" id="style-south" class="btn-chip">South Indian</button>
-                    </div>
-                  </div>
+            <!-- 2. Full-Width Primary Kundli Charts: D1 (Rashi) & D9 (Navamsha) Default Side-by-Side -->
+            <div class="panel charts-col-panel full-width-charts">
+              <div class="chart-toolbar">
+                <div class="chart-panel-heading">
+                  <h3>Kundli Charts (कुंडली चक्र)</h3>
+                  <span class="chart-panel-sub">D1 Rashi &amp; D9 Navamsha Default Enabled · All Shodashavargas (D1–D60)</span>
                 </div>
-                <div id="vedic-charts-container" class="vedic-charts-grid">
-                  <!-- Dynamic chart cards rendered via demo.js -->
+                <div class="chart-toolbar-actions">
+                  <button type="button" id="btn-add-chart" class="btn-add-chart" title="Add another divisional chart">+ Add Chart</button>
+                  <div class="chart-style-toggle">
+                    <button type="button" id="style-north" class="btn-chip active">North Indian</button>
+                    <button type="button" id="style-south" class="btn-chip">South Indian</button>
+                  </div>
                 </div>
               </div>
+              <div id="vedic-charts-container" class="vedic-charts-grid">
+                <!-- D1 and D9 default rendered side by side with loading indicators -->
+                <div class="chart-card chart-loading-card">
+                  <div class="chart-card-header">
+                    <div class="chart-card-title-group">
+                      <span class="varga-select-static">D1 · Rashi</span>
+                      <span class="chart-sub">Physical Body &amp; General Destiny</span>
+                    </div>
+                  </div>
+                  <div class="chart-loading-placeholder">
+                    <div class="chart-spinner"></div>
+                    <span>Calculating D1 Rashi Kundli…</span>
+                  </div>
+                </div>
+                <div class="chart-card chart-loading-card">
+                  <div class="chart-card-header">
+                    <div class="chart-card-title-group">
+                      <span class="varga-select-static">D9 · Navamsha</span>
+                      <span class="chart-sub">Dharma, Marriage &amp; Soul Purpose</span>
+                    </div>
+                  </div>
+                  <div class="chart-loading-placeholder">
+                    <div class="chart-spinner"></div>
+                    <span>Calculating D9 Navamsha Kundli…</span>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-              <!-- Right Column: Vimshottari Dasha -->
+            <!-- 3. Dual Columns: Left = Vimshottari Dasha, Right = Planetary Positions -->
+            <div class="vedic-details-grid">
+              <!-- Left Column: Vimshottari Dasha -->
               <div class="panel dasha-col-panel">
                 <div class="dasha-panel-header">
                   <h3>Vimshottari Dasha (विंशोत्तरी दशा)</h3>
@@ -241,15 +265,15 @@
                 </div>
                 <div id="vedic-dasha"></div>
               </div>
-            </div>
 
-            <!-- 3. Planetary Positions Table -->
-            <div class="panel tables planets-panel">
-              <div class="planets-panel-header">
-                <h3>Vedic Planetary Positions (Navagrahas &amp; Lagna)</h3>
-                <span class="planets-panel-sub">Sidereal Longitudes, Nakshatras, Padas &amp; Divisional Rulers</span>
+              <!-- Right Column: Planetary Positions Table -->
+              <div class="panel tables planets-panel">
+                <div class="planets-panel-header">
+                  <h3>Vedic Planetary Positions (Navagrahas &amp; Lagna)</h3>
+                  <span class="planets-panel-sub">Sidereal Longitudes, Nakshatras, Padas &amp; Divisional Rulers</span>
+                </div>
+                <div class="table-scroll"><table id="vedic-planets"></table></div>
               </div>
-              <div class="table-scroll"><table id="vedic-planets"></table></div>
             </div>
 
             <!-- 4. Raw JSON -->

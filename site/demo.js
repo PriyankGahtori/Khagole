@@ -1,5 +1,5 @@
 // Live demo: astroceleste-engine compiled to WebAssembly, computing Vedic Jyotish charts in the browser.
-import init, * as wasm from "./pkg/astroceleste_engine_wasm.js";
+import init, * as wasm from "./pkg/astroceleste_engine_wasm.js?v=2.2.0";
 import {
   renderNorthIndianChart,
   renderSouthIndianChart,
@@ -9,7 +9,7 @@ import {
   formatDegMin,
   formatDms,
   VARGA_LIST,
-} from "./vedic.js";
+} from "./vedic.js?v=2.2.0";
 
 const { Engine, julianDay, calcDivisional, calcPanchang, calcVimshottariDasha } = wasm;
 
@@ -245,9 +245,13 @@ function getSelectedTzOffset() {
 }
 
 function localToUtc(dateStr, timeStr, tzOffsetStr) {
+  if (!dateStr) dateStr = new Date().toISOString().slice(0, 10);
+  if (!timeStr) timeStr = "12:00:00";
+  if (!tzOffsetStr || typeof tzOffsetStr !== "string") tzOffsetStr = "+05:30";
+
   const sign = tzOffsetStr.startsWith("-") ? -1 : 1;
   const parts = tzOffsetStr.replace(/^[+-]/, "").split(":");
-  const offsetMinutes = sign * (parseInt(parts[0], 10) * 60 + parseInt(parts[1] || "0", 10));
+  const offsetMinutes = sign * (parseInt(parts[0] || "0", 10) * 60 + parseInt(parts[1] || "0", 10));
 
   const [year, month, day] = dateStr.split("-").map(Number);
   const timeParts = timeStr.split(":").map(Number);
@@ -255,7 +259,7 @@ function localToUtc(dateStr, timeStr, tzOffsetStr) {
   const minute = timeParts[1] || 0;
   const second = timeParts[2] || 0;
 
-  const ms = Date.UTC(year, month - 1, day, hour, minute, second) - offsetMinutes * 60000;
+  const ms = Date.UTC(year, (month || 1) - 1, day || 1, hour, minute, second) - offsetMinutes * 60000;
   return new Date(ms).toISOString().slice(0, 19) + "Z";
 }
 
@@ -460,6 +464,8 @@ async function compute() {
   const utc = localToUtc(dateStr, timeStr, tzOffset);
 
   submit.disabled = true;
+  const origSubmitHtml = submit.innerHTML;
+  submit.innerHTML = `<span>⏳ Calculating…</span>`;
   try {
     const engine = await loadEngine();
     const jd = julianDay(utc);
@@ -512,6 +518,7 @@ async function compute() {
     setStatus(`${escapeHtml(err && err.message ? err.message : err)}${code}`, true);
   } finally {
     submit.disabled = false;
+    submit.innerHTML = origSubmitHtml;
   }
 }
 
@@ -523,6 +530,10 @@ function renderVedicCharts(data) {
   if (!data || !data.chart) return;
   const container = $("vedic-charts-container");
   if (!container) return;
+
+  if (!activeVargas || activeVargas.length === 0) {
+    activeVargas = ["D1", "D9"];
+  }
 
   container.innerHTML = "";
 
