@@ -145,6 +145,7 @@ mod test_kernel;
 #[doc(hidden)] // exposed for the reduction tests; not part of the API
 pub mod time;
 mod time_lords;
+pub mod vedic;
 mod zodiac;
 
 pub use aspects::{Aspect, CrossAspect};
