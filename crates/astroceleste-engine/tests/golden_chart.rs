@@ -23,6 +23,7 @@ fn natal_charts_match_reference() {
             orb_settings: None,
             dignity_scheme: "lilly",
             position_mode: "apparent",
+            node_type: "mean",
             chinese_calendar: false,
         };
         let chart = calculate_chart(&kernels, &req).unwrap();

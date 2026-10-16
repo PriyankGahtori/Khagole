@@ -41,6 +41,7 @@ class Engine:
         dignity_scheme: str = "lilly",
         chinese_calendar: bool = False,
         position_mode: str = "apparent",
+        node_type: str = "mean",
     ) -> dict[str, Any]: ...
     def horary(
         self,

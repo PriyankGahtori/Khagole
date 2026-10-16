@@ -72,6 +72,21 @@ pub fn planets_and_sidereal_time_with_mode(
     shift: f64,
     geometric: bool,
 ) -> Result<(Planets, f64), EngineError> {
+    planets_and_sidereal_time_with_options(kernels, jd, shift, geometric, false)
+}
+
+/// All chart bodies at UT1 Julian date `jd`, shifted by `shift` degrees (the ayanamsa for
+/// sidereal charts, 0 for tropical), with the Greenwich apparent sidereal time (hours)
+/// at `jd`.
+/// - `geometric`: true geometric coordinates without light-time or aberration.
+/// - `true_node`: true osculating lunar node (from instantaneous DE440 state vectors) instead of mean node.
+pub fn planets_and_sidereal_time_with_options(
+    kernels: &KernelSet,
+    jd: f64,
+    shift: f64,
+    geometric: bool,
+    true_node: bool,
+) -> Result<(Planets, f64), EngineError> {
     let sample = SpeedSample::at(kernels, jd, geometric)?;
     let mut bodies = Vec::with_capacity(14);
 
@@ -90,7 +105,7 @@ pub fn planets_and_sidereal_time_with_mode(
         });
     }
 
-    // Mean lunar ascending node (IAU polynomial) and its opposite.
+    // Mean lunar ascending node (IAU polynomial).
     let t_cent = (jd - 2_451_545.0) / 36525.0;
     let omega = pyfloat::rem(
         125.0445479 - 1934.1362891 * t_cent
@@ -99,20 +114,41 @@ pub fn planets_and_sidereal_time_with_mode(
             - t_cent.powf(4.0) / 60616000.0,
         360.0,
     );
-    let mean_node = pyfloat::rem(omega - shift, 360.0);
-    for (name, symbol, longitude) in [
-        ("North Node", "☊", mean_node),
-        ("South Node", "☋", pyfloat::rem(mean_node + 180.0, 360.0)),
-    ] {
-        bodies.push(BodyPosition {
-            name,
-            symbol,
-            longitude,
-            latitude: 0.0,
-            distance: 0.00257,
-            speed: -0.05295,
-            is_retrograde: true,
-        });
+
+    if true_node {
+        if let Ok((lon, speed, is_retrograde)) = sample.true_lunar_node() {
+            let node_lon = pyfloat::rem(lon - shift, 360.0);
+            for (name, symbol, longitude) in [
+                ("North Node", "☊", node_lon),
+                ("South Node", "☋", pyfloat::rem(node_lon + 180.0, 360.0)),
+            ] {
+                bodies.push(BodyPosition {
+                    name,
+                    symbol,
+                    longitude,
+                    latitude: 0.0,
+                    distance: 0.00257,
+                    speed,
+                    is_retrograde,
+                });
+            }
+        }
+    } else {
+        let mean_node = pyfloat::rem(omega - shift, 360.0);
+        for (name, symbol, longitude) in [
+            ("North Node", "☊", mean_node),
+            ("South Node", "☋", pyfloat::rem(mean_node + 180.0, 360.0)),
+        ] {
+            bodies.push(BodyPosition {
+                name,
+                symbol,
+                longitude,
+                latitude: 0.0,
+                distance: 0.00257,
+                speed: -0.05295,
+                is_retrograde: true,
+            });
+        }
     }
 
     if let Some(c) = chiron(jd, shift) {
@@ -224,4 +260,27 @@ impl<'k> SpeedSample<'k> {
             Ok((lat, lon, dist, d_lon * 24.0))
         }
     }
+
+    /// Osculating (true) lunar node: intersection of the instantaneous osculating lunar
+    /// orbit plane with the true ecliptic of date. Returns (longitude_deg_tropical, speed_deg_day, is_retrograde).
+    fn true_lunar_node(&self) -> Result<(f64, f64, bool), EngineError> {
+        let compute = |t: &Time, ori: &Orientation| -> Result<f64, EngineError> {
+            let (pos_moon, vel_moon) = self.kernel.barycentric(301, t)?;
+            let (pos_earth, vel_earth) = self.kernel.barycentric(crate::ephemeris::observe::EARTH, t)?;
+            let r = [pos_moon[0] - pos_earth[0], pos_moon[1] - pos_earth[1], pos_moon[2] - pos_earth[2]];
+            let v = [vel_moon[0] - vel_earth[0], vel_moon[1] - vel_earth[1], vel_moon[2] - vel_earth[2]];
+            let r_ecl = crate::frames::mxv(&ori.ecliptic, &r);
+            let v_ecl = crate::frames::mxv(&ori.ecliptic, &v);
+            let h_x = r_ecl[1] * v_ecl[2] - r_ecl[2] * v_ecl[1];
+            let h_y = r_ecl[2] * v_ecl[0] - r_ecl[0] * v_ecl[2];
+            Ok(h_x.atan2(-h_y).to_degrees().rem_euclid(360.0))
+        };
+        let lon = compute(&self.t, &self.orientation)?;
+        let lon_plus = compute(&self.t_plus, &self.orientation_plus)?;
+        let d_lon = pyfloat::wrap180(lon_plus - lon);
+        let speed = d_lon * 24.0;
+        let is_retrograde = speed < 0.0;
+        Ok((lon, speed, is_retrograde))
+    }
 }
+

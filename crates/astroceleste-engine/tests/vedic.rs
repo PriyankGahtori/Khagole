@@ -67,4 +67,65 @@ fn sripati_and_geometric_mode() {
         "Venus geometric longitude is off from JHora: diff is {venus_diff}\" (lon = {})",
         venus.ecliptic_longitude
     );
+
+    // Test True Lunar Node calculation
+    use astroceleste_engine::ephemeris::observe::EARTH;
+    use astroceleste_engine::frames::{mxv, Orientation};
+    use astroceleste_engine::time::Time;
+
+    let t = Time::from_ut1(instant.julian_day());
+    let t_plus = Time::from_ut1(instant.julian_day() + 1.0 / 24.0);
+    let orient = Orientation::at(&t);
+    let orient_plus = Orientation::at(&t_plus);
+    let kernel = kernels.for_jd(instant.julian_day()).unwrap();
+
+    let compute_node = |t_eval: &Time, ori: &Orientation| {
+        let (pos_moon, vel_moon) = kernel.barycentric(301, t_eval).unwrap();
+        let (pos_earth, vel_earth) = kernel.barycentric(EARTH, t_eval).unwrap();
+        let r = [pos_moon[0] - pos_earth[0], pos_moon[1] - pos_earth[1], pos_moon[2] - pos_earth[2]];
+        let v = [vel_moon[0] - vel_earth[0], vel_moon[1] - vel_earth[1], vel_moon[2] - vel_earth[2]];
+        let r_ecl = mxv(&ori.ecliptic, &r);
+        let v_ecl = mxv(&ori.ecliptic, &v);
+        let h_x = r_ecl[1] * v_ecl[2] - r_ecl[2] * v_ecl[1];
+        let h_y = r_ecl[2] * v_ecl[0] - r_ecl[0] * v_ecl[2];
+        let lon = h_x.atan2(-h_y).to_degrees().rem_euclid(360.0);
+        lon
+    };
+
+    let node_lon = compute_node(&t, &orient);
+    let node_lon_plus = compute_node(&t_plus, &orient_plus);
+    let mut d_lon = node_lon_plus - node_lon;
+    if d_lon > 180.0 { d_lon -= 360.0; }
+    if d_lon < -180.0 { d_lon += 360.0; }
+    let speed = d_lon * 24.0;
+
+    println!("Computed True Node (Tropical): lon = {node_lon}°, speed = {speed}°/day");
+    println!("Swiss Ephemeris Tropical: lon = 358.379154°, speed = +0.005585°/day");
+
+    let shift = 23.168635; // Lahiri
+    let sid_node = (node_lon - shift).rem_euclid(360.0);
+    println!("Computed True Node (Lahiri): lon = {sid_node}°");
+    println!("Swiss Ephemeris Lahiri: lon = 335.210414°");
+
+    let diff_arcsec = (node_lon - 358.379154).abs() * 3600.0;
+    println!("Diff vs SwissEph True Node: {diff_arcsec}\"");
+    assert!(diff_arcsec < 0.1, "True node matches Swiss Ephemeris within 0.1 arcsec");
+
+    // Also test calculate_chart with node_type = "true"
+    let mut req_true_node = req.clone();
+    req_true_node.node_type = "true";
+    let chart_true_node = calculate_chart(&kernels, &req_true_node).unwrap();
+    let north_node = chart_true_node.planets.iter().find(|p| p.name == "North Node").unwrap();
+    let south_node = chart_true_node.planets.iter().find(|p| p.name == "South Node").unwrap();
+
+    // Swiss Ephemeris Lahiri True Node is 335.210414°
+    let node_diff = (north_node.ecliptic_longitude - 335.210414).abs() * 3600.0;
+    println!("North Node via calculate_chart: lon = {}°, diff vs SwissEph = {}\"", north_node.ecliptic_longitude, node_diff);
+    assert!(node_diff < 0.5, "North Node matches Swiss Ephemeris within 0.5 arcsec");
+
+    // South Node should be exactly 180° opposite
+    let opposite = (north_node.ecliptic_longitude + 180.0) % 360.0;
+    assert!((south_node.ecliptic_longitude - opposite).abs() < 1e-10);
+    assert_eq!(chart_true_node.node_type, Some("true"));
 }
+

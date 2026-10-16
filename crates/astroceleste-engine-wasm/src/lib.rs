@@ -67,9 +67,12 @@ fn default_dignity_scheme() -> String {
 fn default_position_mode() -> String {
     "apparent".into()
 }
+fn default_node_type() -> String {
+    "mean".into()
+}
 
 /// `{ utc, latitude, longitude, house_system?, zodiac_type?, ayanamsa?, position_mode?,
-/// orb_settings?, dignity_scheme?, quesited_house?, chinese_calendar? }`
+/// node_type?, orb_settings?, dignity_scheme?, quesited_house?, chinese_calendar? }`
 #[derive(Deserialize)]
 struct Request {
     utc: String,
@@ -83,6 +86,8 @@ struct Request {
     ayanamsa: String,
     #[serde(default = "default_position_mode")]
     position_mode: String,
+    #[serde(default = "default_node_type")]
+    node_type: String,
     #[serde(default)]
     orb_settings: Option<Value>,
     #[serde(default = "default_dignity_scheme")]
@@ -113,6 +118,7 @@ impl Request {
             orb_settings: self.orb_settings.as_ref(),
             dignity_scheme: &self.dignity_scheme,
             position_mode: &self.position_mode,
+            node_type: &self.node_type,
             chinese_calendar: self.chinese_calendar,
         }
     }

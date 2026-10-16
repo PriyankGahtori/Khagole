@@ -41,6 +41,7 @@ fn transits_match_reference() {
             orb_settings: None,
             dignity_scheme: "lilly",
             position_mode: "apparent",
+            node_type: "mean",
             chinese_calendar: false,
         };
         let chart = calculate_transit_chart(&kernels, &base["planets"], &req).unwrap();
