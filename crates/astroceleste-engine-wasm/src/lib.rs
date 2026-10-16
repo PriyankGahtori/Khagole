@@ -22,6 +22,8 @@ use astroceleste_engine::{
     planets_and_sidereal_time_with_options, search_elections, time_lords as core_time_lords,
     zi_wei as core_zi_wei, BaziOptions, ChartRequest, ChineseCalendar, ElectionCriteria,
     EngineError, HouseSystem, UtcInstant, ZiWeiOptions,
+    calc_divisional_chart, calc_divisional_point, calc_panchang, calc_vimshottari_dasha,
+    nakshatra_info, YearType,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -376,6 +378,36 @@ impl Engine {
     ) -> Result<JsValue, JsValue> {
         self.houses_ex(jd, 0, lat, lon, house_system)
     }
+
+    /// Compute a divisional chart (D1 to D60).
+    #[wasm_bindgen(js_name = calc_divisional)]
+    pub fn calc_divisional(&self, chart: JsValue, varga: &str) -> Result<JsValue, JsValue> {
+        calc_divisional(chart, None, varga)
+    }
+
+    /// Compute Vimshottari dasha hierarchy from Moon's sidereal longitude and birth JD.
+    #[wasm_bindgen(js_name = calc_vimshottari_dasha)]
+    pub fn calc_vimshottari_dasha(
+        &self,
+        moon_lon: f64,
+        birth_jd: f64,
+        depth: Option<u32>,
+        year_type: Option<String>,
+    ) -> Result<JsValue, JsValue> {
+        calc_vimshottari_dasha_js(moon_lon, birth_jd, depth, year_type)
+    }
+
+    /// Compute Panchanga (five limbs) from Sun and Moon longitudes and Julian Day.
+    #[wasm_bindgen(js_name = calc_panchang)]
+    pub fn calc_panchang(
+        &self,
+        sun_lon: f64,
+        moon_lon: f64,
+        jd: f64,
+        weekday: Option<u8>,
+    ) -> Result<JsValue, JsValue> {
+        calc_panchang_js(sun_lon, moon_lon, jd, weekday)
+    }
 }
 
 impl Default for Engine {
@@ -582,4 +614,110 @@ pub fn excerpt_kernel(kernel: Vec<u8>, start_jd: f64, end_jd: f64) -> Result<Vec
     let spk = Spk::from_bytes(kernel).map_err(|e| js_error("invalid_kernel", &e.to_string()))?;
     spk.excerpt(start_jd, end_jd)
         .map_err(|e| js_error("invalid_kernel", &e.to_string()))
+}
+
+/// Transform a chart or planet array into a divisional chart (D1 to D60).
+#[wasm_bindgen(js_name = calcDivisional)]
+pub fn calc_divisional(
+    chart_or_planets: JsValue,
+    lagna_lon: Option<f64>,
+    varga: &str,
+) -> Result<JsValue, JsValue> {
+    let val: Value = from_js(chart_or_planets)?;
+    let mut planets_vec: Vec<(String, f64)> = Vec::new();
+    let mut resolved_lagna_lon = lagna_lon;
+
+    if let Value::Object(ref obj) = val {
+        if resolved_lagna_lon.is_none() {
+            if let Some(lagna_val) = obj.get("lagna") {
+                if let Some(lon) = lagna_val.get("lon").and_then(|v| v.as_f64()) {
+                    resolved_lagna_lon = Some(lon);
+                } else if let Some(lon) = lagna_val.get("ecliptic_longitude").and_then(|v| v.as_f64()) {
+                    resolved_lagna_lon = Some(lon);
+                }
+            }
+        }
+
+        if let Some(Value::Array(planets_arr)) = obj.get("planets") {
+            for p in planets_arr {
+                if let Value::Object(p_obj) = p {
+                    let name = p_obj.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                    let lon = p_obj.get("ecliptic_longitude")
+                        .or_else(|| p_obj.get("lon"))
+                        .and_then(|v| v.as_f64())
+                        .unwrap_or(0.0);
+                    if name == "Ascendant" && resolved_lagna_lon.is_none() {
+                        resolved_lagna_lon = Some(lon);
+                    }
+                    if !name.is_empty() {
+                        planets_vec.push((name, lon));
+                    }
+                }
+            }
+        }
+    } else if let Value::Array(arr) = val {
+        for p in arr {
+            if let Value::Object(p_obj) = p {
+                let name = p_obj.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let lon = p_obj.get("ecliptic_longitude")
+                    .or_else(|| p_obj.get("lon"))
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0);
+                if name == "Ascendant" && resolved_lagna_lon.is_none() {
+                    resolved_lagna_lon = Some(lon);
+                }
+                if !name.is_empty() {
+                    planets_vec.push((name, lon));
+                }
+            }
+        }
+    }
+
+    let lagna = resolved_lagna_lon.unwrap_or(0.0);
+    let div_chart = calc_divisional_chart(&planets_vec, lagna, varga).map_err(engine_error)?;
+    to_js(&div_chart)
+}
+
+/// Transform a single longitude to its divisional position.
+#[wasm_bindgen(js_name = calcDivisionalPoint)]
+pub fn calc_divisional_point_js(lon: f64, varga: &str) -> Result<JsValue, JsValue> {
+    let p = calc_divisional_point(lon, varga).map_err(engine_error)?;
+    to_js(&p)
+}
+
+/// Compute Vimshottari dasha periods tree from Moon's sidereal longitude and birth JD.
+#[wasm_bindgen(js_name = calcVimshottariDasha)]
+pub fn calc_vimshottari_dasha_js(
+    moon_lon: f64,
+    birth_jd: f64,
+    depth: Option<u32>,
+    year_type: Option<String>,
+) -> Result<JsValue, JsValue> {
+    let yt = match year_type.as_deref() {
+        Some("savana") => YearType::Savana,
+        Some("tropical") => YearType::Tropical,
+        Some("julian") => YearType::Julian,
+        _ => YearType::Sidereal,
+    };
+    let d = depth.unwrap_or(3);
+    let tree = calc_vimshottari_dasha(moon_lon, birth_jd, d, yt);
+    to_js(&tree)
+}
+
+/// Compute Panchanga (five limbs) from Sun and Moon longitudes and Julian Day.
+#[wasm_bindgen(js_name = calcPanchang)]
+pub fn calc_panchang_js(
+    sun_lon: f64,
+    moon_lon: f64,
+    jd: f64,
+    weekday: Option<u8>,
+) -> Result<JsValue, JsValue> {
+    let result = calc_panchang(sun_lon, moon_lon, jd, weekday);
+    to_js(&result)
+}
+
+/// Get nakshatra info for a longitude.
+#[wasm_bindgen(js_name = nakshatraInfo)]
+pub fn nakshatra_info_js(lon: f64) -> Result<JsValue, JsValue> {
+    to_js(&nakshatra_info(lon))
 }
