@@ -20,8 +20,8 @@ The same calculation core runs natively on the server (Python bindings), in desk
 ### 🪔 Vedic Astrology (Jyotish Kundali)
 - **Divisional Charts (Vargas)**: Computes D1 (Rasi), D9 (Navamsha), and all 16 Shodashavargas (D2 Hora, D3 Drekkana, D4 Chaturthamsa, D7 Saptamsa, D10 Dasamsa, D12 Dwadasamsa, D16 Shodasamsa, D20 Vimsamsa, D24 Chaturvimsamsa, D27 Saptavimsamsa, D30 Trimsamsa, D40 Khavedamsa, D45 Akshavedamsa, D60 Shashtiamsa).
 - **Interactive SVG Charts**: North Indian (diamond) and South Indian (box) chart renderers with Google Material 3 typography, arcminute precision (`12°17′`), Kendra elevations, golden Lagna badges, and non-overlapping multi-planet conjunction grids.
-- **Vimshottari Dasha Engine**: Multi-level Mahadasha, Antardasha, and Pratyantardasha timeline and hierarchical tree. Computations support **True Sidereal Solar Year (TSSY)** solar return solver matching **Jagannatha Hora (JHora)**, alongside 365.2564-day sidereal, 360-day savana, and 365.2422-day tropical standards.
-- **JHora Defaults Compatibility**: Out-of-the-box configuration matches JHora canonical defaults:
+- **Vimshottari Dasha Engine**: Multi-level Mahadasha, Antardasha, and Pratyantardasha timeline and hierarchical tree. Computations support **True Sidereal Solar Year (TSSY)** solar return solver matching canonical Parashari standards, alongside 365.2564-day sidereal, 360-day savana, and 365.2422-day tropical standards.
+- **Canonical Parashari Defaults**: Out-of-the-box configuration matches canonical Vedic defaults:
   - **Zodiac**: Sidereal
   - **Ayanamsa**: Chitrapaksha Lahiri (`UserSelectedAyanamsa=17`)
   - **Lunar Nodes**: Mean nodes (`TrueNodes=0`)
@@ -68,7 +68,7 @@ await init();
 const engine = new Engine();
 engine.addKernel("de440s-1950-2050.bsp", kernelBytes);
 
-// Calculate Sidereal Vedic Chart with JHora defaults
+// Calculate Sidereal Vedic Chart with canonical Parashari defaults
 const chart = engine.chart({
   utc: "1950-09-17T04:04:00Z",
   latitude: 23.784,

@@ -110,7 +110,7 @@ fn tools_list() -> Value {
                     "position_mode": {
                         "type": "string",
                         "enum": ["true", "apparent"],
-                        "description": "Calculation mode: 'true' (Geometric / True Positions without light-time, as standard in Vedic JHora) or 'apparent' (with light-time & aberration, standard in Western). Default: 'true'.",
+                        "description": "Calculation mode: 'true' (Geometric / True Positions without light-time, as standard in canonical Vedic astrology) or 'apparent' (with light-time & aberration, standard in Western). Default: 'true'.",
                         "default": "true"
                     },
                     "node_type": {

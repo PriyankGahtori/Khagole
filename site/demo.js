@@ -31,31 +31,105 @@ const ASPECT_CLASS = {
 };
 
 const CITY_PRESETS = {
-  vadnagar: { name: "Vadnagar, Gujarat, India", lat: 23.784, lon: 72.636, tz: "+05:30", iana: "Asia/Kolkata" },
-  delhi: { name: "New Delhi, Delhi, India", lat: 28.6139, lon: 77.209, tz: "+05:30", iana: "Asia/Kolkata" },
-  mumbai: { name: "Mumbai, Maharashtra, India", lat: 19.076, lon: 72.8777, tz: "+05:30", iana: "Asia/Kolkata" },
+  delhi: { name: "New Delhi, Delhi, India", lat: 28.6139, lon: 77.2090, tz: "+05:30", iana: "Asia/Kolkata" },
+  mumbai: { name: "Mumbai, Maharashtra, India", lat: 19.0760, lon: 72.8777, tz: "+05:30", iana: "Asia/Kolkata" },
   bengaluru: { name: "Bengaluru, Karnataka, India", lat: 12.9716, lon: 77.5946, tz: "+05:30", iana: "Asia/Kolkata" },
-  chennai: { name: "Chennai, Tamil Nadu, India", lat: 13.0827, lon: 80.2707, tz: "+05:30", iana: "Asia/Kolkata" },
-  kolkata: { name: "Kolkata, West Bengal, India", lat: 22.5726, lon: 88.3639, tz: "+05:30", iana: "Asia/Kolkata" },
   ujjain: { name: "Ujjain, Madhya Pradesh, India", lat: 23.1765, lon: 75.7885, tz: "+05:30", iana: "Asia/Kolkata" },
   varanasi: { name: "Varanasi, Uttar Pradesh, India", lat: 25.3176, lon: 82.9739, tz: "+05:30", iana: "Asia/Kolkata" },
+  vadnagar: { name: "Vadnagar, Gujarat, India", lat: 23.7840, lon: 72.6360, tz: "+05:30", iana: "Asia/Kolkata" },
+  chennai: { name: "Chennai, Tamil Nadu, India", lat: 13.0827, lon: 80.2707, tz: "+05:30", iana: "Asia/Kolkata" },
+  kolkata: { name: "Kolkata, West Bengal, India", lat: 22.5726, lon: 88.3639, tz: "+05:30", iana: "Asia/Kolkata" },
   london: { name: "London, England, UK", lat: 51.5074, lon: -0.1278, tz: "+00:00", iana: "Europe/London" },
-  newyork: { name: "New York, USA", lat: 40.7128, lon: -74.006, tz: "-05:00", iana: "America/New_York" },
+  newyork: { name: "New York, USA", lat: 40.7128, lon: -74.0060, tz: "-05:00", iana: "America/New_York" },
   tokyo: { name: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, tz: "+09:00", iana: "Asia/Tokyo" },
-  greenwich: { name: "Greenwich, London, UK", lat: 51.4769, lon: 0, tz: "+00:00", iana: "UTC" },
+  greenwich: { name: "Greenwich, London, UK", lat: 51.4769, lon: 0.0000, tz: "+00:00", iana: "UTC" },
 };
 
+// Comprehensive offline index of top Vedic pilgrimage sites, Indian capitals & world metros
+const LOCAL_CITIES = [
+  // India - Metros & Major Centers
+  { name: "New Delhi", admin: "Delhi, India", lat: 28.6139, lon: 77.2090, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Delhi", admin: "Delhi, India", lat: 28.6519, lon: 77.2315, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Mumbai", admin: "Maharashtra, India", lat: 19.0760, lon: 72.8777, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Bengaluru", admin: "Karnataka, India", lat: 12.9716, lon: 77.5946, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Hyderabad", admin: "Telangana, India", lat: 17.3850, lon: 78.4867, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Ahmedabad", admin: "Gujarat, India", lat: 23.0225, lon: 72.5714, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Chennai", admin: "Tamil Nadu, India", lat: 13.0827, lon: 80.2707, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Kolkata", admin: "West Bengal, India", lat: 22.5726, lon: 88.3639, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Pune", admin: "Maharashtra, India", lat: 18.5204, lon: 73.8567, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Jaipur", admin: "Rajasthan, India", lat: 26.9124, lon: 75.7873, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Lucknow", admin: "Uttar Pradesh, India", lat: 26.8467, lon: 80.9462, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Kanpur", admin: "Uttar Pradesh, India", lat: 26.4499, lon: 80.3319, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Nagpur", admin: "Maharashtra, India", lat: 21.1458, lon: 79.0882, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Indore", admin: "Madhya Pradesh, India", lat: 22.7196, lon: 75.8577, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Bhopal", admin: "Madhya Pradesh, India", lat: 23.2599, lon: 77.4126, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Patna", admin: "Bihar, India", lat: 25.5941, lon: 85.1376, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Vadodara", admin: "Gujarat, India", lat: 22.3072, lon: 73.1812, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Surat", admin: "Gujarat, India", lat: 21.1702, lon: 72.8311, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Chandigarh", admin: "Chandigarh, India", lat: 30.7333, lon: 76.7794, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  // Sacred & Historical Vedic Centers
+  { name: "Ujjain", admin: "Madhya Pradesh, India", lat: 23.1765, lon: 75.7885, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Varanasi", admin: "Uttar Pradesh, India", lat: 25.3176, lon: 82.9739, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Kashi", admin: "Varanasi, UP, India", lat: 25.3176, lon: 82.9739, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Ayodhya", admin: "Uttar Pradesh, India", lat: 26.7922, lon: 82.1998, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Haridwar", admin: "Uttarakhand, India", lat: 29.9457, lon: 78.1642, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Rishikesh", admin: "Uttarakhand, India", lat: 30.0869, lon: 78.2676, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Mathura", admin: "Uttar Pradesh, India", lat: 27.4924, lon: 77.6737, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Vrindavan", admin: "Uttar Pradesh, India", lat: 27.5806, lon: 77.7006, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Prayagraj", admin: "Uttar Pradesh, India", lat: 25.4358, lon: 81.8463, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Allahabad", admin: "Uttar Pradesh, India", lat: 25.4358, lon: 81.8463, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Puri", admin: "Odisha, India", lat: 19.8135, lon: 85.8312, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Tirupati", admin: "Andhra Pradesh, India", lat: 13.6288, lon: 79.4192, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Dwarka", admin: "Gujarat, India", lat: 22.2442, lon: 68.9685, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Somnath", admin: "Gujarat, India", lat: 20.8880, lon: 70.4013, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Rameshwaram", admin: "Tamil Nadu, India", lat: 9.2876, lon: 79.3129, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Vadnagar", admin: "Gujarat, India", lat: 23.7840, lon: 72.6360, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Dehradun", admin: "Uttarakhand, India", lat: 30.3165, lon: 78.0322, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Noida", admin: "Uttar Pradesh, India", lat: 28.5355, lon: 77.3910, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Gurugram", admin: "Haryana, India", lat: 28.4595, lon: 77.0266, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Gurgaon", admin: "Haryana, India", lat: 28.4595, lon: 77.0266, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Thiruvananthapuram", admin: "Kerala, India", lat: 8.5241, lon: 76.9366, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Kochi", admin: "Kerala, India", lat: 9.9312, lon: 76.2673, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Bhubaneswar", admin: "Odisha, India", lat: 20.2961, lon: 85.8245, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Guwahati", admin: "Assam, India", lat: 26.1445, lon: 91.7362, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Srinagar", admin: "Jammu & Kashmir, India", lat: 34.0837, lon: 74.7973, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Shimla", admin: "Himachal Pradesh, India", lat: 31.1048, lon: 77.1734, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Amritsar", admin: "Punjab, India", lat: 31.6340, lon: 74.8723, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  // Major International Metros
+  { name: "London", admin: "England, United Kingdom", lat: 51.5074, lon: -0.1278, tz: "+00:00", iana: "Europe/London", countryCode: "GB" },
+  { name: "New York", admin: "New York, USA", lat: 40.7128, lon: -74.0060, tz: "-05:00", iana: "America/New_York", countryCode: "US" },
+  { name: "San Francisco", admin: "California, USA", lat: 37.7749, lon: -122.4194, tz: "-08:00", iana: "America/Los_Angeles", countryCode: "US" },
+  { name: "Los Angeles", admin: "California, USA", lat: 34.0522, lon: -118.2437, tz: "-08:00", iana: "America/Los_Angeles", countryCode: "US" },
+  { name: "Chicago", admin: "Illinois, USA", lat: 41.8781, lon: -87.6298, tz: "-06:00", iana: "America/Chicago", countryCode: "US" },
+  { name: "Toronto", admin: "Ontario, Canada", lat: 43.6532, lon: -79.3832, tz: "-05:00", iana: "America/Toronto", countryCode: "CA" },
+  { name: "Vancouver", admin: "BC, Canada", lat: 49.2827, lon: -123.1207, tz: "-08:00", iana: "America/Vancouver", countryCode: "CA" },
+  { name: "Dubai", admin: "United Arab Emirates", lat: 25.2048, lon: 55.2708, tz: "+04:00", iana: "Asia/Dubai", countryCode: "AE" },
+  { name: "Singapore", admin: "Singapore", lat: 1.3521, lon: 103.8198, tz: "+08:00", iana: "Asia/Singapore", countryCode: "SG" },
+  { name: "Tokyo", admin: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, tz: "+09:00", iana: "Asia/Tokyo", countryCode: "JP" },
+  { name: "Sydney", admin: "NSW, Australia", lat: -33.8688, lon: 151.2093, tz: "+10:00", iana: "Australia/Sydney", countryCode: "AU" },
+  { name: "Melbourne", admin: "Victoria, Australia", lat: -37.8136, lon: 144.9631, tz: "+10:00", iana: "Australia/Melbourne", countryCode: "AU" },
+  { name: "Paris", admin: "France", lat: 48.8566, lon: 2.3522, tz: "+01:00", iana: "Europe/Paris", countryCode: "FR" },
+  { name: "Berlin", admin: "Germany", lat: 52.5200, lon: 13.4050, tz: "+01:00", iana: "Europe/Berlin", countryCode: "DE" },
+  { name: "Rome", admin: "Italy", lat: 41.9028, lon: 12.4964, tz: "+01:00", iana: "Europe/Rome", countryCode: "IT" },
+  { name: "Kuala Lumpur", admin: "Malaysia", lat: 3.1390, lon: 101.6869, tz: "+08:00", iana: "Asia/Kuala_Lumpur", countryCode: "MY" },
+  { name: "Bangkok", admin: "Thailand", lat: 13.7563, lon: 100.5018, tz: "+07:00", iana: "Asia/Bangkok", countryCode: "TH" },
+  { name: "Greenwich", admin: "London, UK", lat: 51.4769, lon: 0.0000, tz: "+00:00", iana: "UTC", countryCode: "GB" },
+];
+
+function findBestLocalCity(query) {
+  const q = query.toLowerCase().trim();
+  if (!q) return null;
+  const exact = LOCAL_CITIES.find((c) => c.name.toLowerCase() === q);
+  if (exact) return exact;
+  const prefix = LOCAL_CITIES.find((c) => c.name.toLowerCase().startsWith(q));
+  if (prefix) return prefix;
+  return LOCAL_CITIES.find((c) => c.name.toLowerCase().includes(q) || c.admin.toLowerCase().includes(q)) || null;
+}
+
 const PRESETS = {
-  modi: () => ({
-    date: "1950-09-17",
-    time: "09:34:00",
-    tz_preset: "+05:30",
-    latitude: 23.784,
-    longitude: 72.636,
-  }),
   delhi: () => {
     const now = new Date();
-    const dStr = now.toISOString().slice(0, 10);
+    const dStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     const h = String(now.getHours()).padStart(2, "0");
     const m = String(now.getMinutes()).padStart(2, "0");
     const s = String(now.getSeconds()).padStart(2, "0");
@@ -64,9 +138,16 @@ const PRESETS = {
       time: `${h}:${m}:${s}`,
       tz_preset: "+05:30",
       latitude: 28.6139,
-      longitude: 77.209,
+      longitude: 77.2090,
     };
   },
+  modi: () => ({
+    date: "1950-09-17",
+    time: "09:34:00",
+    tz_preset: "+05:30",
+    latitude: 23.7840,
+    longitude: 72.6360,
+  }),
   now: () => {
     const iso = new Date().toISOString();
     return {
@@ -299,62 +380,75 @@ function applyLocation({ displayName, lat, lon, timezone, tzOffset }) {
 }
 
 async function searchCitiesOnline(query) {
-  const q = query.trim();
-  if (q.length < 2) return [];
+  const raw = (query || "").trim();
+  const q = raw.toLowerCase();
 
-  // 1. Primary: Open-Meteo free geocoding API (fast, CORS-enabled, returns IANA timezone)
-  try {
-    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`;
-    const res = await fetch(url);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.results && data.results.length > 0) {
-        return data.results.map((r) => {
-          const parts = [r.name];
-          if (r.admin1 && r.admin1 !== r.name) parts.push(r.admin1);
-          if (r.country) parts.push(r.country);
-          return {
-            name: r.name,
-            displayName: parts.join(", "),
-            admin: [r.admin1, r.country].filter(Boolean).join(", "),
-            countryCode: r.country_code || "",
-            lat: Number(r.latitude.toFixed(4)),
-            lon: Number(r.longitude.toFixed(4)),
-            timezone: r.timezone || null,
-          };
-        });
+  // If query is empty, show top popular cities as suggestions immediately
+  if (q.length === 0) {
+    return LOCAL_CITIES.slice(0, 8).map((c) => ({
+      name: c.name,
+      displayName: `${c.name}, ${c.admin}`,
+      admin: c.admin,
+      countryCode: c.countryCode,
+      lat: c.lat,
+      lon: c.lon,
+      timezone: c.iana,
+    }));
+  }
+
+  // 1. Instant local index lookup (0ms latency, 100% reliable)
+  const localMatches = LOCAL_CITIES.filter(
+    (c) => c.name.toLowerCase().includes(q) || c.admin.toLowerCase().includes(q)
+  ).map((c) => ({
+    name: c.name,
+    displayName: `${c.name}, ${c.admin}`,
+    admin: c.admin,
+    countryCode: c.countryCode,
+    lat: c.lat,
+    lon: c.lon,
+    timezone: c.iana,
+  }));
+
+  // If query is at least 2 chars, also attempt Open-Meteo online geocoding to catch any small town/locality
+  if (raw.length >= 2) {
+    try {
+      const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(raw)}&count=8&language=en&format=json`;
+      const res = await fetch(url, { mode: "cors" });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.results && data.results.length > 0) {
+          const onlineList = data.results.map((r) => {
+            const parts = [r.name];
+            if (r.admin1 && r.admin1 !== r.name) parts.push(r.admin1);
+            if (r.country) parts.push(r.country);
+            return {
+              name: r.name,
+              displayName: parts.join(", "),
+              admin: [r.admin1, r.country].filter(Boolean).join(", "),
+              countryCode: r.country_code || "",
+              lat: Number(r.latitude.toFixed(4)),
+              lon: Number(r.longitude.toFixed(4)),
+              timezone: r.timezone || null,
+            };
+          });
+
+          // Append any online results that aren't already represented in local matches
+          for (const item of onlineList) {
+            const exists = localMatches.some(
+              (l) => Math.abs(l.lat - item.lat) < 0.08 && Math.abs(l.lon - item.lon) < 0.08
+            );
+            if (!exists) {
+              localMatches.push(item);
+            }
+          }
+        }
       }
+    } catch (err) {
+      console.warn("Online geocoding unavailable, using local index:", err);
     }
-  } catch (err) {
-    console.warn("Open-Meteo geocoding failed, trying Nominatim fallback:", err);
   }
 
-  // 2. Fallback: OpenStreetMap Nominatim API
-  try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1`;
-    const res = await fetch(url, { headers: { "Accept-Language": "en" } });
-    if (res.ok) {
-      const data = await res.json();
-      return data.map((item) => {
-        const addr = item.address || {};
-        const city = addr.city || addr.town || addr.village || item.name || q;
-        const adminParts = [addr.state || addr.region, addr.country].filter(Boolean);
-        return {
-          name: city,
-          displayName: item.display_name,
-          admin: adminParts.join(", "),
-          countryCode: addr.country_code ? addr.country_code.toUpperCase() : "",
-          lat: Number(parseFloat(item.lat).toFixed(4)),
-          lon: Number(parseFloat(item.lon).toFixed(4)),
-          timezone: null,
-        };
-      });
-    }
-  } catch (err) {
-    console.warn("Nominatim geocoding failed:", err);
-  }
-
-  return [];
+  return localMatches.slice(0, 10);
 }
 
 function fillForm(values) {
@@ -390,6 +484,24 @@ function syncAyanamsa() {
 
 async function compute() {
   if (!form.reportValidity()) return;
+
+  // If user typed a search query and didn't pick from dropdown, commit best match
+  const typedCity = (citySearchInput?.value || "").trim();
+  const currentBadge = $("location-name-display")?.textContent || "";
+  if (typedCity && !currentBadge.toLowerCase().includes(typedCity.toLowerCase())) {
+    const match = findBestLocalCity(typedCity);
+    if (match) {
+      applyLocation({
+        displayName: `${match.name}, ${match.admin}`,
+        lat: match.lat,
+        lon: match.lon,
+        timezone: match.iana,
+        tzOffset: match.tz,
+      });
+      hideCityDropdown();
+    }
+  }
+
   const data = new FormData(form);
   const dateStr = data.get("date");
   const timeStr = data.get("time") || "00:00:00";
@@ -828,43 +940,133 @@ if (citySearchInput) {
     if (citySearchClear) citySearchClear.hidden = val.length === 0;
 
     clearTimeout(searchDebounceTimer);
-    if (val.length < 2) {
-      hideCityDropdown();
+    if (val.length === 0) {
+      // Show popular recommendations when empty
+      const popular = LOCAL_CITIES.slice(0, 8).map((c) => ({
+        name: c.name,
+        displayName: `${c.name}, ${c.admin}`,
+        admin: c.admin,
+        countryCode: c.countryCode,
+        lat: c.lat,
+        lon: c.lon,
+        timezone: c.iana,
+      }));
+      renderCityDropdown(popular);
       return;
     }
 
-    if (cityDropdown) {
+    // 1. Instant local index lookup (0ms latency, 100% reliable)
+    const local = LOCAL_CITIES.filter(
+      (c) => c.name.toLowerCase().includes(val.toLowerCase()) || c.admin.toLowerCase().includes(val.toLowerCase())
+    ).slice(0, 8).map((c) => ({
+      name: c.name,
+      displayName: `${c.name}, ${c.admin}`,
+      admin: c.admin,
+      countryCode: c.countryCode,
+      lat: c.lat,
+      lon: c.lon,
+      timezone: c.iana,
+    }));
+
+    if (local.length > 0) {
+      renderCityDropdown(local);
+    } else if (cityDropdown) {
       cityDropdown.innerHTML = `<div class="city-dropdown-msg">Searching cities worldwide…</div>`;
       cityDropdown.hidden = false;
     }
 
-    searchDebounceTimer = setTimeout(async () => {
-      const results = await searchCitiesOnline(val);
-      if (citySearchInput.value.trim() === val) {
-        renderCityDropdown(results);
-      }
-    }, 250);
+    // 2. Debounced online lookup (250ms) to augment with global coordinates
+    if (val.length >= 2) {
+      searchDebounceTimer = setTimeout(async () => {
+        const results = await searchCitiesOnline(val);
+        if (citySearchInput.value.trim() === val && results.length > 0) {
+          renderCityDropdown(results);
+        }
+      }, 250);
+    }
   });
 
-  citySearchInput.addEventListener("keydown", (e) => {
-    if (!cityDropdown || cityDropdown.hidden || searchResults.length === 0) return;
+  citySearchInput.addEventListener("focus", () => {
+    const val = citySearchInput.value.trim();
+    if (val.length === 0) {
+      const popular = LOCAL_CITIES.slice(0, 8).map((c) => ({
+        name: c.name,
+        displayName: `${c.name}, ${c.admin}`,
+        admin: c.admin,
+        countryCode: c.countryCode,
+        lat: c.lat,
+        lon: c.lon,
+        timezone: c.iana,
+      }));
+      renderCityDropdown(popular);
+    } else {
+      const local = LOCAL_CITIES.filter(
+        (c) => c.name.toLowerCase().includes(val.toLowerCase()) || c.admin.toLowerCase().includes(val.toLowerCase())
+      ).slice(0, 8).map((c) => ({
+        name: c.name,
+        displayName: `${c.name}, ${c.admin}`,
+        admin: c.admin,
+        countryCode: c.countryCode,
+        lat: c.lat,
+        lon: c.lon,
+        timezone: c.iana,
+      }));
+      if (local.length > 0) renderCityDropdown(local);
+    }
+  });
 
-    const items = cityDropdown.querySelectorAll(".city-item");
+  citySearchInput.addEventListener("keydown", async (e) => {
+    const items = cityDropdown ? cityDropdown.querySelectorAll(".city-item") : [];
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
+      if (!cityDropdown || cityDropdown.hidden || items.length === 0) {
+        const results = await searchCitiesOnline(citySearchInput.value);
+        renderCityDropdown(results);
+        return;
+      }
       highlightedIndex = (highlightedIndex + 1) % items.length;
       items.forEach((it, idx) => it.classList.toggle("selected", idx === highlightedIndex));
       items[highlightedIndex]?.scrollIntoView({ block: "nearest" });
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
+      if (!cityDropdown || cityDropdown.hidden || items.length === 0) return;
       highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
       items.forEach((it, idx) => it.classList.toggle("selected", idx === highlightedIndex));
       items[highlightedIndex]?.scrollIntoView({ block: "nearest" });
     } else if (e.key === "Enter") {
+      e.preventDefault();
       if (highlightedIndex >= 0 && highlightedIndex < searchResults.length) {
-        e.preventDefault();
         selectCityResult(searchResults[highlightedIndex]);
+        return;
       }
+      if (searchResults.length > 0) {
+        selectCityResult(searchResults[0]);
+        return;
+      }
+      const val = citySearchInput.value.trim();
+      if (val) {
+        const local = findBestLocalCity(val);
+        if (local) {
+          selectCityResult({
+            name: local.name,
+            displayName: `${local.name}, ${local.admin}`,
+            admin: local.admin,
+            countryCode: local.countryCode,
+            lat: local.lat,
+            lon: local.lon,
+            timezone: local.iana,
+          });
+          return;
+        }
+        const online = await searchCitiesOnline(val);
+        if (online.length > 0) {
+          selectCityResult(online[0]);
+          return;
+        }
+      }
+      hideCityDropdown();
+      compute();
     } else if (e.key === "Escape") {
       hideCityDropdown();
     }
@@ -879,6 +1081,73 @@ if (citySearchClear) {
     }
     citySearchClear.hidden = true;
     hideCityDropdown();
+  });
+}
+
+// GPS Geolocation Button (Google UX pattern)
+const btnLocateMe = $("btn-locate-me");
+if (btnLocateMe) {
+  btnLocateMe.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      setStatus("Geolocation is not supported by your browser.", true);
+      return;
+    }
+    btnLocateMe.disabled = true;
+    btnLocateMe.title = "Locating via GPS…";
+    setStatus("Detecting current coordinates via GPS…");
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        btnLocateMe.disabled = false;
+        btnLocateMe.title = "Use current location (GPS)";
+        const lat = Number(pos.coords.latitude.toFixed(4));
+        const lon = Number(pos.coords.longitude.toFixed(4));
+        const closest = LOCAL_CITIES.find(
+          (c) => Math.abs(c.lat - lat) < 0.25 && Math.abs(c.lon - lon) < 0.25
+        );
+        const bestName = closest ? `${closest.name}, ${closest.admin}` : `GPS (${formatCoords(lat, lon)})`;
+        const tz = closest ? closest.tz : null;
+        let iana = closest ? closest.iana : null;
+        if (!iana) {
+          try {
+            iana = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          } catch {}
+        }
+        applyLocation({
+          displayName: bestName,
+          lat,
+          lon,
+          timezone: iana,
+          tzOffset: tz,
+        });
+        if (citySearchInput) {
+          citySearchInput.value = closest ? closest.name : bestName;
+          if (citySearchClear) citySearchClear.hidden = false;
+        }
+        hideCityDropdown();
+        compute();
+      },
+      (err) => {
+        btnLocateMe.disabled = false;
+        btnLocateMe.title = "Use current location (GPS)";
+        setStatus(`Unable to retrieve GPS coordinates: ${err.message}`, true);
+      },
+      { timeout: 8000 }
+    );
+  });
+}
+
+// Now Button for instant current date & time
+const btnNowTime = $("btn-now-time");
+if (btnNowTime) {
+  btnNowTime.addEventListener("click", () => {
+    const now = new Date();
+    const dStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const h = String(now.getHours()).padStart(2, "0");
+    const m = String(now.getMinutes()).padStart(2, "0");
+    const s = String(now.getSeconds()).padStart(2, "0");
+    form.elements.date.value = dStr;
+    form.elements.time.value = `${h}:${m}:${s}`;
+    compute();
   });
 }
 
@@ -912,7 +1181,7 @@ for (const chip of document.querySelectorAll(".btn-city-chip")) {
   });
 }
 
-// Preset chips (Modi, Delhi, Now, Rome, Y2K)
+// Preset chips (Delhi, Modi, Now, Rome, Y2K)
 for (const btn of form.querySelectorAll("[data-preset]")) {
   btn.addEventListener("click", () => {
     form.querySelectorAll("[data-preset]").forEach((b) => b.classList.remove("active"));
@@ -989,6 +1258,6 @@ setAstrologyMode("vedic");
 syncTzCustom();
 syncAyanamsa();
 
-// Auto-compute Narendra Modi reference preset on initial load for instant demonstration
-fillForm(PRESETS.modi());
+// Make New Delhi default location and current date & time on page load
+fillForm(PRESETS.delhi());
 compute();

@@ -52,8 +52,8 @@
             <div class="presets-row">
               <span class="presets-label">Quick Presets:</span>
               <div class="presets-chips">
-                <button type="button" class="preset-chip active" data-preset="modi">👑 Narendra Modi (1950)</button>
-                <button type="button" class="preset-chip" data-preset="delhi">📍 New Delhi (Now)</button>
+                <button type="button" class="preset-chip active" data-preset="delhi">📍 New Delhi (Now)</button>
+                <button type="button" class="preset-chip" data-preset="modi">👑 Narendra Modi (1950)</button>
                 <button type="button" class="preset-chip" data-preset="now">⏱️ Greenwich (Now)</button>
                 <button type="button" class="preset-chip" data-preset="rome">🏛️ Rome (1987)</button>
                 <button type="button" class="preset-chip" data-preset="y2k">🌐 Y2K (2000)</button>
@@ -64,8 +64,9 @@
             <div class="city-search-section">
               <div class="city-search-bar">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="city-search-input" placeholder="Search any city in the world (e.g. Vadnagar, New Delhi, Varanasi, London, Tokyo, New York)..." autocomplete="off">
-                <button type="button" id="city-search-clear" class="btn-clear-search" hidden title="Clear">✕</button>
+                <input type="text" id="city-search-input" placeholder="Search any city worldwide (e.g. New Delhi, Mumbai, Varanasi, London, Tokyo, New York)..." autocomplete="off">
+                <button type="button" id="city-search-clear" class="btn-clear-search" hidden title="Clear search">✕</button>
+                <button type="button" id="btn-locate-me" class="btn-locate-me" title="Use current location (GPS)">🎯</button>
                 <div id="city-search-dropdown" class="city-dropdown" hidden></div>
               </div>
 
@@ -73,19 +74,19 @@
                 <!-- Active Location Pill Badge -->
                 <div id="location-active-badge" class="location-badge">
                   <span class="badge-dot">●</span>
-                  <span id="location-name-display" class="badge-name">Vadnagar, Gujarat, India</span>
-                  <span id="location-coords-display" class="badge-meta">23.7840° N, 72.6360° E · IST (UTC+05:30)</span>
+                  <span id="location-name-display" class="badge-name">New Delhi, Delhi, India</span>
+                  <span id="location-coords-display" class="badge-meta">28.6139° N, 77.2090° E · IST (UTC+05:30)</span>
                 </div>
 
                 <!-- Popular City Quick Chips -->
                 <div class="city-chips-wrap">
                   <span class="chips-label">Popular:</span>
-                  <button type="button" class="btn-city-chip active" data-city="vadnagar">📍 Vadnagar</button>
-                  <button type="button" class="btn-city-chip" data-city="delhi">📍 New Delhi</button>
+                  <button type="button" class="btn-city-chip active" data-city="delhi">📍 New Delhi</button>
                   <button type="button" class="btn-city-chip" data-city="mumbai">📍 Mumbai</button>
                   <button type="button" class="btn-city-chip" data-city="bengaluru">📍 Bengaluru</button>
                   <button type="button" class="btn-city-chip" data-city="ujjain">📍 Ujjain</button>
                   <button type="button" class="btn-city-chip" data-city="varanasi">📍 Varanasi</button>
+                  <button type="button" class="btn-city-chip" data-city="vadnagar">📍 Vadnagar</button>
                   <button type="button" class="btn-city-chip" data-city="london">📍 London</button>
                   <button type="button" class="btn-city-chip" data-city="newyork">📍 New York</button>
                   <button type="button" class="btn-city-chip" data-city="tokyo">📍 Tokyo</button>
@@ -97,12 +98,15 @@
             <div class="form-hero-grid">
               <label class="form-group">
                 <span class="group-label">Birth Date</span>
-                <input type="date" name="date" required value="1950-09-17">
+                <input type="date" name="date" required value="2026-10-17">
               </label>
 
               <label class="form-group">
-                <span class="group-label">Birth Time <small>(Local)</small></span>
-                <input type="time" name="time" required step="1" value="09:34:00">
+                <div class="label-row-with-action">
+                  <span class="group-label">Birth Time <small>(Local)</small></span>
+                  <button type="button" id="btn-now-time" class="btn-text-action" title="Set to current time">⏱️ Now</button>
+                </div>
+                <input type="time" name="time" required step="1" value="12:00:00">
               </label>
 
               <label class="form-group">
@@ -132,28 +136,28 @@
             <!-- Advanced Astrological Parameters (Collapsible) -->
             <details class="advanced-params-drawer" id="advanced-drawer">
               <summary class="advanced-summary">
-                <span class="summary-text">⚙️ JHora Calculation Configuration &amp; Coordinates</span>
+                <span class="summary-text">⚙️ Canonical Vedic Configuration &amp; Coordinates</span>
                 <span class="summary-hint">Ayanamsa, TSSY Dasha Standard, Houses, Coordinates</span>
               </summary>
               <div class="advanced-grid">
                 <label>
                   <span class="field-label">Latitude <small>(° north +)</small></span>
-                  <input type="number" name="latitude" required min="-90" max="90" step="any" value="23.784">
+                  <input type="number" name="latitude" required min="-90" max="90" step="any" value="28.6139">
                 </label>
                 <label>
                   <span class="field-label">Longitude <small>(° east +)</small></span>
-                  <input type="number" name="longitude" required min="-180" max="180" step="any" value="72.636">
+                  <input type="number" name="longitude" required min="-180" max="180" step="any" value="77.2090">
                 </label>
                 <label id="tz-custom-wrap" class="span-2" hidden>
                   <span class="field-label">Custom UTC Offset <small>(±HH:MM)</small></span>
                   <input type="text" name="tz_custom" value="+05:30" placeholder="+05:30">
                 </label>
 
-                <!-- Vedic specific fields matching JHora defaults -->
+                <!-- Canonical Vedic Astrological Parameters -->
                 <label class="vedic-field">
                   <span class="field-label">Ayanamsa</span>
                   <select name="vedic_ayanamsa">
-                    <option value="lahiri" selected>Lahiri (Chitra Paksha) — JHora Default</option>
+                    <option value="lahiri" selected>Lahiri (Chitra Paksha) — Standard Vedic</option>
                     <option value="true_citra">True Chitra / Invariable Plane</option>
                     <option value="raman">B.V. Raman</option>
                     <option value="krishnamurti">Krishnamurti (KP)</option>
@@ -166,7 +170,7 @@
                 <label class="vedic-field">
                   <span class="field-label">Dasha Year Standard</span>
                   <select name="vedic_year_type">
-                    <option value="tssy" selected>TSSY (True Sidereal Solar Year) — JHora Default</option>
+                    <option value="tssy" selected>TSSY (True Sidereal Solar Year) — Canonical Solar Return</option>
                     <option value="sidereal">Sidereal Year (365.2564 days)</option>
                     <option value="savana">Savana Year (360 days)</option>
                     <option value="tropical">Tropical Year (365.2422 days)</option>
@@ -177,7 +181,7 @@
                 <label class="vedic-field">
                   <span class="field-label">House System</span>
                   <select name="vedic_house_system">
-                    <option value="W" selected>Whole Sign (Rashi Bhava) — JHora Default</option>
+                    <option value="W" selected>Whole Sign (Rashi Bhava) — Standard Parashari</option>
                     <option value="S">Sripati (Traditional Bhava Chalita)</option>
                     <option value="E">Equal House</option>
                     <option value="P">Placidus</option>
@@ -187,7 +191,7 @@
                 <label class="vedic-field">
                   <span class="field-label">Position Mode</span>
                   <select name="vedic_position_mode">
-                    <option value="true" selected>True / Geometric — JHora Default (TruePositions=1)</option>
+                    <option value="true" selected>Geometric / True Ephemeris (Center of Body)</option>
                     <option value="apparent">Apparent (with light-time/aberration)</option>
                   </select>
                 </label>
@@ -195,7 +199,7 @@
                 <label class="vedic-field">
                   <span class="field-label">Lunar Nodes (Rahu &amp; Ketu)</span>
                   <select name="vedic_node_type">
-                    <option value="mean" selected>Mean Node — JHora Default (TrueNodes=0)</option>
+                    <option value="mean" selected>Mean Node — Canonical Parashari</option>
                     <option value="true">True Node (Osculating Orbit)</option>
                   </select>
                 </label>
@@ -204,8 +208,8 @@
                 <label class="western-field" hidden>
                   <span class="field-label">Houses</span>
                   <select name="house_system">
+                    <option value="W" selected>Whole Sign</option>
                     <option value="P">Placidus</option>
-                    <option value="W">Whole Sign</option>
                     <option value="E">Equal</option>
                     <option value="K">Koch</option>
                     <option value="R">Regiomontanus</option>
@@ -220,14 +224,14 @@
                 <label class="western-field" hidden>
                   <span class="field-label">Zodiac</span>
                   <select name="zodiac_type">
+                    <option value="sidereal" selected>Sidereal</option>
                     <option value="tropical">Tropical</option>
-                    <option value="sidereal">Sidereal</option>
                   </select>
                 </label>
                 <label class="western-field span-2" hidden>
-                  <span class="field-label">Ayanamsa <small>(sidereal only)</small></span>
-                  <select name="ayanamsa" disabled>
-                    <option value="lahiri">Lahiri (Chitra Paksha)</option>
+                  <span class="field-label">Ayanamsa <small>(sidereal)</small></span>
+                  <select name="ayanamsa">
+                    <option value="lahiri" selected>Lahiri (Chitra Paksha)</option>
                     <option value="fagan_bradley">Fagan-Bradley</option>
                     <option value="krishnamurti">Krishnamurti (KP)</option>
                     <option value="raman">B.V. Raman</option>
@@ -407,8 +411,8 @@ const chart = engine.chart({
             <p>Computes D1 (Rasi), D9 (Navamsha), and all 16 Shodashavarga charts (D2 to D60). Rendered in high-contrast North Indian (diamond) and South Indian (box) SVGs with Kendra fills and Lagna highlights.</p>
           </article>
           <article>
-            <h3>⏳ Vimshottari Dasha (JHora TSSY)</h3>
-            <p>Multi-level Mahadasha, Antardasha, and Pratyantardasha progressions. Supports True Sidereal Solar Year (TSSY) solar return solver matching Jagannatha Hora defaults, alongside Sidereal, Savana, and Tropical years.</p>
+            <h3>⏳ Vimshottari Dasha (Canonical TSSY)</h3>
+            <p>Multi-level Mahadasha, Antardasha, and Pratyantardasha progressions. Supports True Sidereal Solar Year (TSSY) solar return solver matching canonical Parashari standards, alongside Sidereal, Savana, and Tropical years.</p>
           </article>
           <article>
             <h3>☀️ Panchanga (Five Limbs of Time)</h3>
@@ -428,7 +432,7 @@ const chart = engine.chart({
           </article>
           <article>
             <h3>Tropical and sidereal</h3>
-            <p>14 ayanamsas, including Chitrapaksha Lahiri (JHora default), True Chitra, Fagan-Bradley, Krishnamurti, Raman, and Galactic Center.</p>
+            <p>14 ayanamsas, including Chitrapaksha Lahiri (canonical Vedic default), True Chitra, Fagan-Bradley, Krishnamurti, Raman, and Galactic Center.</p>
           </article>
           <article>
             <h3>Aspects and orbs</h3>
@@ -460,8 +464,8 @@ const chart = engine.chart({
         <h2>About AstroCeleste Engine</h2>
         <div class="feature-grid three">
           <article>
-            <h3>JHora Bit-for-Bit Calibration</h3>
-            <p>Defaults are strictly aligned with Jagannatha Hora (JHora): Sidereal zodiac, Lahiri ayanamsa, Mean nodes (<code>TrueNodes=0</code>), Geometric positions (<code>TruePositions=1</code>), Whole Sign houses (<code>W</code>), and TSSY Dasha year standard.</p>
+            <h3>Canonical Parashari Calibration</h3>
+            <p>Defaults are strictly aligned with canonical Vedic Parashari standards: Sidereal zodiac, Lahiri ayanamsa, Mean nodes (<code>TrueNodes=0</code>), Geometric positions (<code>TruePositions=1</code>), Whole Sign houses (<code>W</code>), and TSSY Dasha year standard.</p>
           </article>
           <article>
             <h3>100% In-Browser Privacy</h3>

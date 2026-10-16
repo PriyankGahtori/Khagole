@@ -80,6 +80,7 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
   svgEl.replaceChildren();
   const W = 400;
   const H = 400;
+  svgEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
   const add = (tag, attrs, content) => {
     const el = document.createElementNS(SVG_NS, tag);
@@ -169,11 +170,11 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
 
       if (p.isAsc) {
         add("rect", {
-          x: px - 35,
-          y: py - 9,
-          width: 70,
-          height: 18,
-          rx: 4,
+          x: px - 44,
+          y: py - 11,
+          width: 88,
+          height: 22,
+          rx: 5,
           class: "ni-lagna-badge-bg",
         });
       }
@@ -198,15 +199,15 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
     };
 
     if (count <= 2) {
-      const lineSpacing = 17;
+      const lineSpacing = 22;
       const startY = cy - ((count - 1) * lineSpacing) / 2;
       planets.forEach((p, idx) => {
         renderPlanet(p, cx, startY + idx * lineSpacing);
       });
     } else {
       // 3 or more planets: 2-column layout to avoid clipping and overlapping
-      const colOffset = 28;
-      const lineSpacing = 16;
+      const colOffset = 34;
+      const lineSpacing = 20;
       const rows = Math.ceil(count / 2);
       const startY = cy - ((rows - 1) * lineSpacing) / 2;
       planets.forEach((p, idx) => {
@@ -238,6 +239,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
   const W = 400;
   const H = 400;
   const CELL = 100;
+  svgEl.setAttribute("viewBox", `0 0 ${W} ${H}`);
 
   const add = (tag, attrs, content) => {
     const el = document.createElementNS(SVG_NS, tag);
@@ -330,7 +332,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
       "text",
       {
         x: x0 + 6,
-        y: y0 + 15,
+        y: y0 + 16,
         class: `si-sign-label ${isLagna ? "is-lagna" : ""}`,
       },
       `${signObj.sa} ${signObj.sym}`,
@@ -346,7 +348,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
       "text",
       {
         x: x0 + CELL - 6,
-        y: y0 + 15,
+        y: y0 + 16,
         class: `si-house-tag ${isKendra ? "kendra" : ""}`,
         "text-anchor": "end",
       },
@@ -370,6 +372,17 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
       const label = p.isAsc ? `Asc ${degStr.trim()}` : `${info.abbr}${degStr}${retro}`;
 
       if (py < y0 + CELL - 4) {
+        if (p.isAsc) {
+          add("rect", {
+            x: px - 2,
+            y: py - 10,
+            width: Math.min(CELL - (px - x0) - 4, 76),
+            height: 17,
+            rx: 4,
+            class: "si-lagna-badge-bg",
+          });
+        }
+
         add(
           "text",
           {
@@ -384,17 +397,17 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     };
 
     if (count <= 3) {
-      const startY = y0 + 34;
-      const lineSpacing = 16;
+      const startY = y0 + 38;
+      const lineSpacing = 19;
       planets.forEach((p, idx) => {
         renderSiPlanet(p, x0 + 7, startY + idx * lineSpacing);
       });
     } else {
       // 4+ planets: 2-column layout to prevent clipping in cell
-      const startY = y0 + 33;
-      const lineSpacing = 15;
+      const startY = y0 + 38;
+      const lineSpacing = 18;
       planets.forEach((p, idx) => {
-        const px = idx % 2 === 0 ? x0 + 6 : x0 + 51;
+        const px = idx % 2 === 0 ? x0 + 5 : x0 + 52;
         const py = startY + Math.floor(idx / 2) * lineSpacing;
         renderSiPlanet(p, px, py);
       });
