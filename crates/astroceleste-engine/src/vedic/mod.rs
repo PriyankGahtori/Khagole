@@ -5,7 +5,10 @@ pub mod divisional;
 pub mod nakshatra;
 pub mod panchang;
 
-pub use dasha::{calc_vimshottari_dasha, DashaNode, YearType};
+pub use dasha::{
+    advance_tssy, calc_vimshottari_dasha, calc_vimshottari_dasha_with_sun, find_solar_return,
+    DashaNode, YearType,
+};
 pub use divisional::{
     calc_divisional_chart, calc_divisional_point, DivisionalChart, DivisionalPlanet,
     DivisionalPosition,

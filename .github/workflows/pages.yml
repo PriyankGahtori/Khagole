@@ -6,7 +6,7 @@ name: Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/vedic-ephemeris-modes]
     paths:
       - "site/**"
       - "crates/astroceleste-engine/**"
@@ -27,7 +27,7 @@ env:
 
 jobs:
   build:
-    if: github.repository_owner == 'ffalcinelli'
+    if: github.repository_owner == 'ffalcinelli' || github.repository_owner == 'PriyankGahtori'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

@@ -148,10 +148,20 @@
                 </select>
               </label>
 
-              <label class="vedic-field span-2">Lunar Nodes (Rahu &amp; Ketu)
+              <label class="vedic-field">Lunar Nodes (Rahu &amp; Ketu)
                 <select name="vedic_node_type">
                   <option value="mean" selected>Mean Node (Canonical Parashari)</option>
                   <option value="true">True Node (Osculating Orbit)</option>
+                </select>
+              </label>
+
+              <label class="vedic-field">Dasha Year Standard
+                <select name="vedic_year_type">
+                  <option value="tssy" selected>TSSY (True Sidereal Solar Year) — Default</option>
+                  <option value="sidereal">Sidereal Year (365.2564 days)</option>
+                  <option value="savana">Savana Year (360 days)</option>
+                  <option value="tropical">Tropical Year (365.2422 days)</option>
+                  <option value="julian">Julian Year (365.25 days)</option>
                 </select>
               </label>
 

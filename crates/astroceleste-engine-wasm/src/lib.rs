@@ -697,7 +697,8 @@ pub fn calc_vimshottari_dasha_js(
         Some("savana") => YearType::Savana,
         Some("tropical") => YearType::Tropical,
         Some("julian") => YearType::Julian,
-        _ => YearType::Sidereal,
+        Some("sidereal") => YearType::Sidereal,
+        _ => YearType::Tssy,
     };
     let d = depth.unwrap_or(3);
     let tree = calc_vimshottari_dasha(moon_lon, birth_jd, d, yt);

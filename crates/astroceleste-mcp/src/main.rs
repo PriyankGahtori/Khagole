@@ -457,7 +457,8 @@ fn handle_tool_call(kernels: &KernelSet, name: &str, arguments: &Value) -> Resul
                 Some("savana") => YearType::Savana,
                 Some("tropical") => YearType::Tropical,
                 Some("julian") => YearType::Julian,
-                _ => YearType::Sidereal,
+                Some("sidereal") => YearType::Sidereal,
+                _ => YearType::Tssy,
             };
 
             let tree = calc_vimshottari_dasha(moon_lon, birth_jd, depth, year_type);

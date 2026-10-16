@@ -282,7 +282,8 @@ async function compute() {
       const moonLon = moon ? moon.ecliptic_longitude : 0.0;
 
       const panchang = calcPanchang(sunLon, moonLon, jd);
-      const dasha = calcVimshottariDasha(moonLon, jd, 3, "sidereal");
+      const yearType = data.get("vedic_year_type") || "tssy";
+      const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType);
 
       lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd };
       renderVedicView(lastVedicData);

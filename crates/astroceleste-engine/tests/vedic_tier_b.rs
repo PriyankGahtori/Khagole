@@ -67,13 +67,13 @@ fn test_modi_chart_divisional_d9_and_dasha() {
     assert_eq!(d9_sun.sign, 10, "Modi D9 Sun is Capricorn (10)");
     assert_eq!(d9_sun.house, 1);
 
-    // 2. Test Vimshottari Dasha
+    // 2. Test Vimshottari Dasha (Default YearType is TSSY)
     let moon = chart.planets.iter().find(|p| p.name == "Moon").unwrap();
     let dasha = calc_vimshottari_dasha(
         moon.ecliptic_longitude,
         instant.julian_day(),
         3,
-        YearType::Sidereal,
+        YearType::default(),
     );
 
     assert_eq!(dasha.len(), 9);
@@ -87,6 +87,14 @@ fn test_modi_chart_divisional_d9_and_dasha() {
     assert_eq!(dasha[6].planet, "Mars");
     assert_eq!(dasha[7].planet, "Rahu");
     assert_eq!(dasha[8].planet, "Jupiter");
+
+    // Exact TSSY dates matching JHora ground truth
+    assert_eq!(dasha[1].start_date, "1963-02-15");
+    assert_eq!(dasha[2].start_date, "1980-02-15");
+    assert_eq!(dasha[3].start_date, "1987-02-15");
+    assert_eq!(dasha[4].start_date, "2007-02-15");
+    assert_eq!(dasha[6].start_date, "2023-02-15");
+    assert_eq!(dasha[7].start_date, "2030-02-15");
 
     // Sub-periods: Saturn Mahadasha has 9 Antardashas
     assert_eq!(dasha[0].children.len(), 9);
