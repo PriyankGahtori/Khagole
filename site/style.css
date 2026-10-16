@@ -636,21 +636,163 @@ td.num { text-align: right; }
   font-weight: 600;
 }
 
-/* Panchanga Bar */
+/* Panchanga Card */
 .panchang-card {
-  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
+
+.panchang-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panchang-hero-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.panchang-masa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.panchang-season-tag {
+  font-size: 0.82rem;
+  color: var(--dim);
+}
+
+.panchang-samvat-tag {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .panchang-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
 }
+
 .panchang-item {
-  display: flex; flex-direction: column; gap: 2px;
-  border-left: 2px solid var(--accent); padding-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: color-mix(in srgb, var(--panel-subtle) 40%, transparent);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: calc(var(--radius) - 2px);
+  padding: 10px 14px;
+  transition: border-color 0.15s ease;
 }
-.panchang-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); }
-.panchang-val { font-size: 0.95rem; color: var(--text); font-weight: 600; }
-.panchang-sub { font-size: 0.78rem; color: var(--muted); }
+
+.panchang-item:hover {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+}
+
+.panchang-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  font-weight: 600;
+}
+
+.panchang-val {
+  font-size: 0.98rem;
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.panchang-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.panchang-sub strong {
+  color: var(--text);
+}
+
+/* Solar & Muhurta Timings Strip */
+.panchang-timings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.panchang-timings-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  font-weight: 600;
+}
+
+.panchang-timings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.panchang-timing-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: calc(var(--radius) - 4px);
+  background: color-mix(in srgb, var(--panel-subtle) 60%, transparent);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+
+.panchang-timing-chip.inauspicious {
+  border-left: 3px solid #ef4444;
+}
+
+.panchang-timing-chip.auspicious {
+  border-left: 3px solid #10b981;
+}
+
+.panchang-timing-chip.solar {
+  border-left: 3px solid #f59e0b;
+}
+
+.panchang-timing-name {
+  font-size: 0.72rem;
+  color: var(--dim);
+}
+
+.panchang-timing-val {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
 
 /* Vedic Results Workspace */
 .vedic-results-root { display: flex; flex-direction: column; gap: 24px; width: 100%; }

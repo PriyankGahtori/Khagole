@@ -15,5 +15,5 @@ pub use divisional::{
 };
 pub use nakshatra::{nakshatra_info, NakshatraInfo};
 pub use panchang::{
-    calc_panchang, KaranaInfo, PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YogaInfo,
+    calc_panchang, KaranaInfo, MasaInfo, PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YogaInfo,
 };

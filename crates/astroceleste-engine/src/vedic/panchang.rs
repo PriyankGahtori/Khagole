@@ -48,6 +48,17 @@ pub const SAMVAT_NAMES: [&str; 60] = [
     "Dundubhi", "Rudhirodgarin", "Raktakshi", "Krodhana", "Akshaya",
 ];
 
+/// The 12 Vedic Lunar Month (Masa) names.
+pub const LUNAR_MONTH_NAMES: [&str; 12] = [
+    "Chaitra", "Vaisakha", "Jyeshtha", "Ashadha", "Shravana", "Bhadrapada",
+    "Ashwina", "Kartika", "Margashirsha", "Pausha", "Magha", "Phalguna",
+];
+
+/// The 6 Vedic Seasons (Ritu).
+pub const RITU_NAMES: [&str; 6] = [
+    "Vasanta", "Grishma", "Varsha", "Sharad", "Hemanta", "Shishira",
+];
+
 /// Tithi (lunar day) information.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TithiInfo {
@@ -64,12 +75,18 @@ pub struct TithiInfo {
 /// Vara (solar weekday) information.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct VaraInfo {
-    /// 0-based weekday index (0 = Sunday .. 6 = Saturday).
+    /// 0-based civil weekday index (0 = Sunday .. 6 = Saturday).
     pub number: u8,
-    /// Name of the weekday.
+    /// Name of the civil weekday (e.g. "Saturday").
     pub name: String,
-    /// Planetary lord governing the weekday.
+    /// Planetary lord governing the civil weekday.
     pub lord: String,
+    /// Name of the Vedic weekday from local sunrise (e.g. "Friday" if before sunrise).
+    pub vedic_name: String,
+    /// Planetary lord governing the Vedic weekday.
+    pub vedic_lord: String,
+    /// Whether the instant is before local sunrise on this civil day.
+    pub is_before_sunrise: bool,
 }
 
 /// Yoga (luni-solar angular combination) information.
@@ -94,6 +111,21 @@ pub struct KaranaInfo {
     pub percent_left: f64,
 }
 
+/// Vedic Lunar Month (Masa), Paksha, Season (Ritu), and Sun course (Ayana).
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct MasaInfo {
+    /// Amanta lunar month name (month reckoned from New Moon to New Moon).
+    pub amanta: String,
+    /// Purnimanta lunar month name (month reckoned from Full Moon to Full Moon).
+    pub purnimanta: String,
+    /// Fortnight: "Shukla" (waxing) or "Krishna" (waning).
+    pub paksha: String,
+    /// Season (Ritu): Vasanta, Grishma, Varsha, Sharad, Hemanta, Shishira.
+    pub ritu: String,
+    /// Sun's course: "Uttarayana" (Northward) or "Dakshinayana" (Southward).
+    pub ayana: String,
+}
+
 /// Hindu Samvatsara calendar years.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SamvatInfo {
@@ -109,7 +141,7 @@ pub struct SamvatInfo {
     pub vikram_name: String,
 }
 
-/// Complete five-limbed Panchanga result.
+/// Complete Vedic Panchanga result (Five Angas + Masa + Samvat).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PanchangResult {
     /// Tithi limb.
@@ -124,18 +156,21 @@ pub struct PanchangResult {
     pub yoga: YogaInfo,
     /// Karana limb.
     pub karana: KaranaInfo,
+    /// Lunar month (Masa), Paksha, Ritu, Ayana.
+    pub masa: MasaInfo,
     /// Samvat eras.
     pub samvat: SamvatInfo,
 }
 
-/// Compute Panchanga from Sun and Moon longitudes and Julian Day.
+/// Compute Panchanga from Sun and Moon sidereal longitudes and Julian Day.
 pub fn calc_panchang(
     sun_lon: f64,
     moon_lon: f64,
     jd: f64,
     local_weekday: Option<u8>,
+    is_before_sunrise: Option<bool>,
 ) -> PanchangResult {
-    // 1. Tithi: Moon - Sun difference (12° each, 30 tithis total)
+    // 1. Tithi: Moon - Sun difference (12° each, 30 tithis total in lunation)
     let diff = (moon_lon - sun_lon).rem_euclid(360.0);
     let tithi_idx = (diff / 12.0).floor() as usize; // 0..29
     let tithi_num = (tithi_idx + 1) as u8;
@@ -157,15 +192,27 @@ pub fn calc_panchang(
         percent_left: tithi_percent_left,
     };
 
-    // 2. Vara: Day of the week
-    let weekday_num = local_weekday.unwrap_or_else(|| {
+    // 2. Vara: Day of the week (Civil and Vedic Sunrise-based)
+    let civil_weekday_num = local_weekday.unwrap_or_else(|| {
         ((jd + 1.5).floor() as i64).rem_euclid(7) as u8
-    });
-    let (vara_name, vara_lord) = VARA_NAMES[weekday_num as usize % 7];
+    }) % 7;
+    let (civil_name, civil_lord) = VARA_NAMES[civil_weekday_num as usize];
+
+    let before_sunrise = is_before_sunrise.unwrap_or(false);
+    let vedic_weekday_num = if before_sunrise {
+        (civil_weekday_num + 6) % 7 // Vedic day begins at sunrise; previous day still in effect
+    } else {
+        civil_weekday_num
+    };
+    let (vedic_name, vedic_lord) = VARA_NAMES[vedic_weekday_num as usize];
+
     let vara = VaraInfo {
-        number: weekday_num,
-        name: vara_name.to_string(),
-        lord: vara_lord.to_string(),
+        number: civil_weekday_num,
+        name: civil_name.to_string(),
+        lord: civil_lord.to_string(),
+        vedic_name: vedic_name.to_string(),
+        vedic_lord: vedic_lord.to_string(),
+        is_before_sunrise: before_sunrise,
     };
 
     // 3. Nakshatra: from Moon's sidereal longitude
@@ -173,7 +220,7 @@ pub fn calc_panchang(
     let nakshatra_span = 360.0 / 27.0;
     let nakshatra_percent_left = (1.0 - (moon_lon.rem_euclid(360.0) % nakshatra_span) / nakshatra_span) * 100.0;
 
-    // 4. Yoga: Sun + Moon longitude
+    // 4. Yoga: sidereal Sun + sidereal Moon longitude
     let yoga_val = (sun_lon + moon_lon).rem_euclid(360.0) / (360.0 / 27.0);
     let yoga_idx = (yoga_val.floor() as usize).min(26);
     let yoga = YogaInfo {
@@ -199,7 +246,36 @@ pub fn calc_panchang(
         percent_left: karana_percent_left,
     };
 
-    // 6. Samvatsara calculations
+    // 6. Masa: Lunar month (Amanta and Purnimanta), Paksha, Season (Ritu), Ayana
+    // Sun moves ~0.98564°/day, Moon-Sun elongation rate ~12.19075°/day.
+    // In the time it took Moon to pull ahead by `diff` degrees from New Moon:
+    // Sun progress since New Moon = diff * (0.98564 / 12.19075) = diff * 0.0808515°
+    let sun_at_nm = (sun_lon - diff * 0.0808515).rem_euclid(360.0);
+    let amanta_idx = ((sun_at_nm / 30.0).floor() as usize + 1) % 12;
+    let amanta_month = LUNAR_MONTH_NAMES[amanta_idx];
+    let is_krishna = tithi_num > 15;
+    let purnimanta_idx = (amanta_idx + if is_krishna { 1 } else { 0 }) % 12;
+    let purnimanta_month = LUNAR_MONTH_NAMES[purnimanta_idx];
+
+    let sun_sign_idx = ((sun_lon.rem_euclid(360.0) / 30.0).floor() as usize) % 12;
+    let ritu_name = RITU_NAMES[sun_sign_idx / 2];
+
+    let norm_sun = sun_lon.rem_euclid(360.0);
+    let ayana_name = if norm_sun >= 270.0 || norm_sun < 90.0 {
+        "Uttarayana"
+    } else {
+        "Dakshinayana"
+    };
+
+    let masa = MasaInfo {
+        amanta: amanta_month.to_string(),
+        purnimanta: purnimanta_month.to_string(),
+        paksha: paksha.to_string(),
+        ritu: ritu_name.to_string(),
+        ayana: ayana_name.to_string(),
+    };
+
+    // 7. Samvatsara calculations
     let (civil_year, civil_month, ..) = UtcInstant::from_julian_day(jd).civil();
     let samvat_base_year = if civil_month >= 4 {
         civil_year
@@ -225,6 +301,7 @@ pub fn calc_panchang(
         nakshatra_percent_left,
         yoga,
         karana,
+        masa,
         samvat,
     }
 }
@@ -236,19 +313,32 @@ mod tests {
     #[test]
     fn test_panchang_limbs() {
         // New moon: Sun=10°, Moon=10° -> Tithi 1 (Shukla Pratipada), Yoga Vishkambha
-        let res = calc_panchang(10.0, 10.0, 2451545.0, Some(6));
+        let res = calc_panchang(10.0, 10.0, 2451545.0, Some(6), None);
         assert_eq!(res.tithi.number, 1);
         assert_eq!(res.tithi.paksha, "Shukla");
         assert_eq!(res.karana.name, "Kimstughna");
         assert_eq!(res.vara.name, "Saturday");
         assert_eq!(res.vara.lord, "Saturn");
+        assert_eq!(res.vara.vedic_name, "Saturday");
         assert_eq!(res.yoga.name, "Priti"); // 20.0 / (360/27) = 1.5 -> index 1 = Priti
+        assert_eq!(res.masa.amanta, "Vaisakha");
+    }
+
+    #[test]
+    fn test_before_sunrise_vara() {
+        // Moment before sunrise on Saturday: Vedic day is Friday (Venus)
+        let res = calc_panchang(10.0, 10.0, 2451545.0, Some(6), Some(true));
+        assert_eq!(res.vara.name, "Saturday");
+        assert_eq!(res.vara.lord, "Saturn");
+        assert_eq!(res.vara.vedic_name, "Friday");
+        assert_eq!(res.vara.vedic_lord, "Venus");
+        assert!(res.vara.is_before_sunrise);
     }
 
     #[test]
     fn test_full_moon_tithi() {
         // Waxing Gibbous approaching Full Moon: Sun=0°, Moon=175° -> Tithi 15 (Purnima)
-        let res = calc_panchang(0.0, 175.0, 2451545.0, None);
+        let res = calc_panchang(0.0, 175.0, 2451545.0, None, None);
         assert_eq!(res.tithi.number, 15);
         assert_eq!(res.tithi.paksha, "Shukla");
         assert_eq!(res.tithi.name, "Purnima (Shukla 15)");

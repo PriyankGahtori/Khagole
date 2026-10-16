@@ -1,5 +1,5 @@
 // Live demo: astroceleste-engine compiled to WebAssembly, computing Vedic Jyotish charts in the browser.
-import init, * as wasm from "./pkg/astroceleste_engine_wasm.js?v=2.2.0";
+import init, * as wasm from "./pkg/astroceleste_engine_wasm.js?v=2.3.0";
 import {
   renderNorthIndianChart,
   renderSouthIndianChart,
@@ -9,7 +9,7 @@ import {
   formatDegMin,
   formatDms,
   VARGA_LIST,
-} from "./vedic.js?v=2.2.0";
+} from "./vedic.js?v=2.3.0";
 
 const { Engine, julianDay, calcDivisional, calcPanchang, calcVimshottariDasha } = wasm;
 
@@ -503,11 +503,85 @@ async function compute() {
     const sunLon = sun ? sun.ecliptic_longitude : 0.0;
     const moonLon = moon ? moon.ecliptic_longitude : 0.0;
 
-    const panchang = calcPanchang(sunLon, moonLon, jd);
+    // Determine local civil weekday from input date string (0=Sunday .. 6=Saturday)
+    const [yNum, mNum, dNum] = dateStr.split("-").map(Number);
+    const localDateObj = new Date(Date.UTC(yNum, mNum - 1, dNum, 12, 0, 0));
+    const localWeekday = localDateObj.getUTCDay();
+
+    // Astronomical Sunrise & Sunset for the user's selected civil date
+    let isBeforeSunrise = false;
+    let timings = null;
+
+    try {
+      // Query local solar noon to get exact sunrise and sunset for this specific date
+      const noonUtc = localToUtc(dateStr, "12:00:00", tzOffset);
+      const noonChart = engine.chart({ ...vedicReq, utc: noonUtc });
+      if (noonChart && noonChart.planetary_hours) {
+        const localSunrise = noonChart.planetary_hours.sunrise;
+        const localSunset = noonChart.planetary_hours.sunset;
+
+        const birthTimeUtc = new Date(utc).getTime();
+        const sunriseTimeUtc = new Date(localSunrise).getTime();
+        const sunsetTimeUtc = new Date(localSunset).getTime();
+
+        if (birthTimeUtc < sunriseTimeUtc) {
+          isBeforeSunrise = true;
+        }
+
+        // Calculate Day Duration (Dina Mana) in ms
+        const dayDurMs = Math.max(1000, sunsetTimeUtc - sunriseTimeUtc);
+        const partMs = dayDurMs / 8;
+
+        // Classical Trikalam fraction by weekday (0=Sun .. 6=Sat)
+        const RAHU_ORDER = [7, 1, 6, 4, 5, 3, 2];
+        const GULIKA_ORDER = [6, 5, 4, 3, 2, 1, 0];
+        const YAMAGANDA_ORDER = [4, 3, 2, 1, 0, 6, 5];
+
+        const rahuPeriod = RAHU_ORDER[localWeekday];
+        const gulikaPeriod = GULIKA_ORDER[localWeekday];
+        const yamagandaPeriod = YAMAGANDA_ORDER[localWeekday];
+
+        const rahuStart = new Date(sunriseTimeUtc + rahuPeriod * partMs);
+        const rahuEnd = new Date(rahuStart.getTime() + partMs);
+
+        const gulikaStart = new Date(sunriseTimeUtc + gulikaPeriod * partMs);
+        const gulikaEnd = new Date(gulikaStart.getTime() + partMs);
+
+        const yamagandaStart = new Date(sunriseTimeUtc + yamagandaPeriod * partMs);
+        const yamagandaEnd = new Date(yamagandaStart.getTime() + partMs);
+
+        // Abhijit Muhurta: 8th muhurta of 15 daytime muhurtas (sr + 7/15 to sr + 8/15)
+        const muhurtaLength = dayDurMs / 15;
+        const abhijitStart = new Date(sunriseTimeUtc + 7 * muhurtaLength);
+        const abhijitEnd = new Date(sunriseTimeUtc + 8 * muhurtaLength);
+
+        // Janma Ghati: elapsed minutes since sunrise / 24
+        const elapsedSinceRiseMs = birthTimeUtc - sunriseTimeUtc;
+        const ghatisSinceSunrise = elapsedSinceRiseMs / (24 * 60 * 1000);
+
+        timings = {
+          sunrise: new Date(localSunrise),
+          sunset: new Date(localSunset),
+          dayDurationMinutes: Math.round(dayDurMs / 60000),
+          hourRuler: chart.planetary_hours ? chart.planetary_hours.hour_ruler : null,
+          hourNumber: chart.planetary_hours ? chart.planetary_hours.hour_number : null,
+          hourType: chart.planetary_hours ? chart.planetary_hours.hour_type : null,
+          rahuKalam: { start: rahuStart, end: rahuEnd },
+          gulikaKalam: { start: gulikaStart, end: gulikaEnd },
+          yamaganda: { start: yamagandaStart, end: yamagandaEnd },
+          abhijit: localWeekday === 3 ? null : { start: abhijitStart, end: abhijitEnd },
+          ghatisSinceSunrise: ghatisSinceSunrise >= 0 ? ghatisSinceSunrise : null,
+        };
+      }
+    } catch (e) {
+      console.warn("Could not calculate solar timings:", e);
+    }
+
+    const panchang = calcPanchang(sunLon, moonLon, jd, localWeekday, isBeforeSunrise);
     const yearType = data.get("vedic_year_type") || "tssy";
     const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType);
 
-    lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd, ascLon };
+    lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd, ascLon, timings, tzOffset };
     renderVedicView(lastVedicData);
 
     const ms = performance.now() - start;
@@ -616,7 +690,7 @@ function renderVedicView(data) {
   $("vedic-result").hidden = false;
 
   renderVedicCharts(data);
-  renderPanchang($("vedic-panchang"), data.panchang);
+  renderPanchang($("vedic-panchang"), data.panchang, data.timings, data.tzOffset);
   renderVedicPlanetsTable($("vedic-planets"), data.d1, data.d9, data.chart, wasm);
   renderVimshottariDasha($("vedic-dasha"), data.dasha, data.moonLon, data.jd, wasm);
 
@@ -625,6 +699,7 @@ function renderVedicView(data) {
       d1: data.d1,
       d9: data.d9,
       panchang: data.panchang,
+      timings: data.timings,
       dasha: data.dasha,
       planets: data.chart.planets,
     },

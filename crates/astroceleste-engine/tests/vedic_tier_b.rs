@@ -109,6 +109,7 @@ fn test_modi_chart_divisional_d9_and_dasha() {
         moon.ecliptic_longitude,
         instant.julian_day(),
         Some(0), // Sunday in local IST
+        Some(false),
     );
 
     // Tithi: Shukla Shashthi (6)
@@ -118,6 +119,8 @@ fn test_modi_chart_divisional_d9_and_dasha() {
     assert_eq!(panchang.vara.lord, "Sun");
     assert_eq!(panchang.nakshatra.name, "Anuradha");
     assert_eq!(panchang.nakshatra.lord, "Saturn");
+    assert_eq!(panchang.masa.amanta, "Bhadrapada");
+    assert_eq!(panchang.masa.paksha, "Shukla");
     assert_eq!(panchang.samvat.vikram_year, 2007);
 }
 

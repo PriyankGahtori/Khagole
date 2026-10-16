@@ -485,7 +485,8 @@ fn handle_tool_call(kernels: &KernelSet, name: &str, arguments: &Value) -> Resul
             };
 
             let weekday = arguments["weekday"].as_u64().map(|w| w as u8);
-            let panchang = calc_panchang(sun_lon, moon_lon, jd, weekday);
+            let is_before_sunrise = arguments["is_before_sunrise"].as_bool();
+            let panchang = calc_panchang(sun_lon, moon_lon, jd, weekday, is_before_sunrise);
             let panchang_json = serde_json::to_value(&panchang).map_err(|e| e.to_string())?;
             Ok(json!({
                 "content": [

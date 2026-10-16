@@ -190,7 +190,7 @@ pub use time_lords::{time_lords, Firdaria, Period, Profection, TimeLords, MAX_TI
 pub use vedic::{
     advance_tssy, calc_divisional_chart, calc_divisional_point, calc_panchang,
     calc_vimshottari_dasha, calc_vimshottari_dasha_with_sun, find_solar_return, nakshatra_info,
-    DashaNode, DivisionalChart, DivisionalPlanet, DivisionalPosition, KaranaInfo, NakshatraInfo,
-    PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YearType, YogaInfo,
+    DashaNode, DivisionalChart, DivisionalPlanet, DivisionalPosition, KaranaInfo, MasaInfo,
+    NakshatraInfo, PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YearType, YogaInfo,
 };
 pub use zodiac::{ayanamsa, ayanamsa_info, AyanamsaInfo, DEFAULT_AYANAMSA};

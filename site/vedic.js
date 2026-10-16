@@ -615,7 +615,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
 
 // ---------------------------------------------------------------------------- Panchanga Renderer
 
-export function renderPanchang(containerEl, panchang) {
+export function renderPanchang(containerEl, panchang, timings, tzOffset) {
   if (!panchang) {
     containerEl.hidden = true;
     return;
@@ -627,40 +627,135 @@ export function renderPanchang(containerEl, panchang) {
   const yogaLeft = panchang.yoga ? panchang.yoga.percent_left?.toFixed(1) : "";
   const karanaLeft = panchang.karana ? panchang.karana.percent_left?.toFixed(1) : "";
 
+  // Time formatting helper
+  const fmtTime = (dateObj) => {
+    if (!dateObj) return "–";
+    const mSign = tzOffset && tzOffset.startsWith("-") ? -1 : 1;
+    const parts = tzOffset ? tzOffset.replace(/^[+-]/, "").split(":").map(Number) : [5, 30];
+    const tzMinutes = mSign * (parts[0] * 60 + (parts[1] || 0));
+    const localMs = dateObj.getTime() + tzMinutes * 60 * 1000;
+    const d = new Date(localMs);
+    const hh = d.getUTCHours();
+    const mm = String(d.getUTCMinutes()).padStart(2, "0");
+    const ampm = hh >= 12 ? "PM" : "AM";
+    const h12 = hh % 12 === 0 ? 12 : hh % 12;
+    return `${h12}:${mm} ${ampm}`;
+  };
+
+  // Vara label and subtitle
+  const isBeforeSr = panchang.vara?.is_before_sunrise;
+  const varaTitle = panchang.vara?.name || "–";
+  const varaSub = isBeforeSr
+    ? `Vedic: <strong>${panchang.vara?.vedic_name}</strong> (${panchang.vara?.vedic_lord}) · Until Sunrise`
+    : `Lord: <strong>${panchang.vara?.lord || "–"}</strong>`;
+
+  // Masa and Ritu
+  const amantaMonth = panchang.masa?.amanta || "";
+  const purnimantaMonth = panchang.masa?.purnimanta || "";
+  const paksha = panchang.masa?.paksha || panchang.tithi?.paksha || "";
+  const ritu = panchang.masa?.ritu || "";
+  const ayana = panchang.masa?.ayana || "";
+  const monthDisplay = amantaMonth === purnimantaMonth
+    ? `${amantaMonth} Masa`
+    : `${amantaMonth} (Amanta) / ${purnimantaMonth} (Purnimanta)`;
+
+  // Timings strip HTML
+  let timingsHtml = "";
+  if (timings && timings.sunrise && timings.sunset) {
+    const sunriseStr = fmtTime(timings.sunrise);
+    const sunsetStr = fmtTime(timings.sunset);
+    const rahuStr = timings.rahuKalam ? `${fmtTime(timings.rahuKalam.start)} – ${fmtTime(timings.rahuKalam.end)}` : "–";
+    const yamaStr = timings.yamaganda ? `${fmtTime(timings.yamaganda.start)} – ${fmtTime(timings.yamaganda.end)}` : "–";
+    const gulikaStr = timings.gulikaKalam ? `${fmtTime(timings.gulikaKalam.start)} – ${fmtTime(timings.gulikaKalam.end)}` : "–";
+    const abhijitStr = timings.abhijit ? `${fmtTime(timings.abhijit.start)} – ${fmtTime(timings.abhijit.end)}` : "Not on Wed";
+    const dayHours = Math.floor(timings.dayDurationMinutes / 60);
+    const dayMins = timings.dayDurationMinutes % 60;
+    const dinaMana = `${dayHours}h ${dayMins}m`;
+    const horaStr = timings.hourRuler ? `${timings.hourRuler} (${timings.hourType || ""} H${timings.hourNumber || ""})` : "–";
+
+    timingsHtml = `
+      <div class="panchang-timings-container">
+        <div class="panchang-timings-title">Auspicious &amp; Inauspicious Timings (सूर्य एवं काल समय)</div>
+        <div class="panchang-timings-grid">
+          <div class="panchang-timing-chip solar">
+            <span class="panchang-timing-name">Sunrise (सूर्योदय)</span>
+            <strong class="panchang-timing-val">${sunriseStr}</strong>
+          </div>
+          <div class="panchang-timing-chip solar">
+            <span class="panchang-timing-name">Sunset (सूर्यास्त)</span>
+            <strong class="panchang-timing-val">${sunsetStr}</strong>
+          </div>
+          <div class="panchang-timing-chip solar">
+            <span class="panchang-timing-name">Dina Mana (दिन मान)</span>
+            <strong class="panchang-timing-val">${dinaMana}</strong>
+          </div>
+          <div class="panchang-timing-chip solar">
+            <span class="panchang-timing-name">Hora Lord (होरा)</span>
+            <strong class="panchang-timing-val">${horaStr}</strong>
+          </div>
+          <div class="panchang-timing-chip inauspicious">
+            <span class="panchang-timing-name">Rahu Kalam (राहु काल)</span>
+            <strong class="panchang-timing-val">${rahuStr}</strong>
+          </div>
+          <div class="panchang-timing-chip inauspicious">
+            <span class="panchang-timing-name">Yamaganda (यमगण्ड)</span>
+            <strong class="panchang-timing-val">${yamaStr}</strong>
+          </div>
+          <div class="panchang-timing-chip auspicious">
+            <span class="panchang-timing-name">Gulika Kalam (गुलिक काल)</span>
+            <strong class="panchang-timing-val">${gulikaStr}</strong>
+          </div>
+          <div class="panchang-timing-chip auspicious">
+            <span class="panchang-timing-name">Abhijit (अभिजीत मुहूर्त)</span>
+            <strong class="panchang-timing-val">${abhijitStr}</strong>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   containerEl.innerHTML = `
     <div class="panchang-card">
+      <div class="panchang-header">
+        <div class="panchang-hero-group">
+          <span class="panchang-masa-badge">
+            <span>📅 ${monthDisplay}</span>
+            <span>· ${paksha} Paksha</span>
+          </span>
+          <span class="panchang-season-tag">🍃 ${ritu} Ritu · ☀️ ${ayana}</span>
+        </div>
+        <div class="panchang-samvat-tag">
+          Vikram ${panchang.samvat?.vikram_year || "–"} (${panchang.samvat?.vikram_name || "–"}) · Shaka ${panchang.samvat?.shaka_year || "–"} (${panchang.samvat?.shaka_name || "–"})
+        </div>
+      </div>
       <div class="panchang-grid">
         <div class="panchang-item">
-          <span class="panchang-label">Tithi (तिथि)</span>
+          <span class="panchang-label">1. Tithi (तिथि)</span>
           <strong class="panchang-val">${panchang.tithi?.name || "–"}</strong>
-          <small class="panchang-sub">${panchang.tithi?.paksha || ""} Paksha · ${tithiLeft}% left</small>
+          <small class="panchang-sub">${paksha} Paksha · ${tithiLeft}% left</small>
         </div>
         <div class="panchang-item">
-          <span class="panchang-label">Vara (वार)</span>
-          <strong class="panchang-val">${panchang.vara?.name || "–"}</strong>
-          <small class="panchang-sub">Lord: ${panchang.vara?.lord || "–"}</small>
+          <span class="panchang-label">2. Vara (वार)</span>
+          <strong class="panchang-val">${varaTitle}</strong>
+          <small class="panchang-sub">${varaSub}</small>
         </div>
         <div class="panchang-item">
-          <span class="panchang-label">Nakshatra (नक्षत्र)</span>
+          <span class="panchang-label">3. Nakshatra (नक्षत्र)</span>
           <strong class="panchang-val">${panchang.nakshatra?.name || "–"} (Pada ${panchang.nakshatra?.pada || "–"})</strong>
-          <small class="panchang-sub">Lord: ${panchang.nakshatra?.lord || "–"} · ${nakLeft}% left</small>
+          <small class="panchang-sub">Lord: <strong>${panchang.nakshatra?.lord || "–"}</strong> · ${nakLeft}% left</small>
         </div>
         <div class="panchang-item">
-          <span class="panchang-label">Yoga (योग)</span>
+          <span class="panchang-label">4. Yoga (योग)</span>
           <strong class="panchang-val">${panchang.yoga?.name || "–"}</strong>
           <small class="panchang-sub">${yogaLeft ? `${yogaLeft}% left` : ""}</small>
         </div>
         <div class="panchang-item">
-          <span class="panchang-label">Karana (करण)</span>
+          <span class="panchang-label">5. Karana (करण)</span>
           <strong class="panchang-val">${panchang.karana?.name || "–"}</strong>
           <small class="panchang-sub">${karanaLeft ? `${karanaLeft}% left` : ""}</small>
         </div>
-        <div class="panchang-item">
-          <span class="panchang-label">Samvatsara (संवत्सर)</span>
-          <strong class="panchang-val">${panchang.samvat?.vikram_name || panchang.samvat?.shaka_name || "–"}</strong>
-          <small class="panchang-sub">Vikram ${panchang.samvat?.vikram_year || "–"} · Shaka ${panchang.samvat?.shaka_year || "–"}</small>
-        </div>
       </div>
+      ${timingsHtml}
     </div>
   `;
 }

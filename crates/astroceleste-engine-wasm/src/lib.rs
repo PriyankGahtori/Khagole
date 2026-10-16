@@ -405,8 +405,9 @@ impl Engine {
         moon_lon: f64,
         jd: f64,
         weekday: Option<u8>,
+        is_before_sunrise: Option<bool>,
     ) -> Result<JsValue, JsValue> {
-        calc_panchang_js(sun_lon, moon_lon, jd, weekday)
+        calc_panchang_js(sun_lon, moon_lon, jd, weekday, is_before_sunrise)
     }
 }
 
@@ -712,8 +713,9 @@ pub fn calc_panchang_js(
     moon_lon: f64,
     jd: f64,
     weekday: Option<u8>,
+    is_before_sunrise: Option<bool>,
 ) -> Result<JsValue, JsValue> {
-    let result = calc_panchang(sun_lon, moon_lon, jd, weekday);
+    let result = calc_panchang(sun_lon, moon_lon, jd, weekday, is_before_sunrise);
     to_js(&result)
 }
 
