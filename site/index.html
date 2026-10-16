@@ -26,6 +26,7 @@
       </div>
       <nav aria-label="Main">
         <a href="#features">Features</a>
+        <a href="#about">About</a>
         <a href="#docs">API</a>
         <a href="https://github.com/PriyankGahtori/astroceleste-engine" target="_blank" rel="noopener">GitHub</a>
       </nav>
@@ -59,6 +60,39 @@
               </div>
             </div>
 
+            <!-- Open API City Search with Autocomplete & Quick Chips -->
+            <div class="city-search-section">
+              <div class="city-search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="city-search-input" placeholder="Search any city in the world (e.g. Vadnagar, New Delhi, Varanasi, London, Tokyo, New York)..." autocomplete="off">
+                <button type="button" id="city-search-clear" class="btn-clear-search" hidden title="Clear">✕</button>
+                <div id="city-search-dropdown" class="city-dropdown" hidden></div>
+              </div>
+
+              <div class="location-status-row">
+                <!-- Active Location Pill Badge -->
+                <div id="location-active-badge" class="location-badge">
+                  <span class="badge-dot">●</span>
+                  <span id="location-name-display" class="badge-name">Vadnagar, Gujarat, India</span>
+                  <span id="location-coords-display" class="badge-meta">23.7840° N, 72.6360° E · IST (UTC+05:30)</span>
+                </div>
+
+                <!-- Popular City Quick Chips -->
+                <div class="city-chips-wrap">
+                  <span class="chips-label">Popular:</span>
+                  <button type="button" class="btn-city-chip active" data-city="vadnagar">📍 Vadnagar</button>
+                  <button type="button" class="btn-city-chip" data-city="delhi">📍 New Delhi</button>
+                  <button type="button" class="btn-city-chip" data-city="mumbai">📍 Mumbai</button>
+                  <button type="button" class="btn-city-chip" data-city="bengaluru">📍 Bengaluru</button>
+                  <button type="button" class="btn-city-chip" data-city="ujjain">📍 Ujjain</button>
+                  <button type="button" class="btn-city-chip" data-city="varanasi">📍 Varanasi</button>
+                  <button type="button" class="btn-city-chip" data-city="london">📍 London</button>
+                  <button type="button" class="btn-city-chip" data-city="newyork">📍 New York</button>
+                  <button type="button" class="btn-city-chip" data-city="tokyo">📍 Tokyo</button>
+                </div>
+              </div>
+            </div>
+
             <!-- Main Input Bar -->
             <div class="form-hero-grid">
               <label class="form-group">
@@ -72,33 +106,17 @@
               </label>
 
               <label class="form-group">
-                <span class="group-label">City Quick-Pick</span>
-                <select id="city-select">
-                  <option value="vadnagar" selected>Vadnagar, Gujarat</option>
-                  <option value="delhi">New Delhi, India</option>
-                  <option value="mumbai">Mumbai, Maharashtra</option>
-                  <option value="bengaluru">Bengaluru, Karnataka</option>
-                  <option value="chennai">Chennai, Tamil Nadu</option>
-                  <option value="kolkata">Kolkata, West Bengal</option>
-                  <option value="ujjain">Ujjain (Avantika), MP</option>
-                  <option value="varanasi">Varanasi (Kashi), UP</option>
-                  <option value="london">London, UK</option>
-                  <option value="newyork">New York, USA</option>
-                  <option value="tokyo">Tokyo, Japan</option>
-                  <option value="greenwich">Greenwich, UK</option>
-                  <option value="custom">Custom Coordinates...</option>
-                </select>
-              </label>
-
-              <label class="form-group">
-                <span class="group-label">Timezone</span>
+                <span class="group-label">Timezone <small>(Auto-detected)</small></span>
                 <select name="tz_preset" id="tz-preset">
                   <option value="+05:30" selected>IST (UTC+05:30 — India)</option>
                   <option value="+00:00">UTC / GMT (+00:00)</option>
                   <option value="local">Local Browser Timezone</option>
                   <option value="-05:00">EST (UTC-05:00 — US East)</option>
+                  <option value="-04:00">EDT (UTC-04:00 — US Daylight)</option>
                   <option value="-08:00">PST (UTC-08:00 — US West)</option>
-                  <option value="+01:00">CET (UTC+01:00 — Europe)</option>
+                  <option value="-07:00">PDT (UTC-07:00 — US West Daylight)</option>
+                  <option value="+01:00">CET / BST (UTC+01:00 — Europe)</option>
+                  <option value="+02:00">CEST (UTC+02:00 — Europe Summer)</option>
                   <option value="+09:00">JST (UTC+09:00 — Japan)</option>
                   <option value="custom">Custom Offset...</option>
                 </select>
@@ -114,7 +132,7 @@
             <!-- Advanced Astrological Parameters (Collapsible) -->
             <details class="advanced-params-drawer" id="advanced-drawer">
               <summary class="advanced-summary">
-                <span class="summary-text">⚙️ Customize Coordinates &amp; Astrological Systems</span>
+                <span class="summary-text">⚙️ JHora Calculation Configuration &amp; Coordinates</span>
                 <span class="summary-hint">Ayanamsa, TSSY Dasha Standard, Houses, Coordinates</span>
               </summary>
               <div class="advanced-grid">
@@ -131,23 +149,14 @@
                   <input type="text" name="tz_custom" value="+05:30" placeholder="+05:30">
                 </label>
 
-                <div class="city-quick-picks span-2" style="display:none;">
-                  <button type="button" class="btn-chip" data-city="vadnagar">Vadnagar</button>
-                  <button type="button" class="btn-chip" data-city="delhi">New Delhi</button>
-                  <button type="button" class="btn-chip" data-city="mumbai">Mumbai</button>
-                  <button type="button" class="btn-chip" data-city="bengaluru">Bengaluru</button>
-                  <button type="button" class="btn-chip" data-city="ujjain">Ujjain</button>
-                  <button type="button" class="btn-chip" data-city="greenwich">Greenwich</button>
-                </div>
-
-                <!-- Vedic specific fields -->
+                <!-- Vedic specific fields matching JHora defaults -->
                 <label class="vedic-field">
                   <span class="field-label">Ayanamsa</span>
                   <select name="vedic_ayanamsa">
-                    <option value="lahiri" selected>Lahiri (Chitra Paksha) — Standard Parashari</option>
+                    <option value="lahiri" selected>Lahiri (Chitra Paksha) — JHora Default</option>
+                    <option value="true_citra">True Chitra / Invariable Plane</option>
                     <option value="raman">B.V. Raman</option>
                     <option value="krishnamurti">Krishnamurti (KP)</option>
-                    <option value="true_citra">True Chitra</option>
                     <option value="fagan_bradley">Fagan-Bradley</option>
                     <option value="yukteshwar">Sri Yukteswar</option>
                     <option value="galcent_0sag">Galactic Center (0° Sagittarius)</option>
@@ -157,7 +166,7 @@
                 <label class="vedic-field">
                   <span class="field-label">Dasha Year Standard</span>
                   <select name="vedic_year_type">
-                    <option value="tssy" selected>TSSY (True Sidereal Solar Year) — Default</option>
+                    <option value="tssy" selected>TSSY (True Sidereal Solar Year) — JHora Default</option>
                     <option value="sidereal">Sidereal Year (365.2564 days)</option>
                     <option value="savana">Savana Year (360 days)</option>
                     <option value="tropical">Tropical Year (365.2422 days)</option>
@@ -168,7 +177,7 @@
                 <label class="vedic-field">
                   <span class="field-label">House System</span>
                   <select name="vedic_house_system">
-                    <option value="W" selected>Whole Sign (Rashi Bhava)</option>
+                    <option value="W" selected>Whole Sign (Rashi Bhava) — JHora Default</option>
                     <option value="S">Sripati (Traditional Bhava Chalita)</option>
                     <option value="E">Equal House</option>
                     <option value="P">Placidus</option>
@@ -178,7 +187,7 @@
                 <label class="vedic-field">
                   <span class="field-label">Position Mode</span>
                   <select name="vedic_position_mode">
-                    <option value="true" selected>True / Geometric (Parashari standard)</option>
+                    <option value="true" selected>True / Geometric — JHora Default (TruePositions=1)</option>
                     <option value="apparent">Apparent (with light-time/aberration)</option>
                   </select>
                 </label>
@@ -186,7 +195,7 @@
                 <label class="vedic-field">
                   <span class="field-label">Lunar Nodes (Rahu &amp; Ketu)</span>
                   <select name="vedic_node_type">
-                    <option value="mean" selected>Mean Node (Canonical Parashari)</option>
+                    <option value="mean" selected>Mean Node — JHora Default (TrueNodes=0)</option>
                     <option value="true">True Node (Osculating Orbit)</option>
                   </select>
                 </label>
@@ -394,6 +403,22 @@ const chart = engine.chart({
         <h2>What it computes</h2>
         <div class="feature-grid">
           <article>
+            <h3>🪔 Vedic Jyotish &amp; Divisional Vargas</h3>
+            <p>Computes D1 (Rasi), D9 (Navamsha), and all 16 Shodashavarga charts (D2 to D60). Rendered in high-contrast North Indian (diamond) and South Indian (box) SVGs with Kendra fills and Lagna highlights.</p>
+          </article>
+          <article>
+            <h3>⏳ Vimshottari Dasha (JHora TSSY)</h3>
+            <p>Multi-level Mahadasha, Antardasha, and Pratyantardasha progressions. Supports True Sidereal Solar Year (TSSY) solar return solver matching Jagannatha Hora defaults, alongside Sidereal, Savana, and Tropical years.</p>
+          </article>
+          <article>
+            <h3>☀️ Panchanga (Five Limbs of Time)</h3>
+            <p>Calculates Tithi, Vara, Nakshatra with Pada, Yoga, and Karana in sub-millisecond execution directly from high-precision Sun and Moon longitudes.</p>
+          </article>
+          <article>
+            <h3>🔍 Global City Search &amp; Auto-Timezone</h3>
+            <p>Search any city across the globe with instant autocomplete geocoding. Automatically derives latitude, longitude, and historical/daylight-saving UTC timezone offsets.</p>
+          </article>
+          <article>
             <h3>Planets and points</h3>
             <p>Sun to Pluto, the lunar nodes, Chiron and Black Moon Lilith, with speed and retrograde status, and the Ascendant and Midheaven.</p>
           </article>
@@ -403,7 +428,7 @@ const chart = engine.chart({
           </article>
           <article>
             <h3>Tropical and sidereal</h3>
-            <p>14 ayanamsas, including Lahiri, Fagan-Bradley, Krishnamurti, Raman and Galactic Center.</p>
+            <p>14 ayanamsas, including Chitrapaksha Lahiri (JHora default), True Chitra, Fagan-Bradley, Krishnamurti, Raman, and Galactic Center.</p>
           </article>
           <article>
             <h3>Aspects and orbs</h3>
@@ -418,22 +443,44 @@ const chart = engine.chart({
             <p>Traditional temperament from the primary qualities, and the lunar phase, illumination, dignity and mansion.</p>
           </article>
           <article>
-            <h3>Horary</h3>
-            <p>Planetary day and hour from the actual sunrise and sunset, significators, void of course Moon and considerations before judgment.</p>
+            <h3>Horary &amp; Elections</h3>
+            <p>Planetary day and hour from actual sunrise and sunset, significators, void of course Moon, considerations before judgment, and electional window searches.</p>
           </article>
           <article>
-            <h3>Transits, synastry, derived charts</h3>
-            <p>Cross-aspects to a natal chart or between two charts, and charts turned to any house.</p>
-          </article>
-          <article>
-            <h3>Chinese astrology</h3>
-            <p>Solar terms, lunar and leap months; the Four Pillars on true solar time with Ten Gods and luck pillars; and the Zi Wei Dou Shu chart with its stars, transformations and limits.</p>
+            <h3>Chinese Astrology</h3>
+            <p>Solar terms, lunar and leap months; the Four Pillars on true solar time with Ten Gods and luck pillars; and the Zi Wei Dou Shu chart with its stars and transformations.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="section alt">
+    <!-- About Section -->
+    <section id="about" class="section alt">
+      <div class="wrap">
+        <h2>About AstroCeleste Engine</h2>
+        <div class="feature-grid three">
+          <article>
+            <h3>JHora Bit-for-Bit Calibration</h3>
+            <p>Defaults are strictly aligned with Jagannatha Hora (JHora): Sidereal zodiac, Lahiri ayanamsa, Mean nodes (<code>TrueNodes=0</code>), Geometric positions (<code>TruePositions=1</code>), Whole Sign houses (<code>W</code>), and TSSY Dasha year standard.</p>
+          </article>
+          <article>
+            <h3>100% In-Browser Privacy</h3>
+            <p>Pure Rust WebAssembly compiles with zero C dependencies. Ephemeris lookups, astrological reductions, and chart generations occur entirely on your local machine with no user data ever sent to remote servers.</p>
+          </article>
+          <article>
+            <h3>NASA JPL Ephemerides</h3>
+            <p>Sub-arcsecond celestial positions computed directly from NASA JPL DE440s (1849–2150) or DE441 (13200 BC–17191 AD) Chebyshev polynomials with IAU 2006 precession and IAU 2000A nutation.</p>
+          </article>
+        </div>
+        <p class="section-foot">
+          Open-source under MIT and Apache-2.0 licenses. Deployed live on GitHub Pages at
+          <a href="https://priyankgahtori.github.io/astroceleste-engine/">priyankgahtori.github.io/astroceleste-engine</a>.
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine">View on GitHub →</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
       <div class="wrap">
         <h2>Verified, not approximated</h2>
         <div class="feature-grid three">
@@ -453,29 +500,29 @@ const chart = engine.chart({
         <p class="section-foot">
           Pure Rust with no C code and two dependencies (serde, serde_json). Builds for servers,
           <code>wasm32-unknown-unknown</code>, Android and iOS.
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/accuracy.md">How accuracy is verified →</a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/accuracy.md">How accuracy is verified →</a>
         </p>
       </div>
     </section>
 
-    <section id="docs" class="section">
+    <section id="docs" class="section alt">
       <div class="wrap">
         <h2>Documentation</h2>
         <div class="link-grid">
           <a href="https://docs.rs/astroceleste-engine"><strong>API reference</strong><span>Rust API on docs.rs</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/api.md"><strong>API guide</strong><span>Options, chart JSON and errors, for all three languages</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/ephemerides.md"><strong>Ephemerides</strong><span>Kernels, date coverage and smaller excerpts</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/architecture.md"><strong>Architecture</strong><span>Crates and the calculation pipeline</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/tree/main/crates/astroceleste-engine-py"><strong>Python</strong><span>The Python bindings</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/tree/main/crates/astroceleste-engine-wasm"><strong>JavaScript</strong><span>The WebAssembly bindings</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Setup, tests and guidelines</span></a>
-          <a href="https://github.com/ffalcinelli/astroceleste-engine/blob/main/SECURITY.md"><strong>Security</strong><span>Reporting vulnerabilities</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/api.md"><strong>API guide</strong><span>Options, chart JSON and errors, for all three languages</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/ephemerides.md"><strong>Ephemerides</strong><span>Kernels, date coverage and smaller excerpts</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/architecture.md"><strong>Architecture</strong><span>Crates and the calculation pipeline</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-py"><strong>Python</strong><span>The Python bindings</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-wasm"><strong>JavaScript</strong><span>The WebAssembly bindings</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Setup, tests and guidelines</span></a>
+          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/SECURITY.md"><strong>Security</strong><span>Reporting vulnerabilities</span></a>
         </div>
         <ul class="registries">
           <li><a href="https://crates.io/crates/astroceleste-engine">crates.io</a></li>
           <li><a href="https://pypi.org/project/astroceleste-engine/">PyPI</a></li>
           <li><a href="https://www.npmjs.com/package/astroceleste-engine">npm</a></li>
-          <li><a href="https://github.com/ffalcinelli/astroceleste-engine">GitHub</a></li>
+          <li><a href="https://github.com/PriyankGahtori/astroceleste-engine">GitHub</a></li>
         </ul>
       </div>
     </section>
@@ -484,12 +531,13 @@ const chart = engine.chart({
   <footer class="footer">
     <div class="wrap">
       <p>
-        astroceleste-engine is the calculation core of <a href="https://astroceleste.it">Astroceleste</a>.
+        <strong>AstroCeleste Engine</strong> · High-precision astronomical and astrological calculation engine.
         Licensed under MIT or Apache-2.0.
       </p>
       <p class="dim">
+        Live application: <a href="https://priyankgahtori.github.io/astroceleste-engine/">priyankgahtori.github.io/astroceleste-engine</a>.
         Planetary ephemerides by NASA JPL. Time scales, frames and apparent positions are
-        ported from <a href="https://rhodesmill.org/skyfield/">Skyfield</a> (MIT). This page makes no third-party requests.
+        ported from <a href="https://rhodesmill.org/skyfield/">Skyfield</a> (MIT).
       </p>
     </div>
   </footer>

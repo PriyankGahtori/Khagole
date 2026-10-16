@@ -349,15 +349,263 @@ td.num { text-align: right; }
   box-shadow: 0 1px 4px rgba(0,0,0,0.2); border: 1px solid var(--border);
 }
 
-.city-quick-picks {
-  display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0 8px; font-size: 0.85rem; color: var(--dim);
+/* City Search, Geocoding Autocomplete & Location Badge (Google Material 3) */
+.city-search-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px 0 16px;
+  position: relative;
 }
-.btn-chip {
-  font: inherit; font-size: 0.8rem; padding: 4px 10px; border-radius: 6px;
-  background: var(--panel-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer;
+
+.city-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 2px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15), inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.btn-chip:hover { border-color: var(--accent); color: var(--text); }
-.btn-chip.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+.city-search-bar:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent), 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: color-mix(in srgb, var(--panel-2) 92%, var(--accent) 4%);
+}
+
+.city-search-bar .search-icon {
+  font-size: 0.95rem;
+  color: var(--dim);
+  margin-right: 10px;
+  user-select: none;
+  pointer-events: none;
+}
+
+#city-search-input {
+  border: none;
+  background: transparent;
+  padding: 10px 0;
+  font-size: 0.92rem;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+}
+
+#city-search-input::placeholder {
+  color: var(--dim);
+  font-size: 0.86rem;
+}
+
+.btn-clear-search {
+  background: transparent;
+  border: none;
+  color: var(--dim);
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 50%;
+  line-height: 1;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.btn-clear-search:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--dim) 20%, transparent);
+}
+
+/* Autocomplete Dropdown */
+.city-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.2);
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 100;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  backdrop-filter: blur(16px);
+}
+
+.city-dropdown[hidden] {
+  display: none;
+}
+
+.city-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  user-select: none;
+}
+
+.city-item:hover,
+.city-item.selected {
+  background: color-mix(in srgb, var(--accent) 15%, var(--panel-2));
+}
+
+.city-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.city-item-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.city-badge {
+  font-size: 0.68rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.city-item-admin {
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.city-item-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  font-size: 0.76rem;
+  color: var(--dim);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.city-item-tz {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+.city-dropdown-msg {
+  padding: 14px 16px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--dim);
+}
+
+/* Location Status Row & Active Badge */
+.location-status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  font-size: 0.82rem;
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.badge-dot {
+  color: #10b981;
+  font-size: 0.75rem;
+  animation: pulse-dot 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.85); }
+}
+
+.badge-name {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.badge-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+/* City Quick Chips */
+.city-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.chips-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--dim);
+  margin-right: 2px;
+}
+
+.btn-city-chip {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-city-chip:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.btn-city-chip.active {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
 
 /* Panchanga Bar */
 .panchang-card {
@@ -423,15 +671,28 @@ td.num { text-align: right; }
 .ni-border { fill: none; stroke: var(--border); stroke-width: 2; }
 .ni-line { stroke: var(--border); stroke-width: 1.2; }
 .ni-diamond { fill: none; stroke: var(--border); stroke-width: 1.6; }
-.ni-sign-num {
-  font-family: var(--font-body); font-size: 12px; fill: var(--dim); font-weight: 600;
+.ni-kendra-fill {
+  fill: color-mix(in srgb, var(--accent) 7%, transparent);
 }
-.ni-sign-num.kendra { fill: var(--accent); }
+.ni-sign-num {
+  font-family: var(--font-body); font-size: 11.5px; fill: var(--dim); font-weight: 600;
+  user-select: none;
+}
+.ni-sign-num.kendra { fill: var(--accent); font-weight: 700; }
 .ni-planet {
-  font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 500;
+  cursor: default;
+}
+.ni-planet.retro {
+  font-weight: 600;
 }
 .ni-planet.ni-lagna { font-weight: 700; fill: var(--accent); }
-.ni-title { font-size: 10px; fill: var(--dim); font-weight: 600; }
+.ni-lagna-badge-bg {
+  fill: color-mix(in srgb, var(--accent) 22%, var(--panel));
+  stroke: color-mix(in srgb, var(--accent) 55%, transparent);
+  stroke-width: 1;
+}
+.ni-title { font-size: 10px; fill: var(--dim); font-weight: 600; font-family: var(--font-body); }
 
 /* South Indian SVG */
 .si-bg { fill: var(--panel-2); }
@@ -440,10 +701,18 @@ td.num { text-align: right; }
 .si-center { fill: var(--panel); stroke: var(--border); stroke-width: 1; }
 .si-center-title { font-family: var(--font-display); font-size: 14px; font-weight: 600; fill: var(--accent); }
 .si-center-sub { font-family: var(--font-body); font-size: 11px; fill: var(--muted); }
-.si-sign-label { font-family: var(--font-body); font-size: 10px; fill: var(--dim); font-weight: 500; }
+.si-kendra-fill {
+  fill: color-mix(in srgb, var(--accent) 5%, transparent);
+}
+.si-sign-label { font-family: var(--font-body); font-size: 10px; fill: var(--dim); font-weight: 500; user-select: none; }
 .si-sign-label.is-lagna { fill: var(--accent); font-weight: 700; }
+.si-house-tag {
+  font-family: var(--font-mono); font-size: 8.5px; fill: var(--dim); font-weight: 500; user-select: none;
+}
+.si-house-tag.kendra { fill: var(--accent); font-weight: 700; }
 .si-lagna-slash { stroke: var(--accent); stroke-width: 2; }
-.si-planet { font-family: var(--font-mono); font-size: 11px; font-weight: 500; }
+.si-planet { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; cursor: default; }
+.si-planet.retro { font-weight: 600; }
 .si-lagna-text { fill: var(--accent); font-weight: 700; }
 
 /* Vimshottari Dasha Enhanced Styles */

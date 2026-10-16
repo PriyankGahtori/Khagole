@@ -90,7 +90,7 @@ import astroceleste_engine as ace
 Path("de440s-1950-2050.bsp").write_bytes(ace.excerpt_kernel("kernels/de440s.bsp", 2433282.5, 2469807.5))
 ```
 
-The [live demo](https://ffalcinelli.github.io/astroceleste-engine/) runs on the 1950–2050
+The [live demo](https://priyankgahtori.github.io/astroceleste-engine/) runs on the 1950–2050
 excerpt.
 
 ## Time scales

@@ -4,27 +4,48 @@
 [![docs.rs](https://img.shields.io/docsrs/astroceleste-engine)](https://docs.rs/astroceleste-engine)
 [![PyPI](https://img.shields.io/pypi/v/astroceleste-engine.svg)](https://pypi.org/project/astroceleste-engine/)
 [![npm](https://img.shields.io/npm/v/astroceleste-engine.svg)](https://www.npmjs.com/package/astroceleste-engine)
-[![CI](https://github.com/ffalcinelli/astroceleste-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/ffalcinelli/astroceleste-engine/actions/workflows/ci.yml)
+[![GitHub Pages](https://github.com/PriyankGahtori/astroceleste-engine/actions/workflows/pages.yml/badge.svg)](https://priyankgahtori.github.io/astroceleste-engine/)
+[![CI](https://github.com/PriyankGahtori/astroceleste-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/PriyankGahtori/astroceleste-engine/actions/workflows/ci.yml)
 
-Astrological chart calculation on JPL ephemerides, in pure Rust.
+High-precision astrological and astronomical calculation engine built on NASA JPL ephemerides, in pure Rust.
 
-It is the calculation core of [Astroceleste](https://astroceleste.it). The same code runs
-on the server (Python bindings), in the desktop and mobile apps (native) and in the browser
-(WASM), so every platform computes the same chart down to the arcsecond.
+The same calculation core runs natively on the server (Python bindings), in desktop/mobile apps, and in the browser via WebAssembly (WASM), ensuring bit-for-bit identical results across all platforms down to the arcsecond.
 
-**[Website and live demo](https://ffalcinelli.github.io/astroceleste-engine/)** · [API docs](https://docs.rs/astroceleste-engine) ·
-[Guides](https://github.com/ffalcinelli/astroceleste-engine/tree/main/docs)
+**[🚀 Live Web Application & Demo](https://priyankgahtori.github.io/astroceleste-engine/)** · [API Docs](https://docs.rs/astroceleste-engine) · [Guides](https://github.com/PriyankGahtori/astroceleste-engine/tree/main/docs)
 
-> **Experimental (0.0.x):** the API may change in any release. Pin an exact version.
+---
 
-> Status: the complete chart pipeline is ported and matches the reference implementation
-> on every golden chart: planets, lunar nodes, Chiron, Lilith, houses (Placidus, Whole Sign,
-> Equal, Porphyry; Koch, Regiomontanus, Campanus, Topocentric, Alcabitius, Morinus and Vehlow
-> are checked against Swiss Ephemeris), aspects and orbs, fixed stars, Arabic parts, temperament, lunar status,
-> horary charts (planetary hours from computed sunrise and sunset), transits, synastry and
-> derived charts, with Python and WebAssembly bindings.
+## Key Capabilities
 
-## Usage
+### 🪔 Vedic Astrology (Jyotish Kundali)
+- **Divisional Charts (Vargas)**: Computes D1 (Rasi), D9 (Navamsha), and all 16 Shodashavargas (D2 Hora, D3 Drekkana, D4 Chaturthamsa, D7 Saptamsa, D10 Dasamsa, D12 Dwadasamsa, D16 Shodasamsa, D20 Vimsamsa, D24 Chaturvimsamsa, D27 Saptavimsamsa, D30 Trimsamsa, D40 Khavedamsa, D45 Akshavedamsa, D60 Shashtiamsa).
+- **Interactive SVG Charts**: North Indian (diamond) and South Indian (box) chart renderers with Google Material 3 typography, arcminute precision (`12°17′`), Kendra elevations, golden Lagna badges, and non-overlapping multi-planet conjunction grids.
+- **Vimshottari Dasha Engine**: Multi-level Mahadasha, Antardasha, and Pratyantardasha timeline and hierarchical tree. Computations support **True Sidereal Solar Year (TSSY)** solar return solver matching **Jagannatha Hora (JHora)**, alongside 365.2564-day sidereal, 360-day savana, and 365.2422-day tropical standards.
+- **JHora Defaults Compatibility**: Out-of-the-box configuration matches JHora canonical defaults:
+  - **Zodiac**: Sidereal
+  - **Ayanamsa**: Chitrapaksha Lahiri (`UserSelectedAyanamsa=17`)
+  - **Lunar Nodes**: Mean nodes (`TrueNodes=0`)
+  - **Position Mode**: True / Geometric (`TruePositions=1`)
+  - **House System**: Whole Sign / Rashi Bhava (`W`)
+  - **Dasha Year Standard**: TSSY (True Sidereal Solar Year)
+- **Panchanga (Five Limbs of Time)**: Sub-millisecond calculation of Tithi, Vara, Nakshatra with Pada, Yoga, and Karana.
+- **Global City Geocoding & Auto-Timezone**: Integrated Open-Meteo & Nominatim autocomplete search for any city globally, auto-filling coordinates and resolving exact historical/DST UTC offsets offline via browser `Intl.DateTimeFormat`.
+
+### 🌐 Western Astrology
+- **Planets & Points**: Sun through Pluto, lunar nodes, Chiron, and Black Moon Lilith with speed and retrograde status, Ascendant, Midheaven, and Vertex.
+- **House Systems**: Eleven systems checked against Swiss Ephemeris (Placidus, Koch, Regiomontanus, Campanus, Topocentric, Alcabitius, Morinus, Porphyry, Equal, Vehlow, Whole Sign).
+- **Aspects & Orbs**: Conjunction, sextile, square, trine, opposition, semi-sextile, and quincunx with configurable orbs and moiety methods.
+- **Horary & Electional**: Planetary day and hour from computed sunrise/sunset, significators, void-of-course Moon, considerations before judgment, and optimal window searching.
+- **Derived & Transits**: Secondary progressions, solar arcs, synastry cross-aspects, and turned charts.
+
+### 🎋 Chinese Astrology
+- **Solar Terms & Calendars**: Solar terms (Jie Qi), lunar and leap months, Chinese New Year anchors.
+- **BaZi (Four Pillars of Destiny)**: Year, Month, Day, and Hour pillars calculated on true solar time, with Ten Gods, hidden stems, and Luck Pillars.
+- **Zi Wei Dou Shu (Purple Star Astrology)**: 12-palace grid, 14 major stars, minor stars, four mutagens (Si Hua), and decennial/annual horoscopes validated against `iztro`.
+
+---
+
+## Rust Usage
 
 ```rust
 use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
@@ -38,91 +59,89 @@ let chart = calculate_chart(&kernels, &request)?;
 println!("{}", serde_json::to_string_pretty(&chart)?);
 ```
 
-Charts serialize to the same JSON as the Astroceleste API. Other entry points:
-`calculate_horary_chart`, `calculate_transit_chart`, `calculate_synastry`,
-`calculate_derived_chart`, and for electional astrology `calculate_election_chart` and
-`search_elections` (the best moments over a span of time), `degree_qualities` (William
-Lilly's qualities of the zodiac degrees), `chart_dignities` (a stored chart judged again
-under another dignity scheme) and `time_lords` (profections and firdaria), all three with
-no kernel needed, and for Chinese astrology
-`chinese_calendar` (solar terms, lunar and leap months), `bazi` (the Four Pillars) and
-`zi_wei` (Zi Wei Dou Shu), both with no kernel needed (see [Chinese astrology](https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/chinese.md)). In the browser or on mobile, load the kernel from memory with
-`Spk::from_bytes`.
+### Vedic Chart Calculation (WASM / Browser)
 
-## Bindings
+```javascript
+import init, { Engine, calcDivisional, calcPanchang, calcVimshottariDasha, julianDay } from "astroceleste-engine";
 
-- **Python** (`pip install astroceleste-engine`, CPython ≥ 3.12): `Engine([kernel paths])`
-  with `.chart()`, `.horary()`, `.transit()`, `.election()`, `.elections()` and
-  `.chinese_calendar()`, plus `synastry()`, `derived_chart()`, `degree_qualities()`,
-  `degree_quality_table()`, `chart_dignities()`, `time_lords()`, `bazi()`, `zi_wei()`,
-  `julian_day()` and `excerpt_kernel()`, returning plain dicts. See [crates/astroceleste-engine-py](https://github.com/ffalcinelli/astroceleste-engine/tree/main/crates/astroceleste-engine-py).
-- **JavaScript / WebAssembly** (`npm install astroceleste-engine`): the same API over
-  kernels loaded from memory, for browsers and Node. See
-  [crates/astroceleste-engine-wasm](https://github.com/ffalcinelli/astroceleste-engine/tree/main/crates/astroceleste-engine-wasm).
+await init();
+const engine = new Engine();
+engine.addKernel("de440s-1950-2050.bsp", kernelBytes);
 
-Both are tested against the same golden fixtures as the Rust crate.
+// Calculate Sidereal Vedic Chart with JHora defaults
+const chart = engine.chart({
+  utc: "1950-09-17T04:04:00Z",
+  latitude: 23.784,
+  longitude: 72.636,
+  zodiac_type: "sidereal",
+  ayanamsa: "lahiri",
+  position_mode: "true",
+  node_type: "mean",
+  house_system: "W",
+});
+
+const ascLon = chart.planets.find(p => p.name === "Ascendant").ecliptic_longitude;
+const moonLon = chart.planets.find(p => p.name === "Moon").ecliptic_longitude;
+const jd = julianDay("1950-09-17T04:04:00Z");
+
+const d1 = calcDivisional(chart, ascLon, "D1");
+const d9 = calcDivisional(chart, ascLon, "D9");
+const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
+```
+
+---
+
+## Language Bindings
+
+- **Python** (`pip install astroceleste-engine`, CPython ≥ 3.12): Fast PyO3 bindings with `.chart()`, `.horary()`, `.transit()`, `.election()`, `.chinese_calendar()`, `.bazi()`, and `.zi_wei()`. See [crates/astroceleste-engine-py](https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-py).
+- **JavaScript / WebAssembly** (`npm install astroceleste-engine`): In-browser and Node.js execution with zero network latency. See [crates/astroceleste-engine-wasm](https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-wasm).
+
+---
 
 ## Documentation
 
-- [API reference on docs.rs](https://docs.rs/astroceleste-engine)
-- [API guide](https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/api.md): request options, the chart JSON, error codes in every
-  language
-- [Ephemerides](https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/ephemerides.md): kernels, date coverage, loading from memory,
-  smaller excerpts for the web and mobile
-- [Accuracy](https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/accuracy.md): how every number is verified
-- [Architecture](https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/architecture.md): crates and calculation pipeline
+- [API Reference on docs.rs](https://docs.rs/astroceleste-engine)
+- [API Guide](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/api.md): Request parameters, options, chart JSON schema, and error codes
+- [Ephemerides Guide](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/ephemerides.md): SPK kernels, date spans, in-memory excerpts
+- [Accuracy Verification](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/accuracy.md): Stage-by-stage verification against JPL, Skyfield, and Swiss Ephemeris
+- [Architecture](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/architecture.md): Core engine and pipeline layout
 
-## Layout
+---
 
-| Path | Content |
+## Repository Layout
+
+| Path | Description |
 |---|---|
-| `crates/astroceleste-engine` | the core library |
-| `crates/astroceleste-engine-py` | Python bindings (PyO3, built with maturin) |
-| `crates/astroceleste-engine-wasm` | WebAssembly bindings (wasm-bindgen, built with wasm-pack) |
-| `tests/fixtures/*.json` | golden charts produced by the reference implementation, the acceptance spec |
-| `tests/data/de440s_2000.bsp` | one-year excerpt of DE440s used by the tests |
-| `scripts/fetch-kernels.sh` | downloads full JPL kernels into `kernels/` (gitignored) |
-| `scripts/make_spk_fixtures.py` | rebuilds the excerpt and the SPK reference states with `jplephem` |
-| `scripts/make_reduction_fixtures.py` | stage-by-stage reference values from Skyfield |
-| `scripts/gen_tables.py` | regenerates the embedded ΔT, nutation and Chiron tables |
-| `scripts/build-site.sh` | builds the landing site and live demo into `target/site/` |
-| `docs/` | guides |
-| `site/` | landing site and live demo, deployed to GitHub Pages |
+| `crates/astroceleste-engine` | Core Rust calculation library |
+| `crates/astroceleste-engine-py` | Python bindings (PyO3 & maturin) |
+| `crates/astroceleste-engine-wasm` | WebAssembly bindings (wasm-bindgen & wasm-pack) |
+| `site/` | Modern client-side web application deployed to GitHub Pages |
+| `tests/fixtures/*.json` | Acceptance test golden charts |
+| `tests/data/de440s_2000.bsp` | One-year DE440s excerpt for automated test suites |
+| `scripts/fetch-kernels.sh` | Downloads full JPL DE440s / DE441 kernels |
+| `scripts/build-site.sh` | Compiles WASM, extracts DE440s excerpt, and builds `target/site` |
 
-## Contributing
+---
 
-Contributions are welcome: see [CONTRIBUTING.md](https://github.com/ffalcinelli/astroceleste-engine/blob/main/CONTRIBUTING.md) for setup, the test
-suite and the rules that keep every platform identical. Report vulnerabilities privately,
-as described in [SECURITY.md](https://github.com/ffalcinelli/astroceleste-engine/blob/main/SECURITY.md). Maintainers release by pushing a version
-tag ([RELEASING.md](https://github.com/ffalcinelli/astroceleste-engine/blob/main/RELEASING.md)).
+## Testing & Verification
 
 ```bash
-cargo test --workspace --exclude astroceleste-engine-py   # uses the committed excerpt
-scripts/fetch-kernels.sh        # full de440s (1849-2150): enables the golden and full-range tests
+# Run test suite using the committed excerpt
+cargo test --workspace --exclude astroceleste-engine-py
+
+# Download full DE440s (1849–2150) to run full-range ephemeris verification tests
+scripts/fetch-kernels.sh
+
+# Lint codebase
 cargo clippy --workspace --all-targets -- -D warnings
 ```
 
-## Ephemerides
+---
 
-The engine reads NASA JPL SPK kernels (DE440s by default, DE441 for dates outside 1849–2150).
-Dates outside the loaded kernels are reported as errors, never approximated. See
-[docs/ephemerides.md](https://github.com/ffalcinelli/astroceleste-engine/blob/main/docs/ephemerides.md) for coverage, sizes and excerpts.
+## License & Attribution
 
-## License
+Dual-licensed under either:
+- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/LICENSE-APACHE))
+- MIT License ([LICENSE-MIT](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/LICENSE-MIT))
 
-Licensed under either of
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/ffalcinelli/astroceleste-engine/blob/main/LICENSE-APACHE))
-- MIT license ([LICENSE-MIT](https://github.com/ffalcinelli/astroceleste-engine/blob/main/LICENSE-MIT))
-
-at your option.
-
-The astronomical reduction (ΔT, IAU 2000A nutation, IAU 2006 precession, light-time,
-deflection and aberration) is ported from [Skyfield](https://github.com/skyfielders/python-skyfield)
-by Brandon Rhodes, used under the MIT license: see
-[NOTICE](https://github.com/ffalcinelli/astroceleste-engine/blob/main/NOTICE), which is shipped in
-every package.
-
-Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion
-in this work, as defined in the Apache-2.0 license, shall be dual licensed as above, without
-any additional terms or conditions.
+Astronomical reduction routines (ΔT, IAU 2000A nutation, IAU 2006 precession, aberration, and deflection) are ported from [Skyfield](https://github.com/skyfielders/python-skyfield) by Brandon Rhodes (MIT License). See [NOTICE](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/NOTICE).

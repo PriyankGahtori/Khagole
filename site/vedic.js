@@ -51,6 +51,13 @@ export function formatDegMin(deg) {
   return `${d}° ${String(m).padStart(2, "0")}′`;
 }
 
+export function formatCompactDegMin(deg) {
+  const norm = ((deg % 30) + 30) % 30;
+  const d = Math.floor(norm);
+  const m = Math.floor((norm - d) * 60);
+  return `${d}°${String(m).padStart(2, "0")}′`;
+}
+
 // ---------------------------------------------------------------------------- North Indian Chart (Diamond)
 
 const NI_HOUSE_COORDS = [
@@ -85,6 +92,12 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
   // Background and border
   add("rect", { x: 0, y: 0, width: W, height: H, class: "ni-bg" });
   add("rect", { x: 2, y: 2, width: W - 4, height: H - 4, class: "ni-border" });
+
+  // Kendra house subtle elevation fills (1, 4, 7, 10)
+  add("polygon", { points: "200,0 300,100 200,200 100,100", class: "ni-kendra-fill" });
+  add("polygon", { points: "0,200 100,100 200,200 100,300", class: "ni-kendra-fill" });
+  add("polygon", { points: "200,200 300,300 200,400 100,300", class: "ni-kendra-fill" });
+  add("polygon", { points: "300,100 400,200 300,300 200,200", class: "ni-kendra-fill" });
 
   // Outer diagonals
   add("line", { x1: 0, y1: 0, x2: W, y2: H, class: "ni-line" });
@@ -147,24 +160,31 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
 
     const [cx, cy] = coords.center;
     const count = planets.length;
-    // Calculate layout for planets in this house
-    const lineSpacing = 14;
-    const startY = cy - ((count - 1) * lineSpacing) / 2;
 
-    planets.forEach((p, idx) => {
+    const renderPlanet = (p, px, py) => {
       const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), color: "#e8e9f3" };
       const retro = p.is_retrograde ? " ℞" : "";
-      const degStr = p.degree !== undefined ? ` ${Math.floor(p.degree)}°` : "";
-      const label = `${info.abbr}${degStr}${retro}`;
+      const degStr = p.degree !== undefined ? ` ${formatCompactDegMin(p.degree)}` : "";
+      const label = p.isAsc ? `Asc ${degStr.trim()}` : `${info.abbr}${degStr}${retro}`;
 
-      const py = count === 1 ? cy : startY + idx * lineSpacing;
+      if (p.isAsc) {
+        add("rect", {
+          x: px - 35,
+          y: py - 9,
+          width: 70,
+          height: 18,
+          rx: 4,
+          class: "ni-lagna-badge-bg",
+        });
+      }
+
       const textEl = add(
         "text",
         {
-          x: cx,
+          x: px,
           y: py,
           class: `ni-planet ${p.isAsc ? "ni-lagna" : ""} ${p.is_retrograde ? "retro" : ""}`,
-          fill: info.color || "var(--text)",
+          fill: p.isAsc ? "var(--accent)" : info.color || "var(--text)",
           "text-anchor": "middle",
           "dominant-baseline": "central",
         },
@@ -175,23 +195,37 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
           textContent: `${p.name} in House ${h} (${signObj.sa}) at ${formatDegMin(p.degree || 0)}${p.is_retrograde ? " (Retrograde)" : ""}`,
         }),
       );
-    });
+    };
+
+    if (count <= 2) {
+      const lineSpacing = 17;
+      const startY = cy - ((count - 1) * lineSpacing) / 2;
+      planets.forEach((p, idx) => {
+        renderPlanet(p, cx, startY + idx * lineSpacing);
+      });
+    } else {
+      // 3 or more planets: 2-column layout to avoid clipping and overlapping
+      const colOffset = 28;
+      const lineSpacing = 16;
+      const rows = Math.ceil(count / 2);
+      const startY = cy - ((rows - 1) * lineSpacing) / 2;
+      planets.forEach((p, idx) => {
+        const px = idx % 2 === 0 ? cx - colOffset : cx + colOffset;
+        const py = startY + Math.floor(idx / 2) * lineSpacing;
+        renderPlanet(p, px, py);
+      });
+    }
   }
 
   // Title badge in corner or center
   if (title) {
-    add("text", { x: 8, y: 16, class: "ni-title", "text-anchor": "start" }, title);
+    add("text", { x: 10, y: 18, class: "ni-title", "text-anchor": "start" }, title);
   }
 }
 
 // ---------------------------------------------------------------------------- South Indian Chart (Box)
 
 // Cell grid (row, col) for signs 1..12
-// South Indian layout:
-// Row 0: Pisces(12), Aries(1), Taurus(2), Gemini(3)
-// Row 1: Aquarius(11), [center], [center], Cancer(4)
-// Row 2: Capricorn(10), [center], [center], Leo(5)
-// Row 3: Sagittarius(9), Scorpio(8), Libra(7), Virgo(6)
 const SI_SIGN_CELLS = {
   12: [0, 0], 1: [0, 1], 2: [0, 2], 3: [0, 3],
   4: [1, 3], 5: [2, 3], 6: [3, 3],
@@ -217,11 +251,12 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
   add("rect", { x: 0, y: 0, width: W, height: H, class: "si-bg" });
   add("rect", { x: 2, y: 2, width: W - 4, height: H - 4, class: "si-border" });
 
+  const lagnaSign = divChart.lagna.sign;
+  const lagnaSignObj = VEDIC_SIGNS[lagnaSign - 1];
+
   // Grid lines
   for (let i = 1; i < 4; i++) {
-    // horizontal lines
     add("line", { x1: 0, y1: i * CELL, x2: W, y2: i * CELL, class: "si-line" });
-    // vertical lines
     add("line", { x1: i * CELL, y1: 0, x2: i * CELL, y2: H, class: "si-line" });
   }
 
@@ -233,9 +268,6 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     height: CELL * 2 - 2,
     class: "si-center",
   });
-
-  const lagnaSign = divChart.lagna.sign;
-  const lagnaSignObj = VEDIC_SIGNS[lagnaSign - 1];
 
   // Center title and Lagna info
   if (title) {
@@ -273,16 +305,24 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     const y0 = row * CELL;
     const signObj = VEDIC_SIGNS[s - 1];
     const isLagna = s === lagnaSign;
+    const houseFromLagna = ((s - lagnaSign + 12) % 12) + 1;
+    const isKendra = houseFromLagna === 1 || houseFromLagna === 4 || houseFromLagna === 7 || houseFromLagna === 10;
+
+    // Kendra subtle highlight in South Indian box
+    if (isKendra) {
+      add("rect", {
+        x: x0 + 1,
+        y: y0 + 1,
+        width: CELL - 2,
+        height: CELL - 2,
+        class: "si-kendra-fill",
+      });
+    }
 
     // Lagna slash in corner if this is the Lagna sign
     if (isLagna) {
-      add("line", {
-        x1: x0 + 1,
-        y1: y0 + 1,
-        x2: x0 + 28,
-        y2: y0 + 28,
-        class: "si-lagna-slash",
-      });
+      add("line", { x1: x0 + 2, y1: y0 + 2, x2: x0 + 24, y2: y0 + 24, class: "si-lagna-slash" });
+      add("line", { x1: x0 + 2, y1: y0 + 8, x2: x0 + 18, y2: y0 + 24, class: "si-lagna-slash" });
     }
 
     // Sign name label in cell
@@ -290,7 +330,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
       "text",
       {
         x: x0 + 6,
-        y: y0 + 14,
+        y: y0 + 15,
         class: `si-sign-label ${isLagna ? "is-lagna" : ""}`,
       },
       `${signObj.sa} ${signObj.sym}`,
@@ -301,33 +341,64 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
       }),
     );
 
+    // House from Lagna badge in top-right
+    const houseLabel = add(
+      "text",
+      {
+        x: x0 + CELL - 6,
+        y: y0 + 15,
+        class: `si-house-tag ${isKendra ? "kendra" : ""}`,
+        "text-anchor": "end",
+      },
+      isLagna ? "H1 (Lg)" : `H${houseFromLagna}`,
+    );
+    houseLabel.append(
+      Object.assign(document.createElementNS(SVG_NS, "title"), {
+        textContent: `House ${houseFromLagna} from Lagna`,
+      }),
+    );
+
     // Planets in this sign
     const planets = signPlanets[s];
     if (planets.length === 0) continue;
 
-    const startY = y0 + 30;
-    const lineSpacing = 13;
-
-    planets.forEach((p, idx) => {
+    const count = planets.length;
+    const renderSiPlanet = (p, px, py) => {
       const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), color: "#e8e9f3" };
       const retro = p.is_retrograde ? " ℞" : "";
-      const degStr = p.degree !== undefined ? ` ${Math.floor(p.degree)}°` : "";
-      const label = p.isAsc ? "ASC (Lg)" : `${info.abbr}${degStr}${retro}`;
+      const degStr = p.degree !== undefined ? ` ${formatCompactDegMin(p.degree)}` : "";
+      const label = p.isAsc ? `Asc ${degStr.trim()}` : `${info.abbr}${degStr}${retro}`;
 
-      const py = startY + idx * lineSpacing;
       if (py < y0 + CELL - 4) {
         add(
           "text",
           {
-            x: x0 + 8,
+            x: px,
             y: py,
             class: `si-planet ${p.isAsc ? "si-lagna-text" : ""} ${p.is_retrograde ? "retro" : ""}`,
-            fill: info.color || "var(--text)",
+            fill: p.isAsc ? "var(--accent)" : info.color || "var(--text)",
           },
           label,
         );
       }
-    });
+    };
+
+    if (count <= 3) {
+      const startY = y0 + 34;
+      const lineSpacing = 16;
+      planets.forEach((p, idx) => {
+        renderSiPlanet(p, x0 + 7, startY + idx * lineSpacing);
+      });
+    } else {
+      // 4+ planets: 2-column layout to prevent clipping in cell
+      const startY = y0 + 33;
+      const lineSpacing = 15;
+      planets.forEach((p, idx) => {
+        const px = idx % 2 === 0 ? x0 + 6 : x0 + 51;
+        const py = startY + Math.floor(idx / 2) * lineSpacing;
+        renderSiPlanet(p, px, py);
+      });
+    }
   }
 }
 

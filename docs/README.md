@@ -18,6 +18,6 @@ Elsewhere:
 - Rust API reference: [docs.rs/astroceleste-engine](https://docs.rs/astroceleste-engine)
 - Python bindings: [crates/astroceleste-engine-py](../crates/astroceleste-engine-py)
 - WebAssembly bindings: [crates/astroceleste-engine-wasm](../crates/astroceleste-engine-wasm)
-- Website and live demo: [ffalcinelli.github.io/astroceleste-engine](https://ffalcinelli.github.io/astroceleste-engine/)
+- Website and live demo: [priyankgahtori.github.io/astroceleste-engine](https://priyankgahtori.github.io/astroceleste-engine/)
 - Contributing: [CONTRIBUTING.md](../CONTRIBUTING.md) · Security: [SECURITY.md](../SECURITY.md)
   · Releasing: [RELEASING.md](../RELEASING.md)

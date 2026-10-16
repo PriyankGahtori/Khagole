@@ -31,18 +31,18 @@ const ASPECT_CLASS = {
 };
 
 const CITY_PRESETS = {
-  vadnagar: { lat: 23.784, lon: 72.636, tz: "+05:30" },
-  delhi: { lat: 28.6139, lon: 77.209, tz: "+05:30" },
-  mumbai: { lat: 19.076, lon: 72.8777, tz: "+05:30" },
-  bengaluru: { lat: 12.9716, lon: 77.5946, tz: "+05:30" },
-  chennai: { lat: 13.0827, lon: 80.2707, tz: "+05:30" },
-  kolkata: { lat: 22.5726, lon: 88.3639, tz: "+05:30" },
-  ujjain: { lat: 23.1765, lon: 75.7885, tz: "+05:30" },
-  varanasi: { lat: 25.3176, lon: 82.9739, tz: "+05:30" },
-  london: { lat: 51.5074, lon: -0.1278, tz: "+00:00" },
-  newyork: { lat: 40.7128, lon: -74.006, tz: "-05:00" },
-  tokyo: { lat: 35.6762, lon: 139.6503, tz: "+09:00" },
-  greenwich: { lat: 51.4769, lon: 0, tz: "+00:00" },
+  vadnagar: { name: "Vadnagar, Gujarat, India", lat: 23.784, lon: 72.636, tz: "+05:30", iana: "Asia/Kolkata" },
+  delhi: { name: "New Delhi, Delhi, India", lat: 28.6139, lon: 77.209, tz: "+05:30", iana: "Asia/Kolkata" },
+  mumbai: { name: "Mumbai, Maharashtra, India", lat: 19.076, lon: 72.8777, tz: "+05:30", iana: "Asia/Kolkata" },
+  bengaluru: { name: "Bengaluru, Karnataka, India", lat: 12.9716, lon: 77.5946, tz: "+05:30", iana: "Asia/Kolkata" },
+  chennai: { name: "Chennai, Tamil Nadu, India", lat: 13.0827, lon: 80.2707, tz: "+05:30", iana: "Asia/Kolkata" },
+  kolkata: { name: "Kolkata, West Bengal, India", lat: 22.5726, lon: 88.3639, tz: "+05:30", iana: "Asia/Kolkata" },
+  ujjain: { name: "Ujjain, Madhya Pradesh, India", lat: 23.1765, lon: 75.7885, tz: "+05:30", iana: "Asia/Kolkata" },
+  varanasi: { name: "Varanasi, Uttar Pradesh, India", lat: 25.3176, lon: 82.9739, tz: "+05:30", iana: "Asia/Kolkata" },
+  london: { name: "London, England, UK", lat: 51.5074, lon: -0.1278, tz: "+00:00", iana: "Europe/London" },
+  newyork: { name: "New York, USA", lat: 40.7128, lon: -74.006, tz: "-05:00", iana: "America/New_York" },
+  tokyo: { name: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, tz: "+09:00", iana: "Asia/Tokyo" },
+  greenwich: { name: "Greenwich, London, UK", lat: 51.4769, lon: 0, tz: "+00:00", iana: "UTC" },
 };
 
 const PRESETS = {
@@ -221,12 +221,160 @@ function setAstrologyMode(mode) {
   }
 }
 
+function formatCoords(lat, lon) {
+  const latDir = lat >= 0 ? "N" : "S";
+  const lonDir = lon >= 0 ? "E" : "W";
+  return `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lon).toFixed(4)}° ${lonDir}`;
+}
+
+export function resolveTzOffset(ianaTimezone, dateStr, timeStr) {
+  if (!ianaTimezone) return "+00:00";
+  try {
+    const [y, m, d] = (dateStr || "2000-01-01").split("-").map(Number);
+    const [hh, mm, ss] = (timeStr || "12:00:00").split(":").map(Number);
+    const date = new Date(Date.UTC(y, (m || 1) - 1, d || 1, hh || 12, mm || 0, ss || 0));
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: ianaTimezone,
+      timeZoneName: "shortOffset",
+    });
+    const parts = formatter.formatToParts(date);
+    const tzPart = parts.find((p) => p.type === "timeZoneName");
+    if (!tzPart || !tzPart.value) return "+00:00";
+    const val = tzPart.value.replace(/^(GMT|UTC)/, "");
+    if (!val) return "+00:00";
+    const sign = val.startsWith("-") ? "-" : "+";
+    const clean = val.replace(/^[+-]/, "");
+    const [hoursStr, minsStr] = clean.split(":");
+    const hours = String(parseInt(hoursStr, 10) || 0).padStart(2, "0");
+    const mins = String(parseInt(minsStr, 10) || 0).padStart(2, "0");
+    return `${sign}${hours}:${mins}`;
+  } catch (err) {
+    console.warn("Timezone resolution failed:", err);
+    return "+00:00";
+  }
+}
+
+function updateActiveLocationDisplay(name, lat, lon, tzOffset) {
+  const nameEl = $("location-name-display");
+  const coordsEl = $("location-coords-display");
+  if (nameEl) nameEl.textContent = name;
+  if (coordsEl) {
+    const tzStr = tzOffset ? ` · UTC${tzOffset.startsWith("+") || tzOffset.startsWith("-") ? tzOffset : "+" + tzOffset}` : "";
+    coordsEl.textContent = `${formatCoords(lat, lon)}${tzStr}`;
+  }
+}
+
+let activeCityIana = "Asia/Kolkata";
+
+function applyLocation({ displayName, lat, lon, timezone, tzOffset }) {
+  form.elements.latitude.value = lat;
+  form.elements.longitude.value = lon;
+  if (timezone) activeCityIana = timezone;
+
+  let offset = tzOffset;
+  if (!offset && activeCityIana) {
+    const dStr = form.elements.date.value;
+    const tStr = form.elements.time.value;
+    offset = resolveTzOffset(activeCityIana, dStr, tStr);
+  }
+  if (!offset) {
+    offset = "+05:30";
+  }
+
+  let presetFound = false;
+  for (const opt of form.elements.tz_preset.options) {
+    if (opt.value === offset) {
+      form.elements.tz_preset.value = offset;
+      presetFound = true;
+      break;
+    }
+  }
+  if (!presetFound) {
+    form.elements.tz_preset.value = "custom";
+    form.elements.tz_custom.value = offset;
+  }
+  syncTzCustom();
+
+  updateActiveLocationDisplay(displayName, lat, lon, offset);
+}
+
+async function searchCitiesOnline(query) {
+  const q = query.trim();
+  if (q.length < 2) return [];
+
+  // 1. Primary: Open-Meteo free geocoding API (fast, CORS-enabled, returns IANA timezone)
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=8&language=en&format=json`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        return data.results.map((r) => {
+          const parts = [r.name];
+          if (r.admin1 && r.admin1 !== r.name) parts.push(r.admin1);
+          if (r.country) parts.push(r.country);
+          return {
+            name: r.name,
+            displayName: parts.join(", "),
+            admin: [r.admin1, r.country].filter(Boolean).join(", "),
+            countryCode: r.country_code || "",
+            lat: Number(r.latitude.toFixed(4)),
+            lon: Number(r.longitude.toFixed(4)),
+            timezone: r.timezone || null,
+          };
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Open-Meteo geocoding failed, trying Nominatim fallback:", err);
+  }
+
+  // 2. Fallback: OpenStreetMap Nominatim API
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1`;
+    const res = await fetch(url, { headers: { "Accept-Language": "en" } });
+    if (res.ok) {
+      const data = await res.json();
+      return data.map((item) => {
+        const addr = item.address || {};
+        const city = addr.city || addr.town || addr.village || item.name || q;
+        const adminParts = [addr.state || addr.region, addr.country].filter(Boolean);
+        return {
+          name: city,
+          displayName: item.display_name,
+          admin: adminParts.join(", "),
+          countryCode: addr.country_code ? addr.country_code.toUpperCase() : "",
+          lat: Number(parseFloat(item.lat).toFixed(4)),
+          lon: Number(parseFloat(item.lon).toFixed(4)),
+          timezone: null,
+        };
+      });
+    }
+  } catch (err) {
+    console.warn("Nominatim geocoding failed:", err);
+  }
+
+  return [];
+}
+
 function fillForm(values) {
   for (const [key, value] of Object.entries(values)) {
     if (form.elements[key] !== undefined) form.elements[key].value = value;
   }
   syncTzCustom();
   syncAyanamsa();
+
+  if (values.latitude !== undefined && values.longitude !== undefined) {
+    const lat = Number(values.latitude);
+    const lon = Number(values.longitude);
+    const tz = getSelectedTzOffset();
+    const match = Object.values(CITY_PRESETS).find(
+      (c) => Math.abs(c.lat - lat) < 0.05 && Math.abs(c.lon - lon) < 0.05
+    );
+    const name = match ? match.name : `Coordinates (${formatCoords(lat, lon)})`;
+    if (match && match.iana) activeCityIana = match.iana;
+    updateActiveLocationDisplay(name, lat, lon, tz);
+  }
 }
 
 function syncTzCustom() {
@@ -587,54 +735,234 @@ $("style-south").addEventListener("click", () => {
   if (lastVedicData) renderVedicCharts(lastVedicData);
 });
 
-const citySelect = $("city-select");
-if (citySelect) {
-  citySelect.addEventListener("change", (e) => {
-    const val = e.target.value;
-    if (val === "custom") {
-      const adv = $("advanced-drawer");
-      if (adv) adv.open = true;
+// ---------------------------------------------------------------------------- City Search Autocomplete & Quick Chips Wiring
+const citySearchInput = $("city-search-input");
+const citySearchClear = $("city-search-clear");
+const cityDropdown = $("city-search-dropdown");
+
+let searchDebounceTimer = null;
+let searchResults = [];
+let highlightedIndex = -1;
+
+function hideCityDropdown() {
+  if (cityDropdown) {
+    cityDropdown.hidden = true;
+    cityDropdown.innerHTML = "";
+  }
+  highlightedIndex = -1;
+  searchResults = [];
+}
+
+function renderCityDropdown(results) {
+  if (!cityDropdown) return;
+  searchResults = results;
+  highlightedIndex = -1;
+
+  if (results.length === 0) {
+    cityDropdown.innerHTML = `<div class="city-dropdown-msg">No cities found matching your search.</div>`;
+    cityDropdown.hidden = false;
+    return;
+  }
+
+  cityDropdown.innerHTML = results
+    .map(
+      (r, idx) => `
+    <div class="city-item" data-idx="${idx}">
+      <div class="city-item-main">
+        <div class="city-item-name">
+          <span>📍</span> <strong>${escapeHtml(r.name)}</strong>
+          ${r.countryCode ? `<span class="city-badge">${escapeHtml(r.countryCode)}</span>` : ""}
+        </div>
+        <div class="city-item-admin">${escapeHtml(r.admin || r.displayName)}</div>
+      </div>
+      <div class="city-item-meta">
+        <div>${formatCoords(r.lat, r.lon)}</div>
+        ${r.timezone ? `<span class="city-item-tz">${escapeHtml(r.timezone)}</span>` : ""}
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+
+  cityDropdown.hidden = false;
+
+  for (const itemEl of cityDropdown.querySelectorAll(".city-item")) {
+    itemEl.addEventListener("click", () => {
+      const idx = Number(itemEl.dataset.idx);
+      const chosen = searchResults[idx];
+      if (chosen) {
+        selectCityResult(chosen);
+      }
+    });
+  }
+}
+
+function selectCityResult(city) {
+  applyLocation({
+    displayName: city.displayName,
+    lat: city.lat,
+    lon: city.lon,
+    timezone: city.timezone,
+    tzOffset: null,
+  });
+
+  if (citySearchInput) {
+    citySearchInput.value = city.name;
+    if (citySearchClear) citySearchClear.hidden = false;
+  }
+  hideCityDropdown();
+
+  // Highlight popular chip if it matches
+  document.querySelectorAll(".btn-city-chip").forEach((b) => {
+    const cData = CITY_PRESETS[b.dataset.city];
+    const isMatch = cData && Math.abs(cData.lat - city.lat) < 0.05 && Math.abs(cData.lon - city.lon) < 0.05;
+    b.classList.toggle("active", isMatch);
+  });
+
+  compute();
+}
+
+if (citySearchInput) {
+  citySearchInput.addEventListener("input", (e) => {
+    const val = e.target.value.trim();
+    if (citySearchClear) citySearchClear.hidden = val.length === 0;
+
+    clearTimeout(searchDebounceTimer);
+    if (val.length < 2) {
+      hideCityDropdown();
       return;
     }
-    const city = CITY_PRESETS[val];
-    if (city) {
-      form.elements.latitude.value = city.lat;
-      form.elements.longitude.value = city.lon;
-      form.elements.tz_preset.value = city.tz;
-      syncTzCustom();
+
+    if (cityDropdown) {
+      cityDropdown.innerHTML = `<div class="city-dropdown-msg">Searching cities worldwide…</div>`;
+      cityDropdown.hidden = false;
+    }
+
+    searchDebounceTimer = setTimeout(async () => {
+      const results = await searchCitiesOnline(val);
+      if (citySearchInput.value.trim() === val) {
+        renderCityDropdown(results);
+      }
+    }, 250);
+  });
+
+  citySearchInput.addEventListener("keydown", (e) => {
+    if (!cityDropdown || cityDropdown.hidden || searchResults.length === 0) return;
+
+    const items = cityDropdown.querySelectorAll(".city-item");
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      highlightedIndex = (highlightedIndex + 1) % items.length;
+      items.forEach((it, idx) => it.classList.toggle("selected", idx === highlightedIndex));
+      items[highlightedIndex]?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
+      items.forEach((it, idx) => it.classList.toggle("selected", idx === highlightedIndex));
+      items[highlightedIndex]?.scrollIntoView({ block: "nearest" });
+    } else if (e.key === "Enter") {
+      if (highlightedIndex >= 0 && highlightedIndex < searchResults.length) {
+        e.preventDefault();
+        selectCityResult(searchResults[highlightedIndex]);
+      }
+    } else if (e.key === "Escape") {
+      hideCityDropdown();
     }
   });
 }
 
+if (citySearchClear) {
+  citySearchClear.addEventListener("click", () => {
+    if (citySearchInput) {
+      citySearchInput.value = "";
+      citySearchInput.focus();
+    }
+    citySearchClear.hidden = true;
+    hideCityDropdown();
+  });
+}
+
+document.addEventListener("click", (e) => {
+  if (cityDropdown && !cityDropdown.contains(e.target) && e.target !== citySearchInput) {
+    hideCityDropdown();
+  }
+});
+
+// Popular city chips listener
+for (const chip of document.querySelectorAll(".btn-city-chip")) {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".btn-city-chip").forEach((b) => b.classList.remove("active"));
+    chip.classList.add("active");
+    const city = CITY_PRESETS[chip.dataset.city];
+    if (city) {
+      applyLocation({
+        displayName: city.name,
+        lat: city.lat,
+        lon: city.lon,
+        timezone: city.iana,
+        tzOffset: city.tz,
+      });
+      if (citySearchInput) {
+        citySearchInput.value = "";
+        if (citySearchClear) citySearchClear.hidden = true;
+      }
+      hideCityDropdown();
+      compute();
+    }
+  });
+}
+
+// Preset chips (Modi, Delhi, Now, Rome, Y2K)
 for (const btn of form.querySelectorAll("[data-preset]")) {
   btn.addEventListener("click", () => {
     form.querySelectorAll("[data-preset]").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     const pName = btn.dataset.preset;
     fillForm(PRESETS[pName]());
-    if (citySelect) {
-      if (pName === "modi") citySelect.value = "vadnagar";
-      else if (pName === "delhi") citySelect.value = "delhi";
-      else if (pName === "now") citySelect.value = "greenwich";
-      else if (pName === "y2k") citySelect.value = "greenwich";
-      else citySelect.value = "custom";
+
+    // Sync city chip active state
+    document.querySelectorAll(".btn-city-chip").forEach((chip) => {
+      if (pName === "modi" && chip.dataset.city === "vadnagar") chip.classList.add("active");
+      else if (pName === "delhi" && chip.dataset.city === "delhi") chip.classList.add("active");
+      else chip.classList.remove("active");
+    });
+
+    if (citySearchInput) {
+      citySearchInput.value = "";
+      if (citySearchClear) citySearchClear.hidden = true;
     }
+    hideCityDropdown();
+
     compute();
   });
 }
 
-for (const chip of form.querySelectorAll("[data-city]")) {
-  chip.addEventListener("click", () => {
-    const city = CITY_PRESETS[chip.dataset.city];
-    if (city) {
-      form.elements.latitude.value = city.lat;
-      form.elements.longitude.value = city.lon;
-      form.elements.tz_preset.value = city.tz;
-      if (citySelect) citySelect.value = chip.dataset.city;
-      syncTzCustom();
-    }
-  });
-}
+// Re-calculate timezone if user edits birth date or time while a city is selected
+form.elements.date.addEventListener("change", () => {
+  if (activeCityIana && form.elements.tz_preset.value !== "custom") {
+    const newOffset = resolveTzOffset(activeCityIana, form.elements.date.value, form.elements.time.value);
+    applyLocation({
+      displayName: $("location-name-display")?.textContent || "Custom Location",
+      lat: Number(form.elements.latitude.value),
+      lon: Number(form.elements.longitude.value),
+      timezone: activeCityIana,
+      tzOffset: newOffset,
+    });
+  }
+});
+
+form.elements.time.addEventListener("change", () => {
+  if (activeCityIana && form.elements.tz_preset.value !== "custom") {
+    const newOffset = resolveTzOffset(activeCityIana, form.elements.date.value, form.elements.time.value);
+    applyLocation({
+      displayName: $("location-name-display")?.textContent || "Custom Location",
+      lat: Number(form.elements.latitude.value),
+      lon: Number(form.elements.longitude.value),
+      timezone: activeCityIana,
+      tzOffset: newOffset,
+    });
+  }
+});
 
 $("copy-vedic-json").addEventListener("click", async (e) => {
   try {
