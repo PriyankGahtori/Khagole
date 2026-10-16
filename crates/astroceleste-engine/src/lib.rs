@@ -187,4 +187,10 @@ pub use lunar::LunarStatus;
 pub use planets::{planets_and_sidereal_time_with_options, BodyPosition, Planets};
 pub use temperament::{Factor, Qualities, Scores, Temperament};
 pub use time_lords::{time_lords, Firdaria, Period, Profection, TimeLords, MAX_TIME_LORDS_YEARS};
+pub use vedic::{
+    calc_divisional_chart, calc_divisional_point, calc_panchang, calc_vimshottari_dasha,
+    nakshatra_info, DashaNode, DivisionalChart, DivisionalPlanet, DivisionalPosition,
+    KaranaInfo, NakshatraInfo, PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YearType,
+    YogaInfo,
+};
 pub use zodiac::{ayanamsa, ayanamsa_info, AyanamsaInfo, DEFAULT_AYANAMSA};
