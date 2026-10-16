@@ -4,6 +4,7 @@ members = [
     "crates/astroceleste-engine",
     "crates/astroceleste-engine-py",
     "crates/astroceleste-engine-wasm",
+    "crates/astroceleste-mcp",
 ]
 
 [workspace.package]

@@ -73,6 +73,13 @@ impl UtcInstant {
         UtcInstant { micros }
     }
 
+    /// From UT Julian day number.
+    pub fn from_julian_day(jd: f64) -> Self {
+        let days = jd - 2_440_587.5;
+        let micros = (days * 86_400.0 * 1_000_000.0).round() as i64;
+        UtcInstant { micros }
+    }
+
     /// Microseconds since the Unix epoch.
     pub fn micros(&self) -> i64 {
         self.micros

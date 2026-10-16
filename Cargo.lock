@@ -33,6 +33,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "astroceleste-mcp"
+version = "0.0.12"
+dependencies = [
+ "astroceleste-engine",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -14,12 +14,14 @@
 
 use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
 use astroceleste_engine::{
-    bazi as core_bazi, calculate_chart, calculate_derived_chart, calculate_election_chart,
-    calculate_horary_chart, calculate_synastry, calculate_transit_chart,
-    chart_dignities as core_chart_dignities, chinese_calendar as core_chinese_calendar,
-    degree_qualities as core_degree_qualities, degree_quality_table as core_degree_quality_table,
-    search_elections, time_lords as core_time_lords, zi_wei as core_zi_wei, BaziOptions,
-    ChartRequest, ChineseCalendar, ElectionCriteria, EngineError, UtcInstant, ZiWeiOptions,
+    ayanamsa, ayanamsa_info, bazi as core_bazi, calculate_chart, calculate_derived_chart,
+    calculate_election_chart, calculate_horary_chart, calculate_synastry,
+    calculate_transit_chart, chart_dignities as core_chart_dignities,
+    chinese_calendar as core_chinese_calendar, degree_qualities as core_degree_qualities,
+    degree_quality_table as core_degree_quality_table, houses_at_sidereal_time,
+    planets_and_sidereal_time_with_options, search_elections, time_lords as core_time_lords,
+    zi_wei as core_zi_wei, BaziOptions, ChartRequest, ChineseCalendar, ElectionCriteria,
+    EngineError, HouseSystem, UtcInstant, ZiWeiOptions,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -128,6 +130,8 @@ impl Request {
 #[wasm_bindgen]
 pub struct Engine {
     kernels: KernelSet,
+    ayanamsa_code: String,
+    position_mode: String,
 }
 
 #[wasm_bindgen]
@@ -136,6 +140,8 @@ impl Engine {
     pub fn new() -> Engine {
         Engine {
             kernels: KernelSet::new(),
+            ayanamsa_code: "lahiri".to_string(),
+            position_mode: "true".to_string(),
         }
     }
 
@@ -241,6 +247,134 @@ impl Engine {
         let chart = calculate_transit_chart(&self.kernels, &natal, &req.as_chart_request(instant))
             .map_err(engine_error)?;
         to_js(&chart)
+    }
+
+    /// Set sidereal mode / ayanamsa: 1 = Lahiri, 3 = Raman, 5 = Krishnamurti, 0 = Fagan/Bradley.
+    #[wasm_bindgen(js_name = set_sid_mode)]
+    pub fn set_sid_mode(&mut self, sid_mode: i32, _t0: Option<f64>, _ayan_t0: Option<f64>) {
+        self.ayanamsa_code = match sid_mode {
+            1 => "lahiri".to_string(),
+            3 => "raman".to_string(),
+            5 => "krishnamurti".to_string(),
+            0 => "fagan_bradley".to_string(),
+            27 => "true_citra".to_string(),
+            _ => "lahiri".to_string(),
+        };
+    }
+
+    /// Returns the ayanamsa in degrees at UT Julian date `jd`.
+    #[wasm_bindgen(js_name = get_ayanamsa_ut)]
+    pub fn get_ayanamsa_ut(&self, jd: f64) -> f64 {
+        let code = ayanamsa(&self.ayanamsa_code).code;
+        ayanamsa_info(jd, code).value
+    }
+
+    /// Topocentric coordinates setter (stub for Swiss Ephemeris compatibility).
+    #[wasm_bindgen(js_name = set_topo)]
+    pub fn set_topo(&mut self, _lon: f64, _lat: f64, _alt: f64) {}
+
+    /// Swiss Ephemeris compatible `calc_ut`:
+    /// Returns Float64Array [longitude, latitude, distance, speed, 0, 0].
+    #[wasm_bindgen(js_name = calc_ut)]
+    pub fn calc_ut(&self, jd: f64, body: i32, flags: u32) -> Result<js_sys::Float64Array, JsValue> {
+        let is_sidereal = (flags & 65536) != 0;
+        let is_geometric = (flags & 16) != 0 || self.position_mode == "true";
+        let is_true_node = body == 11;
+
+        let shift = if is_sidereal {
+            let code = ayanamsa(&self.ayanamsa_code).code;
+            ayanamsa_info(jd, code).value
+        } else {
+            0.0
+        };
+
+        let (planets, _) = planets_and_sidereal_time_with_options(
+            &self.kernels,
+            jd,
+            shift,
+            is_geometric,
+            is_true_node,
+        )
+        .map_err(engine_error)?;
+
+        let target_name = match body {
+            0 => "Sun",
+            1 => "Moon",
+            2 => "Mercury",
+            3 => "Venus",
+            4 => "Mars",
+            5 => "Jupiter",
+            6 => "Saturn",
+            7 => "Uranus",
+            8 => "Neptune",
+            9 => "Pluto",
+            10 | 11 => "North Node",
+            _ => "Sun",
+        };
+
+        if let Some(p) = planets.bodies.iter().find(|b| b.name == target_name) {
+            let res = [p.longitude, p.latitude, p.distance, p.speed, 0.0, 0.0];
+            let arr = js_sys::Float64Array::new_with_length(6);
+            arr.copy_from(&res);
+            Ok(arr)
+        } else {
+            Err(js_error("body_not_found", &format!("body {body} not found")))
+        }
+    }
+
+    /// Swiss Ephemeris compatible `houses_ex`:
+    /// Returns plain object `{ cusps: Float64Array(13), ascmc: Float64Array(10) }`.
+    #[wasm_bindgen(js_name = houses_ex)]
+    pub fn houses_ex(
+        &self,
+        jd: f64,
+        iflag: u32,
+        lat: f64,
+        lon: f64,
+        house_system: &str,
+    ) -> Result<JsValue, JsValue> {
+        let is_sidereal = (iflag & 65536) != 0;
+        let shift = if is_sidereal {
+            let code = ayanamsa(&self.ayanamsa_code).code;
+            ayanamsa_info(jd, code).value
+        } else {
+            0.0
+        };
+
+        let t = astroceleste_engine::time::Time::from_ut1(jd);
+        let orient = astroceleste_engine::frames::Orientation::at(&t);
+        let system = HouseSystem::from_code(house_system);
+        let houses = houses_at_sidereal_time(jd, orient.gast_hours, lat, lon, system, shift);
+
+        let cusps_arr = js_sys::Float64Array::new_with_length(13);
+        let mut cusps_data = [0.0; 13];
+        for i in 0..12 {
+            cusps_data[i + 1] = houses.cusps[i];
+        }
+        cusps_arr.copy_from(&cusps_data);
+
+        let ascmc_arr = js_sys::Float64Array::new_with_length(10);
+        let mut ascmc_data = [0.0; 10];
+        ascmc_data[0] = houses.ascendant;
+        ascmc_data[1] = houses.midheaven;
+        ascmc_arr.copy_from(&ascmc_data);
+
+        let obj = js_sys::Object::new();
+        js_sys::Reflect::set(&obj, &"cusps".into(), &cusps_arr)?;
+        js_sys::Reflect::set(&obj, &"ascmc".into(), &ascmc_arr)?;
+        Ok(obj.into())
+    }
+
+    /// Swiss Ephemeris compatible `houses`:
+    #[wasm_bindgen(js_name = houses)]
+    pub fn houses(
+        &self,
+        jd: f64,
+        lat: f64,
+        lon: f64,
+        house_system: &str,
+    ) -> Result<JsValue, JsValue> {
+        self.houses_ex(jd, 0, lat, lon, house_system)
     }
 }
 

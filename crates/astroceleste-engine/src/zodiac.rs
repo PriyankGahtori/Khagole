@@ -1,5 +1,7 @@
 //! Zodiac signs, house placement and ayanamsas (`charts/calc/zodiac.py`).
 
+use serde::Serialize;
+
 use crate::pyfloat;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -255,6 +257,7 @@ pub const AYANAMSA_CATALOG: [Ayanamsa; 14] = [
     },
 ];
 
+/// Default ayanamsa code ("galcent_0sag").
 pub const DEFAULT_AYANAMSA: &str = "galcent_0sag";
 
 /// Catalog entry for a code (case-insensitive), falling back to the default.
@@ -267,13 +270,18 @@ pub fn ayanamsa(code: &str) -> &'static Ayanamsa {
         .unwrap()
 }
 
-#[derive(Debug, Clone, PartialEq)]
+/// Information about an ayanamsa at a specific moment.
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct AyanamsaInfo {
+    /// Ayanamsa code.
     pub code: &'static str,
+    /// Human-readable name.
     pub name: &'static str,
     /// Degrees, rounded to 6 decimals.
     pub value: f64,
+    /// Degrees in D°MM'SS" format.
     pub formatted: String,
+    /// Precession rate in arcseconds per year.
     pub precession_rate_arcsec_yr: f64,
 }
 

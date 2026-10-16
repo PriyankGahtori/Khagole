@@ -178,9 +178,12 @@ pub use horary::{
     calculate_horary_chart, ApplyingAspect, HoraryChart, HoraryData, MoonStatus, PlanetaryHours,
     SeparatingAspect, Stricture,
 };
+pub use houses::{houses_at_sidereal_time, HouseSystem, Houses};
 pub use instant::{ParseError, UtcInstant};
 pub use judgment::{Collection, Judgment, Perfection, Prohibition, Refranation, Translation};
 pub use lots::Lot;
 pub use lunar::LunarStatus;
+pub use planets::{planets_and_sidereal_time_with_options, BodyPosition, Planets};
 pub use temperament::{Factor, Qualities, Scores, Temperament};
 pub use time_lords::{time_lords, Firdaria, Period, Profection, TimeLords, MAX_TIME_LORDS_YEARS};
+pub use zodiac::{ayanamsa, ayanamsa_info, AyanamsaInfo, DEFAULT_AYANAMSA};
