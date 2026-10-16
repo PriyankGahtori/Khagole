@@ -18,7 +18,7 @@ use crate::houses::{houses_at_sidereal_time, HouseSystem, Houses};
 use crate::instant::UtcInstant;
 use crate::lots::{arabic_parts, Lot};
 use crate::lunar::{lunar_status, LunarStatus};
-use crate::planets::planets_and_sidereal_time;
+use crate::planets::planets_and_sidereal_time_with_mode;
 use crate::symbolic::symbolic_degree_number;
 use crate::temperament::{temperament, Temperament};
 use crate::zodiac::{
@@ -65,6 +65,8 @@ pub struct ChartRequest<'a> {
     pub orb_settings: Option<&'a Value>,
     /// Doctrine of triplicities and bounds: "lilly" (default) or "dorothean".
     pub dignity_scheme: &'a str,
+    /// "apparent" (default) or "true" (geometric positions without light-time or aberration).
+    pub position_mode: &'a str,
     /// Also compute the [`ChineseCalendar`] of the moment (default `false`): a few dozen
     /// solar-term and new-moon searches.
     pub chinese_calendar: bool,
@@ -82,6 +84,7 @@ impl<'a> ChartRequest<'a> {
             ayanamsa: DEFAULT_AYANAMSA,
             orb_settings: None,
             dignity_scheme: "lilly",
+            position_mode: "apparent",
             chinese_calendar: false,
         }
     }
@@ -160,6 +163,9 @@ pub struct Chart {
     pub house_system: String,
     /// "tropical" or "sidereal".
     pub zodiac_type: &'static str,
+    /// Position mode: "apparent" or "true" (geometric). Skipped if None.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub position_mode: Option<&'static str>,
     /// Ayanamsa code; `None` for tropical charts.
     pub ayanamsa: Option<&'static str>,
     /// Human-readable ayanamsa name; `None` for tropical charts.
@@ -275,8 +281,12 @@ pub(crate) fn sky(kernels: &KernelSet, req: &ChartRequest) -> Result<Sky, Engine
     let info = ayanamsa_info(jd, ayanamsa_code);
     let shift = if is_sidereal { info.value } else { 0.0 };
 
+    let is_geometric = req.position_mode.trim().eq_ignore_ascii_case("true")
+        || req.position_mode.trim().eq_ignore_ascii_case("geometric");
+
     // The houses reuse the planets' sidereal time (the same instant): one nutation.
-    let (engine, gast_hours) = planets_and_sidereal_time(kernels, jd, shift)?;
+    let (engine, gast_hours) =
+        planets_and_sidereal_time_with_mode(kernels, jd, shift, is_geometric)?;
     let houses = houses_at_sidereal_time(
         jd,
         gast_hours,
@@ -444,6 +454,13 @@ pub(crate) fn chart_without_hours(
     Ok(Chart {
         house_system: req.house_system.to_string(),
         zodiac_type,
+        position_mode: if req.position_mode.trim().eq_ignore_ascii_case("true")
+            || req.position_mode.trim().eq_ignore_ascii_case("geometric")
+        {
+            Some("true")
+        } else {
+            None
+        },
         ayanamsa: is_sidereal.then_some(ayanamsa_code),
         ayanamsa_name: is_sidereal.then_some(info.name),
         ayanamsa_value: is_sidereal.then_some(info.value),

@@ -23,6 +23,7 @@ pub enum HouseSystem {
     Equal,
     Vehlow,
     WholeSign,
+    Sripati,
 }
 
 impl HouseSystem {
@@ -40,6 +41,7 @@ impl HouseSystem {
             Some('E') => HouseSystem::Equal,
             Some('V') => HouseSystem::Vehlow,
             Some('W') => HouseSystem::WholeSign,
+            Some('S') => HouseSystem::Sripati,
             _ => HouseSystem::Placidus,
         }
     }
@@ -185,6 +187,7 @@ pub fn houses_at_sidereal_time(
             opposite_cusps(&mut c);
         }
         HouseSystem::Porphyry => porphyry(&mut c, asc_deg, mc_deg),
+        HouseSystem::Sripati => sripati(&mut c, asc_deg, mc_deg),
         HouseSystem::Placidus => {
             set_angles(&mut c, asc_deg, mc_deg);
             let solve = |offset: f64, semi_factor: f64| {
@@ -256,6 +259,19 @@ fn porphyry(c: &mut [f64; 13], asc_deg: f64, mc_deg: f64) {
     opposite_cusps(c);
 }
 
+/// Sripati: Porphyry cusps are house centers (Bhava Madhya);
+/// cusps (Sandhis) are midpoints between adjacent house centers.
+fn sripati(c: &mut [f64; 13], asc_deg: f64, mc_deg: f64) {
+    let mut p = [0.0; 13];
+    porphyry(&mut p, asc_deg, mc_deg);
+    for i in 1..=12 {
+        let prev = if i == 1 { p[12] } else { p[i - 1] };
+        let curr = p[i];
+        let diff = pyfloat::rem(curr - prev + 360.0, 360.0);
+        c[i] = pyfloat::rem(prev + diff / 2.0, 360.0);
+    }
+}
+
 /// Houses 5, 6 oppose 11, 12; houses 8, 9 oppose 2, 3.
 fn opposite_cusps(c: &mut [f64; 13]) {
     c[5] = pyfloat::rem(c[11] + 180.0, 360.0);
@@ -293,7 +309,7 @@ mod tests {
     /// Cusps within 1′ of Swiss Ephemeris 2.10 (`swe.houses`) for the same moment.
     #[test]
     fn systems_match_swiss_ephemeris() {
-        let reference: [(&str, [f64; 12]); 7] = [
+        let reference: [(&str, [f64; 12]); 8] = [
             (
                 "K",
                 [
@@ -343,6 +359,13 @@ mod tests {
                     55.2408, 85.2408, 115.2408, 145.2408,
                 ],
             ),
+            (
+                "S",
+                [
+                    175.5363, 205.5363, 236.1272, 266.7182, 296.7182, 326.1272,
+                    355.5363, 25.5363, 56.1272, 86.7182, 116.7182, 146.1272,
+                ],
+            ),
         ];
         for (code, expected) in reference {
             let houses = calculate_houses(JD, 41.9, 12.5, HouseSystem::from_code(code), 0.0);
@@ -370,6 +393,8 @@ mod tests {
             ("E", HouseSystem::Equal),
             ("V", HouseSystem::Vehlow),
             ("W", HouseSystem::WholeSign),
+            ("S", HouseSystem::Sripati),
+            ("sripati", HouseSystem::Sripati),
             ("?", HouseSystem::Placidus),
             ("", HouseSystem::Placidus),
         ] {

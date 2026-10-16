@@ -22,6 +22,7 @@ fn natal_charts_match_reference() {
             ayanamsa: input["ayanamsa"].as_str().unwrap(),
             orb_settings: None,
             dignity_scheme: "lilly",
+            position_mode: "apparent",
             chinese_calendar: false,
         };
         let chart = calculate_chart(&kernels, &req).unwrap();

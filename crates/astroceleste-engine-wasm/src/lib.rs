@@ -64,9 +64,12 @@ fn default_ayanamsa() -> String {
 fn default_dignity_scheme() -> String {
     "lilly".into()
 }
+fn default_position_mode() -> String {
+    "apparent".into()
+}
 
-/// `{ utc, latitude, longitude, house_system?, zodiac_type?, ayanamsa?, orb_settings?,
-/// dignity_scheme?, quesited_house?, chinese_calendar? }`
+/// `{ utc, latitude, longitude, house_system?, zodiac_type?, ayanamsa?, position_mode?,
+/// orb_settings?, dignity_scheme?, quesited_house?, chinese_calendar? }`
 #[derive(Deserialize)]
 struct Request {
     utc: String,
@@ -78,6 +81,8 @@ struct Request {
     zodiac_type: String,
     #[serde(default = "default_ayanamsa")]
     ayanamsa: String,
+    #[serde(default = "default_position_mode")]
+    position_mode: String,
     #[serde(default)]
     orb_settings: Option<Value>,
     #[serde(default = "default_dignity_scheme")]
@@ -107,6 +112,7 @@ impl Request {
             ayanamsa: &self.ayanamsa,
             orb_settings: self.orb_settings.as_ref(),
             dignity_scheme: &self.dignity_scheme,
+            position_mode: &self.position_mode,
             chinese_calendar: self.chinese_calendar,
         }
     }

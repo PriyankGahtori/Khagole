@@ -127,6 +127,7 @@ struct Request {
     ayanamsa: String,
     orb_settings: Option<Value>,
     dignity_scheme: String,
+    position_mode: String,
     chinese_calendar: bool,
 }
 
@@ -150,12 +151,18 @@ impl Request {
             ayanamsa: ayanamsa.to_string(),
             orb_settings: optional_value(orb_settings)?,
             dignity_scheme: "lilly".to_string(),
+            position_mode: "apparent".to_string(),
             chinese_calendar: false,
         })
     }
 
     fn with_dignity_scheme(mut self, scheme: &str) -> Self {
         self.dignity_scheme = scheme.to_string();
+        self
+    }
+
+    fn with_position_mode(mut self, mode: &str) -> Self {
+        self.position_mode = mode.to_string();
         self
     }
 
@@ -174,6 +181,7 @@ impl Request {
             ayanamsa: &self.ayanamsa,
             orb_settings: self.orb_settings.as_ref(),
             dignity_scheme: &self.dignity_scheme,
+            position_mode: &self.position_mode,
             chinese_calendar: self.chinese_calendar,
         }
     }
@@ -234,7 +242,7 @@ impl Engine {
 
     /// The chart of a moment and place, as the API's chart dict; with
     /// `chinese_calendar`, also the Chinese calendar of the moment.
-    #[pyo3(signature = (moment, latitude, longitude, house_system="P", zodiac_type="tropical", ayanamsa="galcent_0sag", orb_settings=None, dignity_scheme="lilly", chinese_calendar=false))]
+    #[pyo3(signature = (moment, latitude, longitude, house_system="P", zodiac_type="tropical", ayanamsa="galcent_0sag", orb_settings=None, dignity_scheme="lilly", chinese_calendar=false, position_mode="apparent"))]
     #[allow(clippy::too_many_arguments)]
     fn chart(
         &self,
@@ -248,6 +256,7 @@ impl Engine {
         orb_settings: Option<&Bound<'_, PyAny>>,
         dignity_scheme: &str,
         chinese_calendar: bool,
+        position_mode: &str,
     ) -> PyResult<Py<PyAny>> {
         let req = Request::new(
             moment,
@@ -259,6 +268,7 @@ impl Engine {
             orb_settings,
         )?
         .with_dignity_scheme(dignity_scheme)
+        .with_position_mode(position_mode)
         .with_chinese_calendar(chinese_calendar);
         let chart = py
             .detach(|| calculate_chart(&self.kernels, &req.as_chart_request()))

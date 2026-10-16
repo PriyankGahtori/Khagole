@@ -40,6 +40,7 @@ fn transits_match_reference() {
             ayanamsa: t["ayanamsa"].as_str().unwrap(),
             orb_settings: None,
             dignity_scheme: "lilly",
+            position_mode: "apparent",
             chinese_calendar: false,
         };
         let chart = calculate_transit_chart(&kernels, &base["planets"], &req).unwrap();

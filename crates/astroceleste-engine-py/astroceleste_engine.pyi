@@ -40,6 +40,7 @@ class Engine:
         orb_settings: dict[str, Any] | None = None,
         dignity_scheme: str = "lilly",
         chinese_calendar: bool = False,
+        position_mode: str = "apparent",
     ) -> dict[str, Any]: ...
     def horary(
         self,
