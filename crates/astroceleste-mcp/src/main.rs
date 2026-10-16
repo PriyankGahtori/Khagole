@@ -9,8 +9,9 @@ use std::path::{Path, PathBuf};
 
 use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
 use astroceleste_engine::{
-    ayanamsa, ayanamsa_info, calculate_chart, calculate_transit_chart, chinese_calendar,
-    ChartRequest, UtcInstant, DEFAULT_AYANAMSA,
+    ayanamsa, ayanamsa_info, calc_divisional_chart, calc_panchang, calc_vimshottari_dasha,
+    calculate_chart, calculate_transit_chart, chinese_calendar, ChartRequest, UtcInstant,
+    YearType, DEFAULT_AYANAMSA,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -188,6 +189,96 @@ fn tools_list() -> Value {
                 },
                 "required": ["utc"]
             }
+        },
+        {
+            "name": "calculate_divisional_chart",
+            "description": "Calculate a Vedic divisional chart (varga D1 to D60: D1 Rasi, D2 Hora, D3 Drekkana, D4 Chaturthamsha, D7 Saptamsha, D9 Navamsha, D10 Dashamsha, D12 Dwadashamsha, D16 Shodashamsha, D20 Vimshamsha, D24 Siddhamsha, D27 Nakshatramsha, D30 Trimshamsha, D40 Khavedamsha, D45 Akshavedamsha, D60 Shashtyamsha).",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "varga": {
+                        "type": "string",
+                        "description": "Divisional chart code (e.g. 'D1', 'D2', 'D3', 'D7', 'D9', 'D10', 'D12', 'D16', 'D20', 'D24', 'D27', 'D30', 'D60')",
+                        "default": "D9"
+                    },
+                    "chart": {
+                        "type": "object",
+                        "description": "A full chart object as returned by calculate_chart (containing planets and houses/lagna)"
+                    },
+                    "planets": {
+                        "type": "array",
+                        "description": "Array of planets, each an object with 'name' and 'longitude' (or 'ecliptic_longitude')"
+                    },
+                    "lagna_longitude": {
+                        "type": "number",
+                        "description": "Lagna (Ascendant) longitude in degrees [0, 360). Optional if chart is provided."
+                    }
+                },
+                "required": ["varga"]
+            }
+        },
+        {
+            "name": "calculate_vimshottari_dasha",
+            "description": "Calculate full hierarchical Vimshottari Dasha periods (Mahadashas, Antardashas, Pratyantardashas) with balance of dasha at birth.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "moon_longitude": {
+                        "type": "number",
+                        "description": "Sidereal longitude of the Moon in degrees [0, 360)"
+                    },
+                    "utc": {
+                        "type": "string",
+                        "description": "Birth date and time in UTC ISO 8601 format (e.g. '1950-09-17T04:04:00Z')"
+                    },
+                    "birth_jd": {
+                        "type": "number",
+                        "description": "Birth instant as Julian Day. Optional if utc is provided."
+                    },
+                    "depth": {
+                        "type": "integer",
+                        "description": "Hierarchy depth: 1 (Mahadasha), 2 (Antardasha), 3 (Pratyantardasha), 4 (Sukshma). Default: 3",
+                        "default": 3
+                    },
+                    "year_type": {
+                        "type": "string",
+                        "enum": ["sidereal", "savana", "tropical", "julian"],
+                        "description": "Year length definition: 'sidereal' (365.256363d - default), 'savana' (360d), 'tropical' (365.24219d), 'julian' (365.25d)",
+                        "default": "sidereal"
+                    }
+                },
+                "required": ["moon_longitude"]
+            }
+        },
+        {
+            "name": "calculate_panchanga",
+            "description": "Calculate the five limbs of the Vedic calendar (Tithi, Vara, Nakshatra, Yoga, Karana) and Hindu Samvatsara eras for any moment.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "sun_longitude": {
+                        "type": "number",
+                        "description": "Sun longitude in degrees [0, 360)"
+                    },
+                    "moon_longitude": {
+                        "type": "number",
+                        "description": "Moon longitude in degrees [0, 360)"
+                    },
+                    "utc": {
+                        "type": "string",
+                        "description": "Moment in UTC ISO 8601 format (e.g. '1950-09-17T04:04:00Z')"
+                    },
+                    "jd": {
+                        "type": "number",
+                        "description": "Moment as Julian Day. Optional if utc is provided."
+                    },
+                    "weekday": {
+                        "type": "integer",
+                        "description": "Local civil weekday (0 = Sunday .. 6 = Saturday). Computed from JD if omitted."
+                    }
+                },
+                "required": ["sun_longitude", "moon_longitude"]
+            }
         }
     ])
 }
@@ -290,6 +381,116 @@ fn handle_tool_call(kernels: &KernelSet, name: &str, arguments: &Value) -> Resul
                     {
                         "type": "text",
                         "text": serde_json::to_string_pretty(&cal_json).unwrap_or_default()
+                    }
+                ]
+            }))
+        }
+        "calculate_divisional_chart" => {
+            let varga = arguments["varga"].as_str().unwrap_or("D9");
+            let mut planets_vec: Vec<(String, f64)> = Vec::new();
+            let mut lagna_lon = arguments["lagna_longitude"].as_f64();
+
+            if let Some(chart_obj) = arguments.get("chart") {
+                if lagna_lon.is_none() {
+                    if let Some(lagna_val) = chart_obj.get("lagna") {
+                        lagna_lon = lagna_val.get("lon").or_else(|| lagna_val.get("ecliptic_longitude")).and_then(|v| v.as_f64());
+                    }
+                }
+                if let Some(planets_arr) = chart_obj.get("planets").and_then(|p| p.as_array()) {
+                    for p in planets_arr {
+                        let name = p["name"].as_str().unwrap_or("").to_string();
+                        let lon = p["ecliptic_longitude"]
+                            .as_f64()
+                            .or_else(|| p["longitude"].as_f64())
+                            .or_else(|| p["lon"].as_f64())
+                            .unwrap_or(0.0);
+                        if name == "Ascendant" && lagna_lon.is_none() {
+                            lagna_lon = Some(lon);
+                        }
+                        if !name.is_empty() {
+                            planets_vec.push((name, lon));
+                        }
+                    }
+                }
+            } else if let Some(planets_arr) = arguments.get("planets").and_then(|p| p.as_array()) {
+                for p in planets_arr {
+                    let name = p["name"].as_str().unwrap_or("").to_string();
+                    let lon = p["ecliptic_longitude"]
+                        .as_f64()
+                        .or_else(|| p["longitude"].as_f64())
+                        .or_else(|| p["lon"].as_f64())
+                        .unwrap_or(0.0);
+                    if name == "Ascendant" && lagna_lon.is_none() {
+                        lagna_lon = Some(lon);
+                    }
+                    if !name.is_empty() {
+                        planets_vec.push((name, lon));
+                    }
+                }
+            }
+
+            let lagna = lagna_lon.unwrap_or(0.0);
+            let div_chart = calc_divisional_chart(&planets_vec, lagna, varga).map_err(|e| e.to_string())?;
+            let div_json = serde_json::to_value(&div_chart).map_err(|e| e.to_string())?;
+            Ok(json!({
+                "content": [
+                    {
+                        "type": "text",
+                        "text": serde_json::to_string_pretty(&div_json).unwrap_or_default()
+                    }
+                ]
+            }))
+        }
+        "calculate_vimshottari_dasha" => {
+            let moon_lon = arguments["moon_longitude"].as_f64().ok_or("missing 'moon_longitude' parameter")?;
+            let birth_jd = if let Some(jd) = arguments["birth_jd"].as_f64() {
+                jd
+            } else if let Some(utc) = arguments["utc"].as_str() {
+                let instant = UtcInstant::parse(utc).map_err(|e| e.to_string())?;
+                instant.julian_day()
+            } else {
+                return Err("missing 'utc' or 'birth_jd' parameter".to_string());
+            };
+
+            let depth = arguments["depth"].as_u64().unwrap_or(3) as u32;
+            let year_type = match arguments["year_type"].as_str() {
+                Some("savana") => YearType::Savana,
+                Some("tropical") => YearType::Tropical,
+                Some("julian") => YearType::Julian,
+                _ => YearType::Sidereal,
+            };
+
+            let tree = calc_vimshottari_dasha(moon_lon, birth_jd, depth, year_type);
+            let dasha_json = serde_json::to_value(&tree).map_err(|e| e.to_string())?;
+            Ok(json!({
+                "content": [
+                    {
+                        "type": "text",
+                        "text": serde_json::to_string_pretty(&dasha_json).unwrap_or_default()
+                    }
+                ]
+            }))
+        }
+        "calculate_panchanga" => {
+            let sun_lon = arguments["sun_longitude"].as_f64().ok_or("missing 'sun_longitude' parameter")?;
+            let moon_lon = arguments["moon_longitude"].as_f64().ok_or("missing 'moon_longitude' parameter")?;
+            let jd = if let Some(jd) = arguments["jd"].as_f64() {
+                jd
+            } else if let Some(utc) = arguments["utc"].as_str() {
+                let instant = UtcInstant::parse(utc).map_err(|e| e.to_string())?;
+                instant.julian_day()
+            } else {
+                2451545.0
+            };
+
+            let weekday = arguments["weekday"].as_u64().map(|w| w as u8);
+            let panchang = calc_panchang(sun_lon, moon_lon, jd, weekday);
+            let panchang_json = serde_json::to_value(&panchang).map_err(|e| e.to_string())?;
+            Ok(json!({
+                "content": [
+                    {
+                        "type": "text",
+                        "text": serde_json::to_string_pretty(&panchang_json).unwrap_or_default()
                     }
                 ]
             }))
