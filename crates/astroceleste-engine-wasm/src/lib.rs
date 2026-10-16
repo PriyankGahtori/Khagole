@@ -57,19 +57,19 @@ fn to_js<T: Serialize>(value: &T) -> Result<JsValue, JsValue> {
 }
 
 fn default_house_system() -> String {
-    "P".into()
+    "W".into()
 }
 fn default_zodiac() -> String {
-    "tropical".into()
+    "sidereal".into()
 }
 fn default_ayanamsa() -> String {
-    "galcent_0sag".into()
+    "lahiri".into()
 }
 fn default_dignity_scheme() -> String {
     "lilly".into()
 }
 fn default_position_mode() -> String {
-    "apparent".into()
+    "true".into()
 }
 fn default_node_type() -> String {
     "mean".into()

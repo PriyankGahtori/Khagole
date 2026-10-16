@@ -243,7 +243,7 @@
                     <option value="aldebaran_15tau">Aldebaran 15° Taurus</option>
                     <option value="hipparchos">Hipparchos</option>
                     <option value="sassanian">Sassanian</option>
-                    <option value="galcent_0sag" selected>Galactic Center 0° Sagittarius</option>
+                    <option value="galcent_0sag">Galactic Center 0° Sagittarius</option>
                     <option value="j2000">J2000.0 Epoch</option>
                   </select>
                 </label>
@@ -273,28 +273,18 @@
                 <div class="chart-toolbar">
                   <div class="chart-panel-heading">
                     <h3>Kundli Charts</h3>
-                    <span class="chart-panel-sub">D1 Rasi &amp; D9 Navamsha</span>
+                    <span class="chart-panel-sub">Divisional Vargas (D1–D60)</span>
                   </div>
-                  <div class="chart-style-toggle">
-                    <button type="button" id="style-north" class="btn-chip active">North Indian</button>
-                    <button type="button" id="style-south" class="btn-chip">South Indian</button>
+                  <div class="chart-toolbar-actions">
+                    <button type="button" id="btn-add-chart" class="btn-add-chart" title="Add another divisional chart">+ Add Chart</button>
+                    <div class="chart-style-toggle">
+                      <button type="button" id="style-north" class="btn-chip active">North Indian</button>
+                      <button type="button" id="style-south" class="btn-chip">South Indian</button>
+                    </div>
                   </div>
                 </div>
-                <div class="vedic-charts-grid">
-                  <div class="chart-card">
-                    <div class="chart-header">
-                      <h4>D1 · Rasi Chart</h4>
-                      <span class="chart-sub">Radix / Physical Reality</span>
-                    </div>
-                    <svg id="chart-d1" viewBox="0 0 400 400" role="img" aria-label="D1 Rasi Chart"></svg>
-                  </div>
-                  <div class="chart-card">
-                    <div class="chart-header">
-                      <h4>D9 · Navamsha Chart</h4>
-                      <span class="chart-sub">Dharma / Soul Potential</span>
-                    </div>
-                    <svg id="chart-d9" viewBox="0 0 400 400" role="img" aria-label="D9 Navamsha Chart"></svg>
-                  </div>
+                <div id="vedic-charts-container" class="vedic-charts-grid">
+                  <!-- Dynamic chart cards rendered via demo.js -->
                 </div>
               </div>
 

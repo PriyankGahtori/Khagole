@@ -9,6 +9,7 @@ import {
   renderVimshottariDasha,
   formatDegMin,
   formatDms,
+  VARGA_LIST,
 } from "./vedic.js";
 
 const { Engine, julianDay, bazi, calcDivisional, calcPanchang, calcVimshottariDasha } = wasm;
@@ -551,7 +552,7 @@ async function compute() {
       const yearType = data.get("vedic_year_type") || "tssy";
       const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType);
 
-      lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd };
+      lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd, ascLon };
       renderVedicView(lastVedicData);
 
       const ms = performance.now() - start;
@@ -562,10 +563,10 @@ async function compute() {
         utc,
         latitude: Number(data.get("latitude")),
         longitude: Number(data.get("longitude")),
-        house_system: data.get("house_system"),
-        zodiac_type: data.get("zodiac_type"),
-        ayanamsa: form.elements.ayanamsa.value,
-        dignity_scheme: data.get("dignity_scheme"),
+        house_system: data.get("house_system") || "W",
+        zodiac_type: data.get("zodiac_type") || "sidereal",
+        ayanamsa: form.elements.ayanamsa?.value || "lahiri",
+        dignity_scheme: data.get("dignity_scheme") || "lilly",
         chinese_calendar: true,
       };
 
@@ -586,18 +587,88 @@ async function compute() {
 
 // ---------------------------------------------------------------------------- Vedic Renderers
 
-function renderVedicCharts(data) {
-  if (!data) return;
-  const svgD1 = $("chart-d1");
-  const svgD9 = $("chart-d9");
+let activeVargas = ["D1", "D9"];
 
-  if (chartStyle === "north") {
-    renderNorthIndianChart(svgD1, data.d1, "D1 · Rasi");
-    renderNorthIndianChart(svgD9, data.d9, "D9 · Navamsha");
-  } else {
-    renderSouthIndianChart(svgD1, data.d1, "D1 · Rasi");
-    renderSouthIndianChart(svgD9, data.d9, "D9 · Navamsha");
-  }
+function renderVedicCharts(data) {
+  if (!data || !data.chart) return;
+  const container = $("vedic-charts-container");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  activeVargas.forEach((vCode, idx) => {
+    const vargaInfo = VARGA_LIST.find((v) => v.code === vCode) || {
+      code: vCode,
+      name: `${vCode} Chart`,
+      desc: "Divisional Varga",
+    };
+
+    const card = document.createElement("div");
+    card.className = "chart-card";
+
+    // Card Header
+    const header = document.createElement("div");
+    header.className = "chart-card-header";
+
+    const titleGroup = document.createElement("div");
+    titleGroup.className = "chart-card-title-group";
+
+    const select = document.createElement("select");
+    select.className = "varga-select";
+    select.setAttribute("aria-label", `Select Divisional Chart ${idx + 1}`);
+    select.innerHTML = VARGA_LIST.map(
+      (v) => `<option value="${v.code}" ${v.code === vCode ? "selected" : ""}>${escapeHtml(v.name)}</option>`,
+    ).join("");
+
+    select.addEventListener("change", (e) => {
+      activeVargas[idx] = e.target.value;
+      renderVedicCharts(lastVedicData);
+    });
+
+    const sub = document.createElement("span");
+    sub.className = "chart-sub";
+    sub.textContent = vargaInfo.desc;
+
+    titleGroup.appendChild(select);
+    titleGroup.appendChild(sub);
+    header.appendChild(titleGroup);
+
+    if (activeVargas.length > 1) {
+      const btnRemove = document.createElement("button");
+      btnRemove.type = "button";
+      btnRemove.className = "btn-remove-chart";
+      btnRemove.title = "Remove this chart";
+      btnRemove.textContent = "✕";
+      btnRemove.addEventListener("click", () => {
+        activeVargas.splice(idx, 1);
+        renderVedicCharts(lastVedicData);
+      });
+      header.appendChild(btnRemove);
+    }
+
+    card.appendChild(header);
+
+    // Card SVG
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 400 400");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", `${vargaInfo.name} Chart`);
+    card.appendChild(svg);
+
+    container.appendChild(card);
+
+    // Compute and render this divisional chart
+    try {
+      const divData = calcDivisional(data.chart, data.ascLon, vCode);
+      if (chartStyle === "north") {
+        renderNorthIndianChart(svg, divData, vargaInfo.name);
+      } else {
+        renderSouthIndianChart(svg, divData, vargaInfo.name);
+      }
+    } catch (err) {
+      console.error(`Failed to calculate divisional ${vCode}:`, err);
+    }
+  });
 }
 
 function renderVedicView(data) {
@@ -846,6 +917,19 @@ $("style-south").addEventListener("click", () => {
   $("style-north").classList.remove("active");
   if (lastVedicData) renderVedicCharts(lastVedicData);
 });
+
+const btnAddChart = $("btn-add-chart");
+if (btnAddChart) {
+  btnAddChart.addEventListener("click", () => {
+    const nextVarga = VARGA_LIST.find((v) => !activeVargas.includes(v.code));
+    if (nextVarga) {
+      activeVargas.push(nextVarga.code);
+    } else {
+      activeVargas.push("D10");
+    }
+    if (lastVedicData) renderVedicCharts(lastVedicData);
+  });
+}
 
 // ---------------------------------------------------------------------------- City Search Autocomplete & Quick Chips Wiring
 const citySearchInput = $("city-search-input");

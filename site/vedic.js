@@ -18,20 +18,39 @@ export const VEDIC_SIGNS = [
 ];
 
 export const PLANET_INFO = {
-  Ascendant: { abbr: "Asc", sa: "Lagna", sym: "Asc", color: "#e0b35a" },
-  Sun: { abbr: "Su", sa: "Surya", sym: "☉", color: "#f59e0b" },
-  Moon: { abbr: "Mo", sa: "Chandra", sym: "☽", color: "#e2e8f0" },
-  Mars: { abbr: "Ma", sa: "Mangala", sym: "♂", color: "#ef4444" },
-  Mercury: { abbr: "Me", sa: "Budha", sym: "☿", color: "#10b981" },
-  Jupiter: { abbr: "Ju", sa: "Guru", sym: "♃", color: "#fbbf24" },
+  Ascendant: { abbr: "Asc", sa: "Lagna", sym: "Asc", color: "#f59e0b" },
+  Sun: { abbr: "Su", sa: "Surya", sym: "☉", color: "#fbbf24" },
+  Moon: { abbr: "Mo", sa: "Chandra", sym: "☽", color: "#f8fafc" },
+  Mars: { abbr: "Ma", sa: "Mangala", sym: "♂", color: "#f87171" },
+  Mercury: { abbr: "Me", sa: "Budha", sym: "☿", color: "#34d399" },
+  Jupiter: { abbr: "Ju", sa: "Guru", sym: "♃", color: "#fde047" },
   Venus: { abbr: "Ve", sa: "Shukra", sym: "♀", color: "#f472b6" },
-  Saturn: { abbr: "Sa", sa: "Shani", sym: "♄", color: "#60a5fa" },
-  "North Node": { abbr: "Ra", sa: "Rahu", sym: "☊", color: "#a78bfa" },
+  Saturn: { abbr: "Sa", sa: "Shani", sym: "♄", color: "#93c5fd" },
+  "North Node": { abbr: "Ra", sa: "Rahu", sym: "☊", color: "#c084fc" },
   "South Node": { abbr: "Ke", sa: "Ketu", sym: "☋", color: "#fb923c" },
   Uranus: { abbr: "Ur", sa: "Uranus", sym: "♅", color: "#38bdf8" },
   Neptune: { abbr: "Ne", sa: "Neptune", sym: "♆", color: "#818cf8" },
-  Pluto: { abbr: "Pl", sa: "Pluto", sym: "♇", color: "#c084fc" },
+  Pluto: { abbr: "Pl", sa: "Pluto", sym: "♇", color: "#e879f9" },
 };
+
+export const VARGA_LIST = [
+  { code: "D1", name: "D1 · Rasi (Radix)", desc: "Physical Body & General Destiny" },
+  { code: "D2", name: "D2 · Hora", desc: "Wealth, Finances & Prosperity" },
+  { code: "D3", name: "D3 · Drekkana", desc: "Siblings, Courage & Vitality" },
+  { code: "D4", name: "D4 · Chaturthamsa", desc: "Home, Real Estate & Fortune" },
+  { code: "D7", name: "D7 · Saptamsa", desc: "Children, Progeny & Creative Lineage" },
+  { code: "D9", name: "D9 · Navamsha", desc: "Dharma, Marriage & Soul Purpose" },
+  { code: "D10", name: "D10 · Dasamsa", desc: "Career, Status & Public Achievements" },
+  { code: "D12", name: "D12 · Dwadasamsa", desc: "Parents, Ancestors & Heritage" },
+  { code: "D16", name: "D16 · Shodasamsa", desc: "Vehicles, Conveyances & Luxuries" },
+  { code: "D20", name: "D20 · Vimsamsa", desc: "Spiritual Path, Sadhana & Worship" },
+  { code: "D24", name: "D24 · Chaturvimsamsa", desc: "Higher Learning & Knowledge" },
+  { code: "D27", name: "D27 · Saptavimsamsa", desc: "Inherent Strengths & Weaknesses" },
+  { code: "D30", name: "D30 · Trimsamsa", desc: "Arishta, Obstacles & Misfortune" },
+  { code: "D40", name: "D40 · Khavedamsa", desc: "Auspicious & Inauspicious Cycles" },
+  { code: "D45", name: "D45 · Akshavedamsa", desc: "Character, Integrity & General Well-being" },
+  { code: "D60", name: "D60 · Shashtiamsa", desc: "Past Karma & Root Soul Destiny" },
+];
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -60,21 +79,141 @@ export function formatCompactDegMin(deg) {
 
 // ---------------------------------------------------------------------------- North Indian Chart (Diamond)
 
-const NI_HOUSE_COORDS = [
-  null, // 1-indexed
-  { signPos: [200, 168], center: [200, 85], anchor: "middle" },   // H1 (Top Diamond)
-  { signPos: [100, 24],  center: [100, 58], anchor: "middle" },   // H2 (Top-Left Upper)
-  { signPos: [24, 100],  center: [55, 100], anchor: "middle" },   // H3 (Top-Left Lower)
-  { signPos: [168, 200], center: [85, 200], anchor: "middle" },   // H4 (Left Diamond)
-  { signPos: [24, 300],  center: [55, 300], anchor: "middle" },   // H5 (Bottom-Left Upper)
-  { signPos: [100, 376], center: [100, 342], anchor: "middle" },  // H6 (Bottom-Left Lower)
-  { signPos: [200, 232], center: [200, 315], anchor: "middle" },  // H7 (Bottom Diamond)
-  { signPos: [300, 376], center: [300, 342], anchor: "middle" },  // H8 (Bottom-Right Lower)
-  { signPos: [376, 300], center: [345, 300], anchor: "middle" },  // H9 (Bottom-Right Upper)
-  { signPos: [232, 200], center: [315, 200], anchor: "middle" },  // H10 (Right Diamond)
-  { signPos: [376, 100], center: [345, 100], anchor: "middle" },  // H11 (Top-Right Lower)
-  { signPos: [300, 24],  center: [300, 58], anchor: "middle" },   // H12 (Top-Right Upper)
+// Sign numbers tucked cleanly in the apex/vertex of each house
+const NI_SIGN_POS = [
+  null,
+  [200, 172], // H1 (bottom vertex of diamond)
+  [100, 78],  // H2 (apex pointing down)
+  [78, 100],  // H3 (apex pointing right)
+  [172, 200], // H4 (right vertex of diamond)
+  [78, 300],  // H5 (apex pointing right)
+  [100, 322], // H6 (apex pointing up)
+  [200, 228], // H7 (top vertex of diamond)
+  [300, 322], // H8 (apex pointing up)
+  [322, 300], // H9 (apex pointing left)
+  [228, 200], // H10 (left vertex of diamond)
+  [322, 100], // H11 (apex pointing left)
+  [300, 78],  // H12 (apex pointing down)
 ];
+
+// Mathematical house-aware planet layout: guarantees ZERO overlaps in diamonds and triangles
+function getNorthIndianPlanetCoords(house, idx, count) {
+  // Houses 1, 4, 7, 10 (Kendra Diamonds: 140x140 diamond interior)
+  if (house === 1) {
+    if (count <= 3) {
+      const startY = 95 - ((count - 1) * 22) / 2;
+      return [200, startY + idx * 22];
+    }
+    const rows = Math.ceil(count / 2);
+    const startY = 95 - ((rows - 1) * 20) / 2;
+    const px = idx % 2 === 0 ? 166 : 234;
+    const py = startY + Math.floor(idx / 2) * 20;
+    return [px, py];
+  }
+  if (house === 4) {
+    if (count <= 3) {
+      const startY = 200 - ((count - 1) * 22) / 2;
+      return [95, startY + idx * 22];
+    }
+    const rows = Math.ceil(count / 2);
+    const startY = 200 - ((rows - 1) * 20) / 2;
+    const px = idx % 2 === 0 ? 68 : 124;
+    const py = startY + Math.floor(idx / 2) * 20;
+    return [px, py];
+  }
+  if (house === 7) {
+    if (count <= 3) {
+      const startY = 305 - ((count - 1) * 22) / 2;
+      return [200, startY + idx * 22];
+    }
+    const rows = Math.ceil(count / 2);
+    const startY = 305 - ((rows - 1) * 20) / 2;
+    const px = idx % 2 === 0 ? 166 : 234;
+    const py = startY + Math.floor(idx / 2) * 20;
+    return [px, py];
+  }
+  if (house === 10) {
+    if (count <= 3) {
+      const startY = 200 - ((count - 1) * 22) / 2;
+      return [305, startY + idx * 22];
+    }
+    const rows = Math.ceil(count / 2);
+    const startY = 200 - ((rows - 1) * 20) / 2;
+    const px = idx % 2 === 0 ? 276 : 332;
+    const py = startY + Math.floor(idx / 2) * 20;
+    return [px, py];
+  }
+
+  // Houses 3, 5 (Vertical Left Triangles: Base at x=0, tall 140px vertical space)
+  if (house === 3) {
+    const startY = 100 - ((count - 1) * 21) / 2;
+    return [38, startY + idx * 21];
+  }
+  if (house === 5) {
+    const startY = 300 - ((count - 1) * 21) / 2;
+    return [38, startY + idx * 21];
+  }
+
+  // Houses 9, 11 (Vertical Right Triangles: Base at x=400, tall 140px vertical space)
+  if (house === 11) {
+    const startY = 100 - ((count - 1) * 21) / 2;
+    return [362, startY + idx * 21];
+  }
+  if (house === 9) {
+    const startY = 300 - ((count - 1) * 21) / 2;
+    return [362, startY + idx * 21];
+  }
+
+  // Houses 2, 12 (Horizontal Top Triangles: Base at y=0, wide 160px horizontal space)
+  if (house === 2) {
+    if (count === 1) return [100, 36];
+    if (count === 2) return [100, idx === 0 ? 24 : 48];
+    if (count === 3) {
+      if (idx === 0) return [62, 24];
+      if (idx === 1) return [138, 24];
+      return [100, 48];
+    }
+    const coords4 = [[58, 22], [142, 22], [76, 44], [124, 44], [100, 56]];
+    return coords4[idx] || [100, 36];
+  }
+  if (house === 12) {
+    if (count === 1) return [300, 36];
+    if (count === 2) return [300, idx === 0 ? 24 : 48];
+    if (count === 3) {
+      if (idx === 0) return [262, 24];
+      if (idx === 1) return [338, 24];
+      return [300, 48];
+    }
+    const coords4 = [[258, 22], [342, 22], [276, 44], [324, 44], [300, 56]];
+    return coords4[idx] || [300, 36];
+  }
+
+  // Houses 6, 8 (Horizontal Bottom Triangles: Base at y=400, wide 160px horizontal space)
+  if (house === 6) {
+    if (count === 1) return [100, 364];
+    if (count === 2) return [100, idx === 0 ? 352 : 376];
+    if (count === 3) {
+      if (idx === 0) return [100, 352];
+      if (idx === 1) return [62, 376];
+      return [138, 376];
+    }
+    const coords4 = [[76, 356], [124, 356], [58, 378], [142, 378], [100, 366]];
+    return coords4[idx] || [100, 364];
+  }
+  if (house === 8) {
+    if (count === 1) return [300, 364];
+    if (count === 2) return [300, idx === 0 ? 352 : 376];
+    if (count === 3) {
+      if (idx === 0) return [300, 352];
+      if (idx === 1) return [262, 376];
+      return [338, 376];
+    }
+    const coords4 = [[276, 356], [324, 356], [258, 378], [342, 378], [300, 366]];
+    return coords4[idx] || [300, 364];
+  }
+
+  return [200, 200];
+}
 
 export function renderNorthIndianChart(svgEl, divChart, title = "") {
   svgEl.replaceChildren();
@@ -90,7 +229,7 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
     return el;
   };
 
-  // Background and border
+  // Background and outer border
   add("rect", { x: 0, y: 0, width: W, height: H, class: "ni-bg" });
   add("rect", { x: 2, y: 2, width: W - 4, height: H - 4, class: "ni-border" });
 
@@ -135,14 +274,14 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
   for (let h = 1; h <= 12; h++) {
     const signNum = ((lagnaSign - 1 + (h - 1)) % 12) + 1;
     const signObj = VEDIC_SIGNS[signNum - 1];
-    const coords = NI_HOUSE_COORDS[h];
+    const signPos = NI_SIGN_POS[h];
 
     // Sign number text
     const signText = add(
       "text",
       {
-        x: coords.signPos[0],
-        y: coords.signPos[1],
+        x: signPos[0],
+        y: signPos[1],
         class: `ni-sign-num ${h === 1 || h === 4 || h === 7 || h === 10 ? "kendra" : ""}`,
         "text-anchor": "middle",
         "dominant-baseline": "central",
@@ -159,63 +298,69 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
     const planets = housePlanets[h];
     if (planets.length === 0) continue;
 
-    const [cx, cy] = coords.center;
     const count = planets.length;
 
-    const renderPlanet = (p, px, py) => {
+    planets.forEach((p, idx) => {
+      const [px, py] = getNorthIndianPlanetCoords(h, idx, count);
       const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), color: "#e8e9f3" };
-      const retro = p.is_retrograde ? " ℞" : "";
-      const degStr = p.degree !== undefined ? ` ${formatCompactDegMin(p.degree)}` : "";
-      const label = p.isAsc ? `Asc ${degStr.trim()}` : `${info.abbr}${degStr}${retro}`;
+      const degStr = p.degree !== undefined ? `${formatCompactDegMin(p.degree)}` : "";
 
       if (p.isAsc) {
         add("rect", {
-          x: px - 44,
-          y: py - 11,
-          width: 88,
-          height: 22,
+          x: px - 38,
+          y: py - 10,
+          width: 76,
+          height: 20,
           rx: 5,
           class: "ni-lagna-badge-bg",
         });
+
+        const textEl = add(
+          "text",
+          {
+            x: px,
+            y: py,
+            class: "ni-planet ni-lagna",
+            "text-anchor": "middle",
+            "dominant-baseline": "central",
+          },
+          `Asc ${degStr}`,
+        );
+        textEl.append(
+          Object.assign(document.createElementNS(SVG_NS, "title"), {
+            textContent: `Lagna (Ascendant) in House ${h} (${signObj.sa}) at ${formatDms(p.degree || 0)}`,
+          }),
+        );
+        return;
       }
 
-      const textEl = add(
-        "text",
-        {
-          x: px,
-          y: py,
-          class: `ni-planet ${p.isAsc ? "ni-lagna" : ""} ${p.is_retrograde ? "retro" : ""}`,
-          fill: p.isAsc ? "var(--accent)" : info.color || "var(--text)",
-          "text-anchor": "middle",
-          "dominant-baseline": "central",
-        },
-        label,
-      );
-      textEl.append(
+      const textEl = document.createElementNS(SVG_NS, "text");
+      textEl.setAttribute("x", px);
+      textEl.setAttribute("y", py);
+      textEl.setAttribute("class", `ni-planet ${p.is_retrograde ? "retro" : ""}`);
+      textEl.setAttribute("text-anchor", "middle");
+      textEl.setAttribute("dominant-baseline", "central");
+
+      const tspanName = document.createElementNS(SVG_NS, "tspan");
+      tspanName.setAttribute("fill", info.color || "var(--text)");
+      tspanName.textContent = `${info.abbr} ${degStr}`;
+      textEl.appendChild(tspanName);
+
+      if (p.is_retrograde) {
+        const tspanRetro = document.createElementNS(SVG_NS, "tspan");
+        tspanRetro.setAttribute("fill", "#f87171");
+        tspanRetro.setAttribute("font-weight", "800");
+        tspanRetro.textContent = " ℞";
+        textEl.appendChild(tspanRetro);
+      }
+
+      textEl.appendChild(
         Object.assign(document.createElementNS(SVG_NS, "title"), {
-          textContent: `${p.name} in House ${h} (${signObj.sa}) at ${formatDegMin(p.degree || 0)}${p.is_retrograde ? " (Retrograde)" : ""}`,
+          textContent: `${p.name} in House ${h} (${signObj.sa}) at ${formatDms(p.degree || 0)}${p.is_retrograde ? " (Retrograde)" : ""}`,
         }),
       );
-    };
-
-    if (count <= 2) {
-      const lineSpacing = 22;
-      const startY = cy - ((count - 1) * lineSpacing) / 2;
-      planets.forEach((p, idx) => {
-        renderPlanet(p, cx, startY + idx * lineSpacing);
-      });
-    } else {
-      // 3 or more planets: 2-column layout to avoid clipping and overlapping
-      const colOffset = 34;
-      const lineSpacing = 20;
-      const rows = Math.ceil(count / 2);
-      const startY = cy - ((rows - 1) * lineSpacing) / 2;
-      planets.forEach((p, idx) => {
-        const px = idx % 2 === 0 ? cx - colOffset : cx + colOffset;
-        const py = startY + Math.floor(idx / 2) * lineSpacing;
-        renderPlanet(p, px, py);
-      });
-    }
+      svgEl.appendChild(textEl);
+    });
   }
 
   // Title badge in corner or center
@@ -367,32 +512,65 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
     const count = planets.length;
     const renderSiPlanet = (p, px, py) => {
       const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), color: "#e8e9f3" };
-      const retro = p.is_retrograde ? " ℞" : "";
-      const degStr = p.degree !== undefined ? ` ${formatCompactDegMin(p.degree)}` : "";
-      const label = p.isAsc ? `Asc ${degStr.trim()}` : `${info.abbr}${degStr}${retro}`;
+      const degStr = p.degree !== undefined
+        ? (count >= 4 ? `${Math.floor(p.degree)}°` : `${formatCompactDegMin(p.degree)}`)
+        : "";
 
       if (py < y0 + CELL - 4) {
         if (p.isAsc) {
           add("rect", {
             x: px - 2,
-            y: py - 10,
-            width: Math.min(CELL - (px - x0) - 4, 76),
+            y: py - 9,
+            width: count >= 4 ? 44 : 74,
             height: 17,
             rx: 4,
             class: "si-lagna-badge-bg",
           });
+
+          const textEl = add(
+            "text",
+            {
+              x: px + (count >= 4 ? 20 : 35),
+              y: py,
+              class: "si-planet si-lagna-text",
+              "text-anchor": "middle",
+              "dominant-baseline": "central",
+            },
+            count >= 4 ? `Asc ${Math.floor(p.degree)}°` : `Asc ${degStr}`,
+          );
+          textEl.append(
+            Object.assign(document.createElementNS(SVG_NS, "title"), {
+              textContent: `Lagna in ${signObj.sa} at ${formatDms(p.degree || 0)}`,
+            }),
+          );
+          return;
         }
 
-        add(
-          "text",
-          {
-            x: px,
-            y: py,
-            class: `si-planet ${p.isAsc ? "si-lagna-text" : ""} ${p.is_retrograde ? "retro" : ""}`,
-            fill: p.isAsc ? "var(--accent)" : info.color || "var(--text)",
-          },
-          label,
+        const textEl = document.createElementNS(SVG_NS, "text");
+        textEl.setAttribute("x", px);
+        textEl.setAttribute("y", py);
+        textEl.setAttribute("class", `si-planet ${p.is_retrograde ? "retro" : ""}`);
+        textEl.setAttribute("dominant-baseline", "central");
+
+        const tspanName = document.createElementNS(SVG_NS, "tspan");
+        tspanName.setAttribute("fill", info.color || "var(--text)");
+        tspanName.textContent = `${info.abbr} ${degStr}`;
+        textEl.appendChild(tspanName);
+
+        if (p.is_retrograde) {
+          const tspanRetro = document.createElementNS(SVG_NS, "tspan");
+          tspanRetro.setAttribute("fill", "#f87171");
+          tspanRetro.setAttribute("font-weight", "800");
+          tspanRetro.textContent = " ℞";
+          textEl.appendChild(tspanRetro);
+        }
+
+        textEl.appendChild(
+          Object.assign(document.createElementNS(SVG_NS, "title"), {
+            textContent: `${p.name} in ${signObj.sa} at ${formatDms(p.degree || 0)}${p.is_retrograde ? " (Retrograde)" : ""}`,
+          }),
         );
+        svgEl.appendChild(textEl);
       }
     };
 
@@ -400,11 +578,11 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
       const startY = y0 + 38;
       const lineSpacing = 19;
       planets.forEach((p, idx) => {
-        renderSiPlanet(p, x0 + 7, startY + idx * lineSpacing);
+        renderSiPlanet(p, x0 + 8, startY + idx * lineSpacing);
       });
     } else {
       // 4+ planets: 2-column layout to prevent clipping in cell
-      const startY = y0 + 38;
+      const startY = y0 + 36;
       const lineSpacing = 18;
       planets.forEach((p, idx) => {
         const px = idx % 2 === 0 ? x0 + 5 : x0 + 52;
