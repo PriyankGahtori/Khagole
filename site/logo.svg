@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- Cosmic background gradient -->
+    <radialGradient id="spaceGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="60%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#050814"/>
+    </radialGradient>
+    <!-- Golden Ecliptic Ring Gradient -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="35%" stop-color="#f59e0b"/>
+      <stop offset="70%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <!-- Celestial Axis / Meridian Gradient -->
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <!-- Center Glow -->
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="25%" stop-color="#fef08a"/>
+      <stop offset="60%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+    </radialGradient>
+    <!-- Filter for subtle cosmic glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Cosmic Disc -->
+  <circle cx="64" cy="64" r="60" fill="url(#spaceGrad)" stroke="url(#goldGrad)" stroke-width="2.5"/>
+
+  <!-- Outer Celestial Meridian (Khagola mandala) -->
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#6366f1" stroke-width="1.2" stroke-opacity="0.5"/>
+  <circle cx="64" cy="64" r="44" fill="none" stroke="#38bdf8" stroke-width="0.8" stroke-opacity="0.3" stroke-dasharray="3 3"/>
+
+  <!-- Polar Axis (Dhruva) -->
+  <line x1="64" y1="12" x2="64" y2="116" stroke="url(#cyanGrad)" stroke-width="1.8" stroke-opacity="0.75"/>
+  <!-- North & South Celestial Poles -->
+  <circle cx="64" cy="12" r="2.5" fill="#38bdf8"/>
+  <circle cx="64" cy="116" r="2.5" fill="#38bdf8"/>
+
+  <!-- Celestial Equator (Vishuvad-vritta) -->
+  <ellipse cx="64" cy="64" rx="52" ry="16" fill="none" stroke="#93c5fd" stroke-width="1.5" stroke-opacity="0.55" stroke-dasharray="4 2"/>
+
+  <!-- Prime Meridian ellipse -->
+  <ellipse cx="64" cy="64" rx="20" ry="52" fill="none" stroke="#818cf8" stroke-width="1.2" stroke-opacity="0.45"/>
+
+  <!-- Ecliptic (Kranti-vritta - Path of the Sun & Grahas) - 23.44° Tilted Golden Ellipse -->
+  <g transform="rotate(-23.44 64 64)">
+    <ellipse cx="64" cy="64" rx="52" ry="22" fill="none" stroke="url(#goldGrad)" stroke-width="2.6" filter="url(#glow)"/>
+    <!-- Cardinal Solstice / Equinox Points on the Ecliptic -->
+    <circle cx="12" cy="64" r="2.8" fill="#fde68a" stroke="#d97706" stroke-width="1"/>
+    <circle cx="116" cy="64" r="2.8" fill="#fde68a" stroke="#d97706" stroke-width="1"/>
+    <circle cx="64" cy="42" r="2.2" fill="#fbbf24"/>
+    <circle cx="64" cy="86" r="2.2" fill="#fbbf24"/>
+  </g>
+
+  <!-- Central Surya / Cosmic Bindu Glow -->
+  <circle cx="64" cy="64" r="16" fill="url(#sunGlow)"/>
+
+  <!-- Radiant 8-pointed Central Star (Jyotir-mandala) -->
+  <!-- Diagonal rays -->
+  <path d="M64 54 L66.5 61.5 L74 64 L66.5 66.5 L64 74 L61.5 66.5 L54 64 L61.5 61.5 Z" fill="#fde68a"/>
+  <!-- Outer points -->
+  <path d="M64 48 L65.8 62.2 L79 60 L66 65.5 L69 79 L63.5 66.5 L52 72 L61.5 64 Z" fill="#f59e0b" opacity="0.6"/>
+  <!-- Central Bindu Core -->
+  <circle cx="64" cy="64" r="3.5" fill="#ffffff" stroke="#f59e0b" stroke-width="1.2"/>
+</svg>

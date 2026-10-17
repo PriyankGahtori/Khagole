@@ -637,8 +637,9 @@ export function renderPanchang(containerEl, panchang, timings, tzOffset, ayanams
     ayanamsaHtml = `
       <div class="panchang-ayanamsa-group">
         <span class="panchang-ayanamsa-badge" title="Precession / Sidereal Zodiac Offset">
+          <span class="ayanamsa-icon">☸️</span>
           <span class="ayanamsa-title">Ayanamsa:</span>
-          <strong>${name}</strong>
+          <strong class="ayanamsa-name">${name}</strong>
           ${valDms ? `<span class="ayanamsa-val">${valDms}</span>` : ""}
           ${valDeg ? `<span class="ayanamsa-dec">(${valDeg})</span>` : ""}
         </span>
@@ -782,8 +783,24 @@ export function renderPanchang(containerEl, panchang, timings, tzOffset, ayanams
 
 // ---------------------------------------------------------------------------- Vedic Planetary Table
 
-export function renderVedicPlanetsTable(tableEl, d1Chart, d9Chart, natalChart, wasm) {
+export function renderVedicPlanetsTable(tableEl, d1Chart, d9Chart, natalChart, wasm, ayanamsa) {
   tableEl.classList.add("vedic-planets-table");
+
+  // Populate planets Ayanamsa header badge if element exists
+  const badgeEl = document.getElementById("planets-ayanamsa-badge");
+  if (badgeEl) {
+    if (ayanamsa) {
+      const isObj = typeof ayanamsa === "object";
+      const aName = isObj ? (ayanamsa.name || "Lahiri") : (ayanamsa === "lahiri" ? "Lahiri (Chitra Paksha)" : ayanamsa);
+      const aValDms = isObj ? (ayanamsa.formatted || (ayanamsa.value !== undefined && ayanamsa.value !== null ? formatDms(ayanamsa.value) : "")) : "";
+      const aValDeg = isObj && ayanamsa.value !== undefined && ayanamsa.value !== null ? `${ayanamsa.value.toFixed(6)}°` : "";
+      badgeEl.innerHTML = `☸️ <strong>${aName}</strong> ${aValDms ? `<span class="ayanamsa-val">${aValDms}</span>` : ""} ${aValDeg ? `<span class="ayanamsa-dec">(${aValDeg})</span>` : ""}`;
+      badgeEl.hidden = false;
+    } else {
+      badgeEl.hidden = true;
+    }
+  }
+
   const d9Map = new Map((d9Chart?.planets || []).map((p) => [p.name, p]));
   const natalMap = new Map((natalChart?.planets || []).map((p) => [p.name, p]));
 

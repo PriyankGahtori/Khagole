@@ -671,33 +671,93 @@ td.num { text-align: right; }
 .panchang-ayanamsa-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
+  gap: 8px;
+  padding: 5px 14px;
   border-radius: 9999px;
-  background: color-mix(in srgb, #6366f1 12%, transparent);
-  border: 1px solid color-mix(in srgb, #6366f1 28%, transparent);
-  color: #818cf8;
-  font-size: 0.82rem;
+  background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  border: 1.5px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--text);
+  font-size: 0.85rem;
   font-variant-numeric: tabular-nums;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.panchang-ayanamsa-badge .ayanamsa-icon {
+  font-size: 0.95rem;
 }
 
 .panchang-ayanamsa-badge .ayanamsa-title {
-  color: var(--dim);
-  font-weight: 500;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.panchang-ayanamsa-badge strong {
-  color: #c7d2fe;
+.panchang-ayanamsa-badge strong,
+.panchang-ayanamsa-badge .ayanamsa-name {
+  color: var(--text);
+  font-weight: 700;
 }
 
 .panchang-ayanamsa-badge .ayanamsa-val {
-  color: #a5b4fc;
-  font-weight: 600;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.9rem;
 }
 
 .panchang-ayanamsa-badge .ayanamsa-dec {
-  color: var(--muted);
-  font-size: 0.75rem;
+  color: var(--dim);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+/* Title wrap with Ayanamsa pills in Charts & Planets */
+.chart-title-wrap,
+.planets-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.charts-ayanamsa-pill,
+.planets-ayanamsa-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.charts-ayanamsa-pill strong,
+.planets-ayanamsa-pill strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.charts-ayanamsa-pill .ayanamsa-val,
+.planets-ayanamsa-pill .ayanamsa-val {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.charts-ayanamsa-pill .ayanamsa-dec,
+.planets-ayanamsa-pill .ayanamsa-dec {
+  color: var(--dim);
+  font-size: 0.74rem;
+}
+
+.brand-logo {
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(224, 179, 90, 0.35);
+  flex-shrink: 0;
+  display: block;
 }
 
 .panchang-grid {

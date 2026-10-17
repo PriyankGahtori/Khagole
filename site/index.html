@@ -9,16 +9,16 @@
   <meta property="og:title" content="Khagole — Vedic Jyotish &amp; Vimshottari Dasha Engine">
   <meta property="og:description" content="Khagole: Vedic charts on NASA JPL ephemerides in pure Rust: identical results in Rust, WebAssembly, and native MCP.">
   <meta property="og:type" content="website">
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=2.4.0">
-  <script type="module" src="demo.js?v=2.4.0"></script>
+  <link rel="icon" href="favicon.svg?v=2.5.0" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css?v=2.5.0">
+  <script type="module" src="demo.js?v=2.5.0"></script>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a class="brand" href="#top" aria-label="Khagole home">
-        <img src="favicon.svg" alt="" width="26" height="26">
-        <span>Khagole <span class="brand-badge">Vedic Jyotish · DE440s</span></span>
+        <img src="logo.svg?v=2.5.0" alt="Khagole Logo" width="32" height="32" class="brand-logo">
+        <span class="brand-name">Khagole <span class="brand-badge">Vedic Jyotish · DE440s</span></span>
       </a>
       <nav aria-label="Main">
         <a href="#features">Features</a>
@@ -129,6 +129,19 @@
                 </select>
               </label>
 
+              <label class="form-group">
+                <span class="group-label">Ayanamsa <small>(Sidereal Precession)</small></span>
+                <select name="vedic_ayanamsa" id="vedic-ayanamsa-select">
+                  <option value="lahiri" selected>Lahiri (Chitra Paksha) — Standard Vedic</option>
+                  <option value="true_citra">True Chitra / Invariable Plane</option>
+                  <option value="raman">B.V. Raman</option>
+                  <option value="krishnamurti">Krishnamurti (KP)</option>
+                  <option value="fagan_bradley">Fagan-Bradley</option>
+                  <option value="yukteshwar">Sri Yukteswar</option>
+                  <option value="galcent_0sag">Galactic Center (0° Sagittarius)</option>
+                </select>
+              </label>
+
               <div class="form-group btn-group">
                 <button type="submit" class="button primary compute-btn-hero" id="compute-btn">
                   <span>Calculate Horoscope</span>
@@ -140,7 +153,7 @@
             <details class="advanced-params-drawer" id="advanced-drawer">
               <summary class="advanced-summary">
                 <span class="summary-text">⚙️ Canonical Vedic Configuration &amp; Coordinates</span>
-                <span class="summary-hint">Ayanamsa, TSSY Dasha Standard, Houses, Coordinates</span>
+                <span class="summary-hint">TSSY Dasha Standard, Houses, Position Mode, Nodes, Coordinates</span>
               </summary>
               <div class="advanced-grid">
                 <label>
@@ -157,19 +170,6 @@
                 </label>
 
                 <!-- Canonical Vedic Astrological Parameters -->
-                <label class="vedic-field">
-                  <span class="field-label">Ayanamsa</span>
-                  <select name="vedic_ayanamsa">
-                    <option value="lahiri" selected>Lahiri (Chitra Paksha) — Standard Vedic</option>
-                    <option value="true_citra">True Chitra / Invariable Plane</option>
-                    <option value="raman">B.V. Raman</option>
-                    <option value="krishnamurti">Krishnamurti (KP)</option>
-                    <option value="fagan_bradley">Fagan-Bradley</option>
-                    <option value="yukteshwar">Sri Yukteswar</option>
-                    <option value="galcent_0sag">Galactic Center (0° Sagittarius)</option>
-                  </select>
-                </label>
-
                 <label class="vedic-field">
                   <span class="field-label">Dasha Year Standard</span>
                   <select name="vedic_year_type">
@@ -224,7 +224,10 @@
             <div class="panel charts-col-panel full-width-charts">
               <div class="chart-toolbar">
                 <div class="chart-panel-heading">
-                  <h3>Kundli Charts (कुंडली चक्र)</h3>
+                  <div class="chart-title-wrap">
+                    <h3>Kundli Charts (कुंडली चक्र)</h3>
+                    <span id="charts-ayanamsa-badge" class="charts-ayanamsa-pill" title="Precession Offset Applied to Charts"></span>
+                  </div>
                   <span class="chart-panel-sub">D1 Rashi &amp; D9 Navamsha Default Enabled · All Shodashavargas (D1–D60)</span>
                 </div>
                 <div class="chart-toolbar-actions">
@@ -278,7 +281,10 @@
               <!-- Right Column: Planetary Positions Table -->
               <div class="panel tables planets-panel">
                 <div class="planets-panel-header">
-                  <h3>Vedic Planetary Positions (Navagrahas &amp; Lagna)</h3>
+                  <div class="planets-title-wrap">
+                    <h3>Vedic Planetary Positions (Navagrahas &amp; Lagna)</h3>
+                    <span id="planets-ayanamsa-badge" class="planets-ayanamsa-pill" title="Precession Offset Applied to Planetary Longitudes"></span>
+                  </div>
                   <span class="planets-panel-sub">Sidereal Longitudes, Nakshatras, Padas &amp; Divisional Rulers</span>
                 </div>
                 <div class="table-scroll"><table id="vedic-planets"></table></div>

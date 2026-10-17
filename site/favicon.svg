@@ -1,6 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <circle cx="32" cy="32" r="29" fill="#0b1020" stroke="#e0b35a" stroke-width="3"/>
-  <circle cx="32" cy="32" r="19" fill="none" stroke="#e0b35a" stroke-width="1.5" opacity=".6"/>
-  <path d="M3 32h58M32 3v58" stroke="#e0b35a" stroke-width="1.5" opacity=".6"/>
-  <path d="M32 20l3 9 9 3-9 3-3 9-3-9-9-3 9-3z" fill="#f4e3b5"/>
+  <defs>
+    <radialGradient id="favSpace" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="70%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#050814"/>
+    </radialGradient>
+    <linearGradient id="favGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Disc -->
+  <circle cx="32" cy="32" r="30" fill="url(#favSpace)" stroke="url(#favGold)" stroke-width="2"/>
+  
+  <!-- Outer Ring -->
+  <circle cx="32" cy="32" r="25" fill="none" stroke="#6366f1" stroke-width="1" opacity="0.6"/>
+  
+  <!-- Polar Axis -->
+  <line x1="32" y1="5" x2="32" y2="59" stroke="#38bdf8" stroke-width="1.2" opacity="0.8"/>
+  <circle cx="32" cy="6" r="1.5" fill="#38bdf8"/>
+  <circle cx="32" cy="58" r="1.5" fill="#38bdf8"/>
+  
+  <!-- Equator & Meridian -->
+  <ellipse cx="32" cy="32" rx="25" ry="9" fill="none" stroke="#93c5fd" stroke-width="1" stroke-dasharray="2 1" opacity="0.6"/>
+  <ellipse cx="32" cy="32" rx="10" ry="25" fill="none" stroke="#818cf8" stroke-width="1" opacity="0.5"/>
+  
+  <!-- Tilted Golden Ecliptic -->
+  <g transform="rotate(-23.44 32 32)">
+    <ellipse cx="32" cy="32" rx="25" ry="12" fill="none" stroke="url(#favGold)" stroke-width="2"/>
+    <circle cx="7" cy="32" r="2" fill="#fde68a"/>
+    <circle cx="57" cy="32" r="2" fill="#fde68a"/>
+  </g>
+  
+  <!-- Central Radiant Star / Bindu -->
+  <circle cx="32" cy="32" r="4.5" fill="#f59e0b"/>
+  <path d="M32 25 L33.5 30.5 L39 32 L33.5 33.5 L32 39 L30.5 33.5 L25 32 L30.5 30.5 Z" fill="#fde68a"/>
+  <circle cx="32" cy="32" r="2" fill="#ffffff"/>
 </svg>

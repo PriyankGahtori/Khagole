@@ -1,5 +1,5 @@
 // Live demo: Khagole Engine compiled to WebAssembly, computing Vedic Jyotish charts in the browser.
-import init, * as wasm from "./pkg/khagole_engine_wasm.js?v=2.4.0";
+import init, * as wasm from "./pkg/khagole_engine_wasm.js?v=2.5.0";
 import {
   renderNorthIndianChart,
   renderSouthIndianChart,
@@ -10,7 +10,7 @@ import {
   formatDegMin,
   formatDms,
   VARGA_LIST,
-} from "./vedic.js?v=2.4.0";
+} from "./vedic.js?v=2.5.0";
 
 const { Engine, julianDay, calcDivisional, calcPanchang, calcVimshottariDasha } = wasm;
 
@@ -738,7 +738,8 @@ async function compute() {
 
     const ms = performance.now() - start;
     const took = ms < 1 ? "under 1 ms" : ms < 10 ? `${ms.toFixed(1)} ms` : `${Math.round(ms)} ms`;
-    setStatus(`Vedic chart &amp; Dasha computed in ${took}, on your device.`);
+    const ayanStr = ayanamsaObj?.formatted ? ` · Ayanamsa: <strong>${escapeHtml(ayanamsaObj.name)} ${escapeHtml(ayanamsaObj.formatted)}</strong>` : "";
+    setStatus(`Vedic chart &amp; Dasha computed in ${took}${ayanStr}, on your device.`);
   } catch (err) {
     const code = err && err.code ? ` (${err.code})` : "";
     setStatus(`${escapeHtml(err && err.message ? err.message : err)}${code}`, true);
@@ -756,6 +757,17 @@ function renderVedicCharts(data) {
   if (!data || !data.chart) return;
   const container = $("vedic-charts-container");
   if (!container) return;
+
+  const chartBadge = $("charts-ayanamsa-badge");
+  if (chartBadge) {
+    if (data.ayanamsa) {
+      const a = data.ayanamsa;
+      chartBadge.innerHTML = `☸️ <strong>${a.name}</strong> ${a.formatted ? `<span class="ayanamsa-val">${a.formatted}</span>` : ""}`;
+      chartBadge.hidden = false;
+    } else {
+      chartBadge.hidden = true;
+    }
+  }
 
   if (!activeVargas || activeVargas.length === 0) {
     activeVargas = ["D1", "D9"];
@@ -843,7 +855,7 @@ function renderVedicView(data) {
 
   renderVedicCharts(data);
   renderPanchang($("vedic-panchang"), data.panchang, data.timings, data.tzOffset, data.ayanamsa || data.chart?.ayanamsa);
-  renderVedicPlanetsTable($("vedic-planets"), data.d1, data.d9, data.chart, wasm);
+  renderVedicPlanetsTable($("vedic-planets"), data.d1, data.d9, data.chart, wasm, data.ayanamsa || data.chart?.ayanamsa);
   renderVimshottariDasha($("vedic-dasha"), data.dasha, data.moonLon, data.jd, wasm, data.tzOffset);
 
   lastVedicJson = JSON.stringify(
