@@ -17,7 +17,7 @@ const engine = new Engine();
 engine.addKernel("de440s_2000.bsp", readFileSync(join(here, "../../../tests/data/de440s_2000.bsp")));
 const chart = engine.chart({ utc: "2000-06-01T12:00:00Z", latitude: 41.9, longitude: 12.5 });
 assert.equal(chart.planets[0].name, "Sun");
-assert.equal(chart.planets[0].sign, "Gemini");
+assert.equal(chart.planets[0].sign, "Taurus"); // Vedic Sidereal (default)
 assert.equal(chart.houses.length, 12);
 assert.equal(julianDay("2000-06-01T12:00:00Z"), 2451697);
 assert.equal(degreeQualities(5.5).sign, "Aries");
