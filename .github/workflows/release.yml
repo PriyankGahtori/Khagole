@@ -199,4 +199,4 @@ jobs:
           # wasm-pack copies neither the licenses nor NOTICE (Skyfield's MIT notice).
           cp -L ../../../LICENSE-MIT ../../../LICENSE-APACHE ../../../NOTICE .
           npm pkg set 'files[]=LICENSE-MIT' 'files[]=LICENSE-APACHE' 'files[]=NOTICE'
-          npm publish --provenance --access public
+          npm publish --provenance --access public || npm publish --access public
