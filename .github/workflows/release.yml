@@ -22,7 +22,7 @@ jobs:
     # Nothing is published unless the tagged commit passes the tests on the full kernel,
     # whatever CI said about it.
     name: test the tagged commit
-    if: github.repository_owner == 'ffalcinelli'
+    if: github.repository_owner == 'ffalcinelli' || github.repository_owner == 'PriyankGahtori'
     runs-on: ubuntu-latest
     env:
       KHAGOLE_REQUIRE_KERNEL: "1"
@@ -44,7 +44,7 @@ jobs:
   release:
     name: publish
     needs: verify
-    if: github.repository_owner == 'ffalcinelli'
+    if: github.repository_owner == 'ffalcinelli' || github.repository_owner == 'PriyankGahtori'
     runs-on: ubuntu-latest
     environment: crates-io
     permissions:

@@ -4,7 +4,7 @@
 
 > **Experimental (0.0.x):** the API may change in any release. Pin an exact version.
 
-Python bindings for [khagole-engine](https://github.com/ffalcinelli/khagole-engine),
+Python bindings for [khagole-engine](https://github.com/PriyankGahtori/Khagole),
 astrological chart calculation on NASA JPL ephemerides, written in Rust.
 
 [Website and live demo](https://priyankgahtori.github.io/Khagole/) ·

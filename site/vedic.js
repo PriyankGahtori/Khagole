@@ -264,7 +264,7 @@ export function renderNorthIndianChart(svgEl, divChart, title = "") {
   });
 
   for (const p of divChart.planets) {
-    if (p.name === "Ascendant" || p.name === "Midheaven") continue;
+    if (p.name === "Ascendant" || p.name === "Midheaven" || p.name === "Chiron" || p.name === "Lilith") continue;
     const h = p.house || 1;
     if (h >= 1 && h <= 12) {
       housePlanets[h].push(p);
@@ -441,7 +441,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
   });
 
   for (const p of divChart.planets) {
-    if (p.name === "Ascendant" || p.name === "Midheaven") continue;
+    if (p.name === "Ascendant" || p.name === "Midheaven" || p.name === "Chiron" || p.name === "Lilith") continue;
     const s = p.sign || 1;
     if (s >= 1 && s <= 12) {
       signPlanets[s].push(p);
@@ -855,7 +855,7 @@ export function renderVedicPlanetsTable(tableEl, d1Chart, d9Chart, natalChart, w
   });
 
   for (const p of sortedPlanets) {
-    if (p.name === "Ascendant" || p.name === "Midheaven") continue;
+    if (p.name === "Ascendant" || p.name === "Midheaven" || p.name === "Chiron" || p.name === "Lilith") continue;
     const info = PLANET_INFO[p.name] || { abbr: p.name.slice(0, 2), sa: p.name, sym: "•", color: "var(--text)" };
     const natal = natalMap.get(p.name);
     const d9P = d9Map.get(p.name);

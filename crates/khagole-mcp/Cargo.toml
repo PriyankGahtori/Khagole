@@ -1,5 +1,6 @@
 [package]
 name = "khagole-mcp"
+description = "Model Context Protocol (MCP) server for Khagole Vedic Jyotish & JPL ephemerides"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

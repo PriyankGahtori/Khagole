@@ -41,7 +41,7 @@ ziWei(chart.chinese_calendar, request.utc, 12.5, 60);  // Zi Wei Dou Shu
 
 Also: `engine.chineseCalendar(utc)`, `engine.kernels`, `engine.coverage`,
 `engine.supports(jd)`, `chartDignities(chart, "dorothean")`, `degreeQualities(longitude)`,
-`degreeQualityTable()` and `julianDay(utc)`. The [API guide](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/api.md)
+`degreeQualityTable()` and `julianDay(utc)`. The [API guide](https://github.com/PriyankGahtori/Khagole/blob/main/docs/api.md)
 describes every option and result.
 
 To ship a smaller kernel, cut the range you need (positions are unchanged inside it):

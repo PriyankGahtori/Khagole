@@ -601,6 +601,8 @@ async function compute() {
     }
 
     const chart = engine.chart(vedicReq);
+    // Classical Vedic astrology uses Navagrahas (+ outer planets), excluding Chiron and Lilith
+    chart.planets = chart.planets.filter((p) => p.name !== "Chiron" && p.name !== "Lilith");
     const ascPoint = chart.planets.find((p) => p.name === "Ascendant") || chart.houses[0];
     const ascLon = ascPoint ? ascPoint.ecliptic_longitude : 0.0;
 
