@@ -45,6 +45,23 @@ The same calculation core runs natively on the server (Python bindings), in desk
 
 ---
 
+## Installation
+
+Add **Khagole** to your project across Rust, Python, or JavaScript/TypeScript:
+
+```bash
+# Rust (Cargo)
+cargo add khagole-engine
+
+# Python (pip, CPython ≥ 3.12)
+pip install khagole-engine
+
+# JavaScript / Node.js / Browser (npm)
+npm install khagole-engine
+```
+
+---
+
 ## Rust Usage
 
 ```rust
@@ -91,10 +108,11 @@ const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
 
 ---
 
-## Language Bindings
+## Language Bindings & Packages
 
-- **Python** (`pip install khagole-engine`, CPython ≥ 3.12): Fast PyO3 bindings with `.chart()`, `.horary()`, `.transit()`, `.election()`, `.chinese_calendar()`, `.bazi()`, and `.zi_wei()`. See [crates/khagole-engine-py](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-py).
-- **JavaScript / WebAssembly** (`npm install khagole-engine`): In-browser and Node.js execution with zero network latency. See [crates/khagole-engine-wasm](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-wasm).
+- **Rust**: [`khagole-engine`](https://crates.io/crates/khagole-engine) and [`khagole-mcp`](https://crates.io/crates/khagole-mcp) on [crates.io](https://crates.io/crates/khagole-engine).
+- **Python** ([`khagole-engine` on PyPI](https://pypi.org/project/khagole-engine/), CPython ≥ 3.12): Fast PyO3 bindings with native precompiled wheels for Linux (x86_64, aarch64, musl), macOS (universal2), and Windows (x64). See [crates/khagole-engine-py](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-py).
+- **JavaScript / WebAssembly** ([`khagole-engine` on npm](https://www.npmjs.com/package/khagole-engine)): In-browser and Node.js execution with zero network latency. See [crates/khagole-engine-wasm](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-wasm).
 
 ---
 
@@ -139,10 +157,24 @@ cargo clippy --workspace --all-targets -- -D warnings
 
 ---
 
-## License & Attribution
+## Credits & Reference Works
+
+**Khagole** is built on top of and inspired by exceptional foundational works across astronomy, astrometry, and astrology:
+
+- **[astroceleste-engine](https://github.com/ffalcinelli/astroceleste-engine)** by Francesco Falcinelli: The upstream Rust astrometric calculation engine, SPK/DAF NASA JPL kernel parser, astronomical reduction pipeline architecture, and golden chart testing framework.
+- **[Skyfield](https://github.com/skyfielders/python-skyfield)** by Brandon Rhodes (MIT License): Precision astronomical reduction routines ported from Python to pure Rust, including ΔT models, IAU 2000A nutation tables, IAU 2006 precession, aberration, light-time correction, and gravitational deflection.
+- **NASA Jet Propulsion Laboratory (JPL)**: Planetary and lunar development ephemerides (DE440s / DE441), the primary gold-standard foundation for celestial positions.
+- **[Swiss Ephemeris](https://www.astro.com/swisseph/)** by Astrodienst (Alois Treindl & Dieter Koch): Benchmark reference for planetary position verification, ayanamsa values, and house cusp systems.
+- **[Jagannatha Hora](https://www.vedicastrologer.org/jh/)** by P.V.R. Narasimha Rao: Standard reference benchmark for canonical Vedic Jyotish calculations, Shodashavarga divisional chart algorithms, and True Sidereal Solar Year (TSSY) Vimshottari Dasha calculations.
+- **[iztro](https://github.com/SylarLong/iztro)** by Sylar Long (MIT License): Reference implementation and star brightness tables for Chinese Zi Wei Dou Shu astrology.
+- **[Open-Meteo](https://open-meteo.com/) & [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/)**: Global city geocoding, coordinates, and timezone resolution datasets.
+
+---
+
+## License
 
 Dual-licensed under either:
 - Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/PriyankGahtori/Khagole/blob/main/LICENSE-APACHE))
 - MIT License ([LICENSE-MIT](https://github.com/PriyankGahtori/Khagole/blob/main/LICENSE-MIT))
 
-Astronomical reduction routines (ΔT, IAU 2000A nutation, IAU 2006 precession, aberration, and deflection) are ported from [Skyfield](https://github.com/skyfielders/python-skyfield) by Brandon Rhodes (MIT License). See [NOTICE](https://github.com/PriyankGahtori/Khagole/blob/main/NOTICE).
+See [NOTICE](https://github.com/PriyankGahtori/Khagole/blob/main/NOTICE) for full third-party copyright notices and attribution statements.
