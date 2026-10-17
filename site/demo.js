@@ -1,5 +1,5 @@
 // Live demo: astroceleste-engine compiled to WebAssembly, computing Vedic Jyotish charts in the browser.
-import init, * as wasm from "./pkg/astroceleste_engine_wasm.js?v=2.3.0";
+import init, * as wasm from "./pkg/astroceleste_engine_wasm.js?v=2.4.0";
 import {
   renderNorthIndianChart,
   renderSouthIndianChart,
@@ -9,7 +9,7 @@ import {
   formatDegMin,
   formatDms,
   VARGA_LIST,
-} from "./vedic.js?v=2.3.0";
+} from "./vedic.js?v=2.4.0";
 
 const { Engine, julianDay, calcDivisional, calcPanchang, calcVimshottariDasha } = wasm;
 
@@ -692,7 +692,7 @@ function renderVedicView(data) {
   renderVedicCharts(data);
   renderPanchang($("vedic-panchang"), data.panchang, data.timings, data.tzOffset);
   renderVedicPlanetsTable($("vedic-planets"), data.d1, data.d9, data.chart, wasm);
-  renderVimshottariDasha($("vedic-dasha"), data.dasha, data.moonLon, data.jd, wasm);
+  renderVimshottariDasha($("vedic-dasha"), data.dasha, data.moonLon, data.jd, wasm, data.tzOffset);
 
   lastVedicJson = JSON.stringify(
     {

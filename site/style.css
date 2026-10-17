@@ -301,32 +301,6 @@ td.num { text-align: right; }
 .footer p { margin: 0 0 8px; }
 .footer .dim { color: var(--dim); }
 
-@media (max-width: 1024px) {
-  .vedic-details-grid { grid-template-columns: minmax(0, 1fr); }
-  .vedic-charts-grid { grid-template-columns: minmax(0, 1fr); }
-  .form-hero-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-  .btn-group { grid-column: 1 / -1; }
-}
-
-@media (max-width: 768px) {
-  .code-grid { grid-template-columns: minmax(0, 1fr); }
-  .feature-grid, .link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .feature-grid.three { grid-template-columns: minmax(0, 1fr); }
-  .chart-toolbar { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .dasha-hero-banner { flex-direction: column; align-items: flex-start; }
-}
-
-@media (max-width: 640px) {
-  .topbar-inner { flex-wrap: wrap; padding: 8px 0; }
-  .topbar nav { gap: 14px; }
-  .topbar nav a:nth-child(2) { display: none; }
-  .hero { padding: 40px 0 32px; }
-  .section { padding: 40px 0; }
-  .feature-grid, .link-grid { grid-template-columns: minmax(0, 1fr); }
-  .form-hero-grid { grid-template-columns: 1fr; }
-  .btn-group { grid-column: 1; }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .progress i { transition: none; }
@@ -809,12 +783,12 @@ td.num { text-align: right; }
   width: 100%;
 }
 
-/* 2-Column Grid for Details (Dasha on Left, Planetary Positions on Right) */
+/* Full-Width Stack for Vedic Panels (Dasha Explorer & Planetary Positions) */
 .vedic-details-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
+  display: flex;
+  flex-direction: column;
   gap: 24px;
-  align-items: start;
+  width: 100%;
 }
 
 .chart-loading-placeholder {
@@ -990,42 +964,71 @@ td.num { text-align: right; }
 /* Vimshottari Dasha Enhanced Styles */
 .dasha-overview { margin-bottom: 20px; display: flex; flex-direction: column; gap: 14px; }
 
+/* 1. Hero Running Dasha Banner */
 .dasha-hero-banner {
-  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: stretch; gap: 16px;
   background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--panel-2)) 0%, var(--panel) 100%);
   border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
   border-radius: var(--radius); padding: 18px 22px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
-.dasha-hero-left { display: flex; flex-direction: column; gap: 6px; }
+.dasha-hero-left { display: flex; flex-direction: column; gap: 10px; flex: 1; min-width: 0; }
+.dasha-hero-badge-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .dasha-hero-pill {
-  align-self: flex-start;
   font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent);
   padding: 3px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
 }
-.dasha-hero-title {
-  display: flex; align-items: center; gap: 8px; margin: 4px 0 2px;
+.dasha-hero-sub-text { font-size: 0.78rem; color: var(--dim); }
+
+.dasha-hero-pills-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
-.graha-pill {
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 1.15rem; font-weight: 700; padding: 4px 14px; border-radius: 8px;
-  background: var(--panel-2); border: 1.5px solid;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+.dasha-hero-pill-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--panel-2); border: 1.5px solid color-mix(in srgb, var(--lord-color, var(--accent)) 40%, var(--border));
+  border-radius: 10px; padding: 6px 12px; cursor: pointer; transition: all 0.15s ease;
+  font: inherit; color: var(--text); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
-.graha-arrow { color: var(--dim); font-size: 1.1rem; }
-.dasha-hero-sub { margin: 0; font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
-.dasha-hero-stats { display: flex; gap: 20px; align-items: center; }
+.dasha-hero-pill-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--lord-color, var(--accent));
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.dasha-hero-pill-btn.focused {
+  border-color: var(--lord-color, var(--accent));
+  background: color-mix(in srgb, var(--lord-color, var(--accent)) 16%, var(--panel-2));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lord-color, var(--accent)) 35%, transparent);
+}
+.pill-badge {
+  font-size: 0.72rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; border: 1px solid;
+}
+.pill-lord {
+  font-size: 0.98rem; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 4px;
+}
+.pill-dev {
+  font-size: 0.85rem; color: var(--lord-color, var(--accent)); font-weight: 800;
+}
+.pill-rem {
+  font-size: 0.75rem; color: var(--lord-color, var(--accent)); font-weight: 600;
+  background: color-mix(in srgb, var(--lord-color, var(--accent)) 15%, transparent);
+  padding: 2px 6px; border-radius: 999px; margin-left: 2px;
+}
+.graha-arrow { color: var(--dim); font-size: 1.1rem; user-select: none; }
+.dasha-hero-sub { margin: 0; font-size: 0.84rem; color: var(--muted); line-height: 1.45; }
+
+.dasha-hero-stats { display: flex; gap: 14px; align-items: stretch; }
 .stat-box {
-  display: flex; flex-direction: column; gap: 2px;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
   background: var(--panel-2); border: 1px solid var(--border);
   border-radius: 8px; padding: 10px 14px; min-width: 130px;
 }
 .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); }
-.stat-value { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+.stat-value { font-size: 1.05rem; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
 .stat-sub { font-size: 0.75rem; color: var(--muted); }
 
-/* 120-Year Timeline Bar */
+/* 2. 120-Year Timeline Bar */
 .dasha-timeline-card {
   background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 14px 18px;
@@ -1043,11 +1046,15 @@ td.num { text-align: right; }
 .dasha-timeline-seg {
   display: flex; align-items: center; justify-content: center; height: 100%;
   border-right: 1px solid var(--border); position: relative;
-  transition: filter 0.15s ease; cursor: pointer;
+  transition: filter 0.15s ease; cursor: pointer; user-select: none;
 }
-.dasha-timeline-seg:hover { filter: brightness(1.2); }
+.dasha-timeline-seg:hover { filter: brightness(1.25); }
 .dasha-timeline-seg.active {
   box-shadow: inset 0 0 0 2px var(--accent);
+}
+.dasha-timeline-seg.selected {
+  outline: 2px solid var(--accent);
+  z-index: 2;
 }
 .seg-label { font-size: 0.72rem; font-weight: 700; pointer-events: none; }
 .timeline-today-marker {
@@ -1060,7 +1067,195 @@ td.num { text-align: right; }
   color: var(--accent); background: var(--panel); padding: 1px 4px; border-radius: 3px; border: 1px solid var(--accent);
 }
 
-.dasha-tree { display: flex; flex-direction: column; gap: 8px; }
+/* 3. Level Explorer Card */
+.dasha-explorer-card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; display: flex; flex-direction: column; gap: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+.dasha-explorer-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 12px 18px; border-bottom: 1px solid var(--border); background: var(--panel-2);
+}
+.dasha-nav-group { flex: 1; min-width: 0; }
+.dasha-breadcrumb-wrap {
+  display: flex; align-items: center; gap: 6px; overflow-x: auto; white-space: nowrap;
+  -webkit-overflow-scrolling: touch; padding: 2px 0;
+}
+.dasha-crumb-btn {
+  font: inherit; font-size: 0.82rem; font-weight: 600; color: var(--muted);
+  background: transparent; border: 1px solid transparent; border-radius: 6px;
+  padding: 4px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.15s ease;
+}
+.dasha-crumb-btn:hover {
+  color: var(--text); background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.dasha-crumb-btn.active {
+  color: var(--accent); background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent); font-weight: 700;
+}
+.crumb-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.crumb-level { font-size: 0.68rem; opacity: 0.85; text-transform: uppercase; }
+.dasha-crumb-sep { color: var(--dim); font-size: 0.95rem; user-select: none; }
+
+.dasha-view-toggles { display: flex; align-items: center; gap: 6px; }
+.btn-view-toggle {
+  font: inherit; font-size: 0.78rem; font-weight: 600; padding: 5px 12px;
+  border-radius: 6px; background: var(--panel); border: 1px solid var(--border);
+  color: var(--muted); cursor: pointer; transition: all 0.15s ease;
+}
+.btn-view-toggle:hover { color: var(--text); border-color: var(--accent); }
+.btn-view-toggle.active {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  border-color: var(--accent); color: var(--accent);
+}
+
+/* 4. Level Tabs */
+.dasha-level-tabs-wrap {
+  border-bottom: 1px solid var(--border); background: var(--panel); padding: 8px 18px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.dasha-level-tabs {
+  display: flex; align-items: center; gap: 6px; width: max-content;
+}
+.dasha-level-tab {
+  font: inherit; font-size: 0.82rem; font-weight: 500; color: var(--muted);
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  transition: all 0.15s ease; white-space: nowrap;
+}
+.dasha-level-tab:hover {
+  color: var(--text); border-color: var(--accent);
+}
+.dasha-level-tab.active {
+  background: color-mix(in srgb, var(--accent) 16%, var(--panel-2));
+  border-color: var(--accent); color: var(--accent); font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+.level-tab-code {
+  font-size: 0.72rem; font-weight: 800; padding: 1px 5px; border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--accent);
+}
+.level-tab-span { font-size: 0.72rem; color: var(--dim); }
+
+/* 5. Context Bar */
+.dasha-level-context-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 12px 18px; background: color-mix(in srgb, var(--accent) 4%, var(--panel));
+  border-bottom: 1px solid var(--border);
+}
+.context-title-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.context-level-badge {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 2px 8px; border-radius: 4px; background: var(--panel-2); border: 1px solid var(--border);
+  color: var(--accent);
+}
+.context-heading { margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.context-range { font-size: 0.8rem; color: var(--dim); font-variant-numeric: tabular-nums; }
+.context-hint { font-size: 0.78rem; color: var(--muted); font-style: italic; }
+
+/* 6. Period Table */
+.dasha-table-wrap { width: 100%; }
+.dasha-table {
+  width: 100%; border-collapse: collapse; font-size: 0.88rem;
+}
+.dasha-table th {
+  padding: 10px 14px; text-align: left; font-size: 0.78rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--dim);
+  background: var(--panel-2); border-bottom: 1px solid var(--border);
+}
+.dasha-table td {
+  padding: 10px 14px; border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  vertical-align: middle;
+}
+.dasha-table-row {
+  transition: background 0.12s ease; cursor: pointer;
+}
+.dasha-table-row:hover {
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel-2));
+}
+.dasha-table-row.active {
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel));
+}
+.dasha-table-row.selected {
+  outline: 1.5px solid var(--accent);
+}
+
+.dasha-col-planet { white-space: nowrap; }
+.dasha-planet-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.dasha-planet-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+}
+.dasha-planet-dev {
+  font-size: 0.84rem; font-weight: 800; color: var(--pill-color, var(--accent));
+}
+.dasha-planet-name {
+  font-size: 0.94rem; color: var(--text);
+}
+.dasha-level-tag {
+  font-size: 0.68rem; font-weight: 700; padding: 1px 5px; border-radius: 4px;
+  background: var(--panel-2); border: 1px solid var(--border); color: var(--dim);
+}
+
+.dasha-col-dates {
+  color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.84rem;
+}
+.dasha-date-sep { color: var(--dim); margin: 0 4px; }
+.dasha-col-duration { white-space: nowrap; }
+.dasha-duration-badge {
+  font-size: 0.8rem; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+  background: var(--panel-2); border: 1px solid var(--border); color: var(--text);
+}
+
+.dasha-col-status { white-space: nowrap; }
+.dasha-status-pill {
+  font-size: 0.75rem; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.dasha-status-pill.active {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--accent); font-weight: 700;
+}
+.dasha-status-pill.past {
+  color: var(--dim); background: transparent;
+}
+.dasha-status-pill.future {
+  color: var(--muted); background: transparent;
+}
+
+.dasha-col-action { text-align: right; white-space: nowrap; }
+.dasha-drill-btn {
+  font: inherit; font-size: 0.78rem; font-weight: 600; padding: 4px 10px;
+  border-radius: 6px; background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent); cursor: pointer; transition: all 0.15s ease;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.dasha-drill-btn:hover {
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  transform: translateX(2px);
+}
+.dasha-drill-btn .arrow { font-size: 0.95rem; line-height: 1; }
+.dasha-leaf-tag {
+  font-size: 0.72rem; color: var(--dim); font-style: italic;
+}
+
+.dasha-table-legend {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 10px 18px; font-size: 0.76rem; color: var(--dim); background: var(--panel-2);
+  border-top: 1px solid var(--border);
+}
+.dot-legend.active { color: var(--accent); font-weight: 700; }
+.dot-legend.past { color: var(--dim); }
+.dot-legend.upcoming { color: var(--muted); }
+.legend-note { margin-left: auto; color: var(--dim); font-style: italic; }
+
+/* 7. Tree View */
+.dasha-tree { display: flex; flex-direction: column; gap: 8px; padding: 12px 16px; }
 .dasha-node {
   border: 1px solid var(--border); border-radius: 8px; background: var(--panel);
   overflow: hidden; transition: border-color 0.15s ease;
@@ -1091,15 +1286,194 @@ td.num { text-align: right; }
 .dasha-children { padding: 8px 12px 12px 28px; display: flex; flex-direction: column; gap: 6px; }
 .dasha-children.sub { padding: 6px 8px 10px 20px; }
 
-/* Pratyantardasha Grid */
+/* Pratyantardasha Grid in Tree View */
 .pd-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; margin-top: 6px;
 }
 .pd-item {
-  display: flex; flex-direction: column; gap: 2px; padding: 6px 8px;
+  display: flex; flex-direction: column; gap: 2px; padding: 8px 10px;
   border: 1px solid var(--border); border-radius: 6px; background: var(--panel); font-size: 0.8rem;
 }
 .pd-item.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
-.pd-dates { color: var(--dim); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.pd-header { display: flex; align-items: center; justify-content: space-between; }
+.pd-dates { color: var(--dim); font-size: 0.74rem; font-variant-numeric: tabular-nums; }
+.pd-dur { font-size: 0.72rem; color: var(--muted); }
 .pd-active-dot { color: var(--accent); font-size: 0.75rem; font-weight: 700; }
 
+/* Sticky Graha Column for Planetary Positions Table */
+.vedic-planets-table th:first-child,
+.vedic-planets-table td:first-child,
+.vedic-planets-table th:nth-child(2),
+.vedic-planets-table td:nth-child(2) {
+  position: sticky;
+  left: 0;
+  background: var(--panel-2);
+  z-index: 2;
+}
+.vedic-planets-table td:first-child {
+  z-index: 3;
+}
+.vedic-planets-table th:nth-child(2),
+.vedic-planets-table td:nth-child(2) {
+  left: 36px;
+  box-shadow: 3px 0 8px rgba(0, 0, 0, 0.16);
+}
+
+/* ============================================================================
+   Unified Responsive Media Queries (Mobile & Tablet Optimization)
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .vedic-details-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 860px) {
+  .vedic-charts-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 18px;
+  }
+  .chart-card svg {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .chart-card {
+    padding: 12px 14px 14px;
+  }
+  .chart-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .chart-toolbar-actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .code-grid { grid-template-columns: minmax(0, 1fr); }
+  .feature-grid, .link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .feature-grid.three { grid-template-columns: minmax(0, 1fr); }
+
+  .dasha-hero-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  .dasha-hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+  .stat-box { min-width: 0; padding: 8px 12px; }
+
+  .panchang-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .panchang-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+  .panchang-timings-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+
+  .dasha-table th, .dasha-table td {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+  .dasha-level-context-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .legend-note {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar-inner { flex-wrap: wrap; padding: 8px 0; }
+  .topbar nav { gap: 14px; }
+  .topbar nav a:nth-child(2) { display: none; }
+  .hero { padding: 32px 0 24px; }
+  .section { padding: 32px 0; }
+  .feature-grid, .link-grid { grid-template-columns: minmax(0, 1fr); }
+
+  .wrap { padding: 0 14px; }
+
+  /* Full-width responsive form inputs */
+  .form-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .btn-group {
+    grid-column: 1 !important;
+  }
+  .btn-primary {
+    width: 100% !important;
+    height: 48px;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+  .location-status-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .city-chips-wrap {
+    gap: 6px;
+  }
+
+  /* Responsive Dasha Explorer elements */
+  .dasha-level-tabs {
+    gap: 4px;
+  }
+  .dasha-level-tab {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+  .level-tab-span {
+    display: none;
+  }
+  .dasha-col-dates {
+    font-size: 0.78rem;
+  }
+  .dasha-hero-pill-btn {
+    font-size: 0.85rem;
+    padding: 5px 9px;
+  }
+  .pill-rem {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .dasha-hero-stats {
+    grid-template-columns: 1fr;
+  }
+  .panchang-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .panchang-timings-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .dasha-timeline-seg .seg-label {
+    font-size: 0.6rem;
+  }
+  .dasha-table-wrap {
+    font-size: 0.78rem;
+  }
+  .dasha-planet-name {
+    font-size: 0.86rem;
+  }
+}
