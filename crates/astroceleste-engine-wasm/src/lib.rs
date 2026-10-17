@@ -264,11 +264,32 @@ impl Engine {
         };
     }
 
+    /// Set sidereal ayanamsa by system code (e.g. "lahiri", "raman", "krishnamurti").
+    #[wasm_bindgen(js_name = set_ayanamsa)]
+    pub fn set_ayanamsa(&mut self, code: &str) {
+        self.ayanamsa_code = code.to_string();
+    }
+
     /// Returns the ayanamsa in degrees at UT Julian date `jd`.
     #[wasm_bindgen(js_name = get_ayanamsa_ut)]
     pub fn get_ayanamsa_ut(&self, jd: f64) -> f64 {
         let code = ayanamsa(&self.ayanamsa_code).code;
         ayanamsa_info(jd, code).value
+    }
+
+    /// Returns the ayanamsa in degrees at UT Julian date `jd` with Swiss Ephemeris flags.
+    /// If flags & 2 (SEFLG_NONUT) is set, returns mean ayanamsa; otherwise returns true ayanamsa (with nutation).
+    #[wasm_bindgen(js_name = get_ayanamsa_ex_ut)]
+    pub fn get_ayanamsa_ex_ut(&self, jd: f64, flags: u32) -> f64 {
+        let code = ayanamsa(&self.ayanamsa_code).code;
+        let mean_ayan = ayanamsa_info(jd, code).value;
+        if (flags & 2) != 0 {
+            mean_ayan
+        } else {
+            let t = astroceleste_engine::time::Time::from_ut1(jd);
+            let orient = astroceleste_engine::frames::Orientation::at(&t);
+            mean_ayan + orient.d_psi.to_degrees()
+        }
     }
 
     /// Topocentric coordinates setter (stub for Swiss Ephemeris compatibility).
@@ -285,7 +306,14 @@ impl Engine {
 
         let shift = if is_sidereal {
             let code = ayanamsa(&self.ayanamsa_code).code;
-            ayanamsa_info(jd, code).value
+            let mean_ayan = ayanamsa_info(jd, code).value;
+            if (flags & 2) != 0 {
+                mean_ayan
+            } else {
+                let t = astroceleste_engine::time::Time::from_ut1(jd);
+                let orient = astroceleste_engine::frames::Orientation::at(&t);
+                mean_ayan + orient.d_psi.to_degrees()
+            }
         } else {
             0.0
         };
@@ -338,7 +366,14 @@ impl Engine {
         let is_sidereal = (iflag & 65536) != 0;
         let shift = if is_sidereal {
             let code = ayanamsa(&self.ayanamsa_code).code;
-            ayanamsa_info(jd, code).value
+            let mean_ayan = ayanamsa_info(jd, code).value;
+            if (iflag & 2) != 0 {
+                mean_ayan
+            } else {
+                let t = astroceleste_engine::time::Time::from_ut1(jd);
+                let orient = astroceleste_engine::frames::Orientation::at(&t);
+                mean_ayan + orient.d_psi.to_degrees()
+            }
         } else {
             0.0
         };
@@ -395,6 +430,31 @@ impl Engine {
         year_type: Option<String>,
         tz_offset_hours: Option<f64>,
     ) -> Result<JsValue, JsValue> {
+        let yt = match year_type.as_deref() {
+            Some("calendar") => YearType::Calendar,
+            Some("savana") => YearType::Savana,
+            Some("tropical") => YearType::Tropical,
+            Some("julian") => YearType::Julian,
+            Some("sidereal") => YearType::Sidereal,
+            _ => YearType::Tssy,
+        };
+        let d = depth.unwrap_or(3);
+        let tz = tz_offset_hours.unwrap_or(0.0);
+
+        if yt == YearType::Tssy && !self.kernels.is_empty() {
+            let sun_fn = |jd: f64| -> f64 {
+                if let Ok(arr) = self.calc_ut(jd, 0, 65536 | 16) {
+                    arr.get_index(0)
+                } else {
+                    astroceleste_engine::vedic::dasha::keplerian_sun_sidereal_lon(jd, 0.0, birth_jd)
+                }
+            };
+            let tree = astroceleste_engine::vedic::dasha::calc_vimshottari_dasha_with_sun_tz(
+                moon_lon, birth_jd, d, yt, &sun_fn, tz,
+            );
+            return to_js(&tree);
+        }
+
         calc_vimshottari_dasha_js(moon_lon, birth_jd, depth, year_type, tz_offset_hours)
     }
 

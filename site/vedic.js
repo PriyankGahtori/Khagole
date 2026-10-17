@@ -615,7 +615,7 @@ export function renderSouthIndianChart(svgEl, divChart, title = "") {
 
 // ---------------------------------------------------------------------------- Panchanga Renderer
 
-export function renderPanchang(containerEl, panchang, timings, tzOffset) {
+export function renderPanchang(containerEl, panchang, timings, tzOffset, ayanamsa) {
   if (!panchang) {
     containerEl.hidden = true;
     return;
@@ -626,6 +626,25 @@ export function renderPanchang(containerEl, panchang, timings, tzOffset) {
   const nakLeft = panchang.nakshatra_percent_left !== undefined ? panchang.nakshatra_percent_left?.toFixed(1) : "";
   const yogaLeft = panchang.yoga ? panchang.yoga.percent_left?.toFixed(1) : "";
   const karanaLeft = panchang.karana ? panchang.karana.percent_left?.toFixed(1) : "";
+
+  // Ayanamsa display badge
+  let ayanamsaHtml = "";
+  if (ayanamsa) {
+    const isObj = typeof ayanamsa === "object";
+    const name = isObj ? (ayanamsa.name || "Lahiri") : (ayanamsa === "lahiri" ? "Lahiri (Chitra Paksha)" : ayanamsa);
+    const valDms = isObj ? (ayanamsa.formatted || (ayanamsa.value !== undefined && ayanamsa.value !== null ? formatDms(ayanamsa.value) : "")) : "";
+    const valDeg = isObj && ayanamsa.value !== undefined && ayanamsa.value !== null ? `${ayanamsa.value.toFixed(6)}°` : "";
+    ayanamsaHtml = `
+      <div class="panchang-ayanamsa-group">
+        <span class="panchang-ayanamsa-badge" title="Precession / Sidereal Zodiac Offset">
+          <span class="ayanamsa-title">Ayanamsa:</span>
+          <strong>${name}</strong>
+          ${valDms ? `<span class="ayanamsa-val">${valDms}</span>` : ""}
+          ${valDeg ? `<span class="ayanamsa-dec">(${valDeg})</span>` : ""}
+        </span>
+      </div>
+    `;
+  }
 
   // Time formatting helper
   const fmtTime = (dateObj) => {
@@ -724,6 +743,7 @@ export function renderPanchang(containerEl, panchang, timings, tzOffset) {
           </span>
           <span class="panchang-season-tag">🍃 ${ritu} Ritu · ☀️ ${ayana}</span>
         </div>
+        ${ayanamsaHtml}
         <div class="panchang-samvat-tag">
           Vikram ${panchang.samvat?.vikram_year || "–"} (${panchang.samvat?.vikram_name || "–"}) · Shaka ${panchang.samvat?.shaka_year || "–"} (${panchang.samvat?.shaka_name || "–"})
         </div>

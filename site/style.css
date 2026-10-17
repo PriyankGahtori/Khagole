@@ -663,6 +663,43 @@ td.num { text-align: right; }
   font-variant-numeric: tabular-nums;
 }
 
+.panchang-ayanamsa-group {
+  display: flex;
+  align-items: center;
+}
+
+.panchang-ayanamsa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, #6366f1 12%, transparent);
+  border: 1px solid color-mix(in srgb, #6366f1 28%, transparent);
+  color: #818cf8;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.panchang-ayanamsa-badge .ayanamsa-title {
+  color: var(--dim);
+  font-weight: 500;
+}
+
+.panchang-ayanamsa-badge strong {
+  color: #c7d2fe;
+}
+
+.panchang-ayanamsa-badge .ayanamsa-val {
+  color: #a5b4fc;
+  font-weight: 600;
+}
+
+.panchang-ayanamsa-badge .ayanamsa-dec {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
 .panchang-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

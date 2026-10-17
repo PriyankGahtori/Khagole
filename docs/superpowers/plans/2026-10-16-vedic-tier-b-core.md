@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Pure Rust: zero C library bindings or system ephemeris dependencies needed for Tier B math.
-- Complete parity with `hora-prakash` and JHora for all D1–D60 algorithms, Vimshottari dasha hierarchy, and Panchanga 5 angas.
+- Complete parity with `hora-prakash` and canonical Vedic reference ephemeris for all D1–D60 algorithms, Vimshottari dasha hierarchy, and Panchanga 5 angas.
 - Maintain existing codebase quality, doc comments, serialization formats, and tests.
 - All WASM targets must build cleanly with `wasm-pack build --target web`.
 
@@ -423,7 +423,7 @@ git commit -m "feat(vedic): implement five Panchanga angas and Samvatsara cycle"
 
 In `crates/astroceleste-engine/tests/vedic_tier_b.rs`:
 - Load Narendra Modi chart (1950-09-17 04:04:00 UTC) with Lahiri ayanamsa.
-- Test Navamsha (D9) positions for all 9 planets and Lagna against JHora fixture values.
+- Test Navamsha (D9) positions for all 9 planets and Lagna against reference ephemeris fixture values.
 - Test Vimshottari dasha starting balance (Saturn Mahadasha at birth).
 - Test Panchang on birth date (Tithi, Vara, Nakshatra, Yoga, Karana).
 

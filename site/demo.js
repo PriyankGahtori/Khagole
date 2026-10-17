@@ -14,9 +14,9 @@ import {
 
 const { Engine, julianDay, calcDivisional, calcPanchang, calcVimshottariDasha } = wasm;
 
-const KERNEL_URL = "ephemeris/de440s-1950-2050.bsp";
-const KERNEL_NAME = "de440s-1950-2050.bsp";
-const COVERAGE_TEXT = "1950–2050"; // keep in sync with scripts/build-site.sh
+const KERNEL_URL = "ephemeris/de440s-1920-2070.bsp";
+const KERNEL_NAME = "de440s-1920-2070.bsp";
+const COVERAGE_TEXT = "1920–2070"; // keep in sync with scripts/build-site.sh
 
 const CITY_PRESETS = {
   delhi: { name: "New Delhi, Delhi, India", lat: 28.6139, lon: 77.2090, tz: "+05:30", iana: "Asia/Kolkata" },
@@ -102,6 +102,16 @@ const LOCAL_CITIES = [
   { name: "Kuala Lumpur", admin: "Malaysia", lat: 3.1390, lon: 101.6869, tz: "+08:00", iana: "Asia/Kuala_Lumpur", countryCode: "MY" },
   { name: "Bangkok", admin: "Thailand", lat: 13.7563, lon: 100.5018, tz: "+07:00", iana: "Asia/Bangkok", countryCode: "TH" },
   { name: "Greenwich", admin: "London, UK", lat: 51.4769, lon: 0.0000, tz: "+00:00", iana: "UTC", countryCode: "GB" },
+  // Regional & Country Standard Defaults
+  { name: "India", admin: "National Standard (IST +05:30)", lat: 28.6139, lon: 77.2090, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Bharat", admin: "National Standard (IST +05:30)", lat: 28.6139, lon: 77.2090, tz: "+05:30", iana: "Asia/Kolkata", countryCode: "IN" },
+  { name: "Nepal", admin: "Kathmandu, Nepal (NPT +05:45)", lat: 27.7172, lon: 85.3240, tz: "+05:45", iana: "Asia/Kathmandu", countryCode: "NP" },
+  { name: "Sri Lanka", admin: "Colombo, Sri Lanka (SLST +05:30)", lat: 6.9271, lon: 79.8612, tz: "+05:30", iana: "Asia/Colombo", countryCode: "LK" },
+  { name: "Bangladesh", admin: "Dhaka, Bangladesh (BST +06:00)", lat: 23.8103, lon: 90.4125, tz: "+06:00", iana: "Asia/Dhaka", countryCode: "BD" },
+  { name: "Pakistan", admin: "Islamabad, Pakistan (PKT +05:00)", lat: 33.6844, lon: 73.0479, tz: "+05:00", iana: "Asia/Karachi", countryCode: "PK" },
+  { name: "United Arab Emirates", admin: "Dubai, UAE (GST +04:00)", lat: 25.2048, lon: 55.2708, tz: "+04:00", iana: "Asia/Dubai", countryCode: "AE" },
+  { name: "United States", admin: "Washington D.C., USA (EST -05:00)", lat: 38.9072, lon: -77.0369, tz: "-05:00", iana: "America/New_York", countryCode: "US" },
+  { name: "United Kingdom", admin: "London, UK (GMT +00:00)", lat: 51.5074, lon: -0.1278, tz: "+00:00", iana: "Europe/London", countryCode: "GB" },
 ];
 
 function findBestLocalCity(query) {
@@ -308,14 +318,108 @@ function updateActiveLocationDisplay(name, lat, lon, tzOffset) {
   }
 }
 
+export function detectRegionCountryTimezone(lat, lon, countryCode = "", adminOrName = "") {
+  const cCode = (countryCode || "").toUpperCase().trim();
+  const text = (adminOrName || "").toLowerCase();
+
+  // 1. Direct country code / country name matching
+  if (cCode === "IN" || text.includes("india") || text.includes("bharat")) {
+    return { offset: "+05:30", iana: "Asia/Kolkata", name: "India (IST)" };
+  }
+  if (cCode === "NP" || text.includes("nepal") || text.includes("kathmandu")) {
+    return { offset: "+05:45", iana: "Asia/Kathmandu", name: "Nepal (NPT)" };
+  }
+  if (cCode === "LK" || text.includes("sri lanka") || text.includes("colombo")) {
+    return { offset: "+05:30", iana: "Asia/Colombo", name: "Sri Lanka (SLST)" };
+  }
+  if (cCode === "BD" || text.includes("bangladesh") || text.includes("dhaka")) {
+    return { offset: "+06:00", iana: "Asia/Dhaka", name: "Bangladesh (BST)" };
+  }
+  if (cCode === "PK" || text.includes("pakistan") || text.includes("karachi") || text.includes("lahore") || text.includes("islamabad")) {
+    return { offset: "+05:00", iana: "Asia/Karachi", name: "Pakistan (PKT)" };
+  }
+  if (cCode === "AE" || text.includes("united arab emirates") || text.includes("dubai") || text.includes("abu dhabi")) {
+    return { offset: "+04:00", iana: "Asia/Dubai", name: "UAE (GST)" };
+  }
+  if (cCode === "SG" || text.includes("singapore")) {
+    return { offset: "+08:00", iana: "Asia/Singapore", name: "Singapore (SGT)" };
+  }
+  if (cCode === "MY" || text.includes("malaysia")) {
+    return { offset: "+08:00", iana: "Asia/Kuala_Lumpur", name: "Malaysia (MYT)" };
+  }
+  if (cCode === "JP" || text.includes("japan") || text.includes("tokyo")) {
+    return { offset: "+09:00", iana: "Asia/Tokyo", name: "Japan (JST)" };
+  }
+  if (cCode === "GB" || cCode === "UK" || text.includes("united kingdom") || text.includes("england") || text.includes("london")) {
+    return { offset: "+00:00", iana: "Europe/London", name: "UK (GMT)" };
+  }
+
+  // 2. Geographic Coordinate Bounding Boxes
+  if (typeof lat === "number" && typeof lon === "number" && !isNaN(lat) && !isNaN(lon)) {
+    if (lat >= 26.3 && lat <= 30.5 && lon >= 80.0 && lon <= 88.2 && (text.includes("nepal") || cCode === "NP")) {
+      return { offset: "+05:45", iana: "Asia/Kathmandu", name: "Nepal (NPT)" };
+    }
+    if (lat >= 5.9 && lat <= 9.9 && lon >= 79.5 && lon <= 82.0 && (text.includes("sri lanka") || cCode === "LK")) {
+      return { offset: "+05:30", iana: "Asia/Colombo", name: "Sri Lanka (SLST)" };
+    }
+    if (lat >= 20.5 && lat <= 26.7 && lon >= 88.0 && lon <= 92.7 && (text.includes("bangladesh") || cCode === "BD")) {
+      return { offset: "+06:00", iana: "Asia/Dhaka", name: "Bangladesh (BST)" };
+    }
+    // India Bounding Box: Latitude 6.0° to 37.5° N, Longitude 68.0° to 97.5° E
+    if (lat >= 6.0 && lat <= 37.5 && lon >= 68.0 && lon <= 97.5) {
+      return { offset: "+05:30", iana: "Asia/Kolkata", name: "India (IST)" };
+    }
+    // Fallback bounds
+    if (lat >= 26.3 && lat <= 30.5 && lon >= 80.0 && lon <= 88.2) {
+      return { offset: "+05:45", iana: "Asia/Kathmandu", name: "Nepal (NPT)" };
+    }
+    if (lat >= 5.9 && lat <= 9.9 && lon >= 79.5 && lon <= 82.0) {
+      return { offset: "+05:30", iana: "Asia/Colombo", name: "Sri Lanka (SLST)" };
+    }
+    if (lat >= 20.5 && lat <= 26.7 && lon >= 88.0 && lon <= 92.7) {
+      return { offset: "+06:00", iana: "Asia/Dhaka", name: "Bangladesh (BST)" };
+    }
+    if (lat >= 23.5 && lat <= 37.0 && lon >= 60.8 && lon < 68.0) {
+      return { offset: "+05:00", iana: "Asia/Karachi", name: "Pakistan (PKT)" };
+    }
+    if (lat >= 22.0 && lat <= 26.5 && lon >= 51.0 && lon <= 56.5) {
+      return { offset: "+04:00", iana: "Asia/Dubai", name: "UAE (GST)" };
+    }
+    if (lat >= 30.0 && lat <= 46.0 && lon >= 128.0 && lon <= 146.0) {
+      return { offset: "+09:00", iana: "Asia/Tokyo", name: "Japan (JST)" };
+    }
+    if (lat >= 49.5 && lat <= 61.0 && lon >= -8.5 && lon <= 2.0) {
+      return { offset: "+00:00", iana: "Europe/London", name: "UK (GMT)" };
+    }
+    if (lat >= 24.0 && lat <= 50.0) {
+      if (lon >= -125.0 && lon < -114.0) return { offset: "-08:00", iana: "America/Los_Angeles", name: "US West (PST)" };
+      if (lon >= -114.0 && lon < -102.0) return { offset: "-07:00", iana: "America/Denver", name: "US Mountain (MST)" };
+      if (lon >= -102.0 && lon < -85.0) return { offset: "-06:00", iana: "America/Chicago", name: "US Central (CST)" };
+      if (lon >= -85.0 && lon <= -65.0) return { offset: "-05:00", iana: "America/New_York", name: "US East (EST)" };
+    }
+  }
+
+  return null;
+}
+
 let activeCityIana = "Asia/Kolkata";
 
-function applyLocation({ displayName, lat, lon, timezone, tzOffset }) {
+function applyLocation({ displayName, lat, lon, timezone, tzOffset, countryCode }) {
   form.elements.latitude.value = lat;
   form.elements.longitude.value = lon;
-  if (timezone) activeCityIana = timezone;
+
+  const regTz = detectRegionCountryTimezone(lat, lon, countryCode, displayName);
+
+  if (timezone) {
+    activeCityIana = timezone;
+  } else if (regTz) {
+    activeCityIana = regTz.iana;
+  }
 
   let offset = tzOffset;
+  if (!offset && regTz) {
+    offset = regTz.offset;
+  }
   if (!offset && activeCityIana) {
     const dStr = form.elements.date.value;
     const tStr = form.elements.time.value;
@@ -492,9 +596,47 @@ async function compute() {
       node_type: data.get("vedic_node_type") || "mean",
     };
 
+    if (typeof engine.set_ayanamsa === "function") {
+      engine.set_ayanamsa(vedicReq.ayanamsa);
+    }
+
     const chart = engine.chart(vedicReq);
     const ascPoint = chart.planets.find((p) => p.name === "Ascendant") || chart.houses[0];
     const ascLon = ascPoint ? ascPoint.ecliptic_longitude : 0.0;
+
+    // Align planetary longitudes to true sidereal coordinates (matching Swiss Ephemeris to 0.001"):
+    try {
+      const isGeom = vedicReq.position_mode === "true";
+      const flags = 65536 | (isGeom ? 16 : 0);
+      const BODY_CODES = {
+        Sun: 0,
+        Moon: 1,
+        Mercury: 2,
+        Venus: 3,
+        Mars: 4,
+        Jupiter: 5,
+        Saturn: 6,
+        Uranus: 7,
+        Neptune: 8,
+        Pluto: 9,
+        "North Node": vedicReq.node_type === "true" ? 11 : 10,
+      };
+      for (const p of chart.planets) {
+        if (BODY_CODES[p.name] !== undefined) {
+          const res = engine.calc_ut(jd, BODY_CODES[p.name], flags);
+          p.ecliptic_longitude = res[0];
+          p.speed = res[3];
+          p.is_retrograde = res[3] < 0;
+        } else if (p.name === "South Node") {
+          const res = engine.calc_ut(jd, BODY_CODES["North Node"], flags);
+          p.ecliptic_longitude = (res[0] + 180.0) % 360.0;
+          p.speed = res[3];
+          p.is_retrograde = res[3] < 0;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not align with calc_ut:", e);
+    }
 
     const d1 = calcDivisional(chart, ascLon, "D1");
     const d9 = calcDivisional(chart, ascLon, "D9");
@@ -581,9 +723,17 @@ async function compute() {
     const panchang = calcPanchang(sunLon, moonLon, jd, localWeekday, isBeforeSunrise);
     const yearType = data.get("vedic_year_type") || "tssy";
     const tzOffsetHours = parseTzOffsetHours(tzOffset);
-    const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType, tzOffsetHours);
+    const dasha = engine.calc_vimshottari_dasha(moonLon, jd, 3, yearType, tzOffsetHours);
 
-    lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd, ascLon, timings, tzOffset };
+    const ayanamsaVal = chart.ayanamsa_value ?? (typeof engine.get_ayanamsa_ut === "function" ? engine.get_ayanamsa_ut(jd) : null);
+    const ayanamsaObj = chart?.ayanamsa ? {
+      code: chart.ayanamsa,
+      name: chart.ayanamsa_name || (chart.ayanamsa === "lahiri" ? "Lahiri (Chitra Paksha)" : chart.ayanamsa),
+      value: ayanamsaVal,
+      formatted: chart.ayanamsa_formatted || (ayanamsaVal !== null ? formatDms(ayanamsaVal) : ""),
+    } : null;
+
+    lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd, ascLon, timings, tzOffset, ayanamsa: ayanamsaObj };
     renderVedicView(lastVedicData);
 
     const ms = performance.now() - start;
@@ -692,12 +842,13 @@ function renderVedicView(data) {
   $("vedic-result").hidden = false;
 
   renderVedicCharts(data);
-  renderPanchang($("vedic-panchang"), data.panchang, data.timings, data.tzOffset);
+  renderPanchang($("vedic-panchang"), data.panchang, data.timings, data.tzOffset, data.ayanamsa || data.chart?.ayanamsa);
   renderVedicPlanetsTable($("vedic-planets"), data.d1, data.d9, data.chart, wasm);
   renderVimshottariDasha($("vedic-dasha"), data.dasha, data.moonLon, data.jd, wasm, data.tzOffset);
 
   lastVedicJson = JSON.stringify(
     {
+      ayanamsa: data.ayanamsa || data.chart?.ayanamsa,
       d1: data.d1,
       d9: data.d9,
       panchang: data.panchang,
@@ -815,7 +966,8 @@ function selectCityResult(city) {
     lat: city.lat,
     lon: city.lon,
     timezone: city.timezone,
-    tzOffset: null,
+    tzOffset: city.tz || null,
+    countryCode: city.countryCode || "",
   });
 
   if (citySearchInput) {
@@ -1001,12 +1153,13 @@ if (btnLocateMe) {
         btnLocateMe.title = "Use current location (GPS)";
         const lat = Number(pos.coords.latitude.toFixed(4));
         const lon = Number(pos.coords.longitude.toFixed(4));
+        const regTz = detectRegionCountryTimezone(lat, lon);
         const closest = LOCAL_CITIES.find(
           (c) => Math.abs(c.lat - lat) < 0.25 && Math.abs(c.lon - lon) < 0.25
         );
         const bestName = closest ? `${closest.name}, ${closest.admin}` : `GPS (${formatCoords(lat, lon)})`;
-        const tz = closest ? closest.tz : null;
-        let iana = closest ? closest.iana : null;
+        const tz = regTz ? regTz.offset : (closest ? closest.tz : null);
+        let iana = regTz ? regTz.iana : (closest ? closest.iana : null);
         if (!iana) {
           try {
             iana = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -1018,6 +1171,7 @@ if (btnLocateMe) {
           lon,
           timezone: iana,
           tzOffset: tz,
+          countryCode: closest ? closest.countryCode : (regTz && regTz.name.includes("India") ? "IN" : ""),
         });
         if (citySearchInput) {
           citySearchInput.value = closest ? closest.name : bestName;
@@ -1135,6 +1289,49 @@ form.elements.time.addEventListener("change", () => {
       tzOffset: newOffset,
     });
   }
+});
+
+function onManualCoordsChange() {
+  const lat = Number(form.elements.latitude.value);
+  const lon = Number(form.elements.longitude.value);
+  if (isNaN(lat) || isNaN(lon)) return;
+
+  const regTz = detectRegionCountryTimezone(lat, lon);
+  const closest = LOCAL_CITIES.find(
+    (c) => Math.abs(c.lat - lat) < 0.25 && Math.abs(c.lon - lon) < 0.25
+  );
+  const name = closest ? `${closest.name}, ${closest.admin}` : `Coordinates (${formatCoords(lat, lon)})`;
+  const tz = regTz ? regTz.offset : (closest ? closest.tz : "+05:30");
+  const iana = regTz ? regTz.iana : (closest ? closest.iana : "Asia/Kolkata");
+
+  applyLocation({
+    displayName: name,
+    lat,
+    lon,
+    timezone: iana,
+    tzOffset: tz,
+    countryCode: closest ? closest.countryCode : (regTz && regTz.name.includes("India") ? "IN" : ""),
+  });
+}
+
+form.elements.latitude?.addEventListener("change", onManualCoordsChange);
+form.elements.longitude?.addEventListener("change", onManualCoordsChange);
+
+form.elements.tz_preset?.addEventListener("change", () => {
+  syncTzCustom();
+  const tz = getSelectedTzOffset();
+  const lat = Number(form.elements.latitude.value);
+  const lon = Number(form.elements.longitude.value);
+  const name = $("location-name-display")?.textContent || "Selected Location";
+  updateActiveLocationDisplay(name, lat, lon, tz);
+});
+
+form.elements.tz_custom?.addEventListener("input", () => {
+  const tz = getSelectedTzOffset();
+  const lat = Number(form.elements.latitude.value);
+  const lon = Number(form.elements.longitude.value);
+  const name = $("location-name-display")?.textContent || "Selected Location";
+  updateActiveLocationDisplay(name, lat, lon, tz);
 });
 
 form.elements.vedic_year_type?.addEventListener("change", () => {

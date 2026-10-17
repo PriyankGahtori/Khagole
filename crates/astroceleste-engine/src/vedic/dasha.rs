@@ -108,18 +108,21 @@ pub fn norm_delta(d: f64) -> f64 {
 
 /// Computes the Sun's true geometric sidereal longitude for a given Julian Day,
 /// incorporating high-precision solar mean motion, the equation of center,
-/// and precession of the equinoxes. Matches JPL DE440 within ~2.8 arcseconds.
-pub fn keplerian_sun_sidereal_lon(jd: f64, birth_ayanamsa: f64, birth_jd: f64) -> f64 {
+/// Earth-Moon barycenter perturbations, and IAU 2006 precession of the equinoxes.
+pub fn keplerian_sun_sidereal_lon(jd: f64, _birth_ayanamsa: f64, _birth_jd: f64) -> f64 {
     let d = jd - 2_451_545.0;
     let t = d / 36525.0;
-    let l0 = (280.46646 + 36000.76983 * t).rem_euclid(360.0);
-    let m = ((357.52911 + 35999.05029 * t).rem_euclid(360.0)).to_radians();
-    let c = (1.914602 - 0.004817 * t) * m.sin()
+    let t2 = t * t;
+    let l0 = (280.466457 + 36000.769828 * t + 0.0003032 * t2).rem_euclid(360.0);
+    let m = ((357.529109 + 35999.050291 * t - 0.0001537 * t2).rem_euclid(360.0)).to_radians();
+    let c = (1.914602 - 0.004817 * t - 0.000014 * t2) * m.sin()
         + (0.019993 - 0.000101 * t) * (2.0 * m).sin()
         + 0.000289 * (3.0 * m).sin();
-    let true_trop_lon = (l0 + c).rem_euclid(360.0);
-    // General precession in longitude rate: ~50.290966 arcsec per Julian year
-    let ayanamsa = birth_ayanamsa + (50.290966 / 3600.0) * ((jd - birth_jd) / 365.25);
+    // Moon perturbation due to Earth-Moon barycenter motion: ~6.45 arcseconds
+    let d_moon = ((297.85036 + 445267.11148 * t).rem_euclid(360.0)).to_radians();
+    let moon_pert = (6.454 / 3600.0) * d_moon.sin();
+    let true_trop_lon = (l0 + c + moon_pert).rem_euclid(360.0);
+    let ayanamsa = crate::zodiac::ayanamsa_value(jd, "lahiri");
     (true_trop_lon - ayanamsa).rem_euclid(360.0)
 }
 
@@ -506,9 +509,7 @@ pub fn calc_vimshottari_dasha_tz(
     match year_type {
         YearType::Calendar => calc_vimshottari_dasha_calendar(moon_lon, birth_jd, depth, tz_offset_hours),
         YearType::Tssy => {
-            let t_cent = (birth_jd - 2_451_545.0) / 36525.0;
-            let ayanamsa_approx = 23.857092 + 1.39697 * t_cent;
-            let sun_fn = |jd| keplerian_sun_sidereal_lon(jd, ayanamsa_approx, birth_jd);
+            let sun_fn = |jd| keplerian_sun_sidereal_lon(jd, 0.0, birth_jd);
             calc_vimshottari_dasha_tssy_tz(moon_lon, birth_jd, depth, &sun_fn, tz_offset_hours)
         }
         _ => calc_vimshottari_dasha_linear_tz(moon_lon, birth_jd, depth, year_type, tz_offset_hours),
