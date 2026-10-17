@@ -18,6 +18,6 @@ Elsewhere:
 - Rust API reference: [docs.rs/khagole-engine](https://docs.rs/khagole-engine)
 - Python bindings: [crates/khagole-engine-py](../crates/khagole-engine-py)
 - WebAssembly bindings: [crates/khagole-engine-wasm](../crates/khagole-engine-wasm)
-- Website and live demo: [priyankgahtori.github.io/khagole-engine](https://priyankgahtori.github.io/Khagole/)
+- Website and live demo: [priyankgahtori.github.io/Khagole](https://priyankgahtori.github.io/Khagole/)
 - Contributing: [CONTRIBUTING.md](../CONTRIBUTING.md) · Security: [SECURITY.md](../SECURITY.md)
   · Releasing: [RELEASING.md](../RELEASING.md)
