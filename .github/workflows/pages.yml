@@ -9,6 +9,7 @@ on:
     branches: [main, feat/vedic-ephemeris-modes]
     paths:
       - "site/**"
+      - "examples/web-cdn/**"
       - "crates/khagole-engine/**"
       - "crates/khagole-engine-wasm/**"
       - "scripts/build-site.sh"
