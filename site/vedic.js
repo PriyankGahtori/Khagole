@@ -1381,7 +1381,7 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
         <div class="dasha-timeline-card">
           <div class="timeline-header">
             <span class="timeline-title">120-Year Vimshottari Life Cycle Timeline</span>
-            <span class="timeline-legend">TSSY Solar Return · Click any period to explore</span>
+            <span class="timeline-legend">Click any period to explore</span>
           </div>
           <div class="dasha-timeline-bar-wrap">
             <div class="dasha-timeline-bar">

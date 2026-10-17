@@ -6,8 +6,9 @@ pub mod nakshatra;
 pub mod panchang;
 
 pub use dasha::{
-    advance_tssy, calc_vimshottari_dasha, calc_vimshottari_dasha_with_sun, find_solar_return,
-    DashaNode, YearType,
+    advance_tssy, calc_vimshottari_dasha, calc_vimshottari_dasha_calendar,
+    calc_vimshottari_dasha_tz, calc_vimshottari_dasha_with_sun, calc_vimshottari_dasha_with_sun_tz,
+    find_solar_return, jd_to_civil_date_string, DashaNode, YearType,
 };
 pub use divisional::{
     calc_divisional_chart, calc_divisional_point, DivisionalChart, DivisionalPlanet,

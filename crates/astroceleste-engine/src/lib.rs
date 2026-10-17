@@ -189,8 +189,10 @@ pub use temperament::{Factor, Qualities, Scores, Temperament};
 pub use time_lords::{time_lords, Firdaria, Period, Profection, TimeLords, MAX_TIME_LORDS_YEARS};
 pub use vedic::{
     advance_tssy, calc_divisional_chart, calc_divisional_point, calc_panchang,
-    calc_vimshottari_dasha, calc_vimshottari_dasha_with_sun, find_solar_return, nakshatra_info,
-    DashaNode, DivisionalChart, DivisionalPlanet, DivisionalPosition, KaranaInfo, MasaInfo,
-    NakshatraInfo, PanchangResult, SamvatInfo, TithiInfo, VaraInfo, YearType, YogaInfo,
+    calc_vimshottari_dasha, calc_vimshottari_dasha_calendar, calc_vimshottari_dasha_tz,
+    calc_vimshottari_dasha_with_sun, calc_vimshottari_dasha_with_sun_tz, find_solar_return,
+    jd_to_civil_date_string, nakshatra_info, DashaNode, DivisionalChart, DivisionalPlanet,
+    DivisionalPosition, KaranaInfo, MasaInfo, NakshatraInfo, PanchangResult, SamvatInfo, TithiInfo,
+    VaraInfo, YearType, YogaInfo,
 };
 pub use zodiac::{ayanamsa, ayanamsa_info, AyanamsaInfo, DEFAULT_AYANAMSA};

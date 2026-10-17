@@ -22,7 +22,7 @@ use astroceleste_engine::{
     planets_and_sidereal_time_with_options, search_elections, time_lords as core_time_lords,
     zi_wei as core_zi_wei, BaziOptions, ChartRequest, ChineseCalendar, ElectionCriteria,
     EngineError, HouseSystem, UtcInstant, ZiWeiOptions,
-    calc_divisional_chart, calc_divisional_point, calc_panchang, calc_vimshottari_dasha,
+    calc_divisional_chart, calc_divisional_point, calc_panchang, calc_vimshottari_dasha_tz,
     nakshatra_info, YearType,
 };
 use serde::{Deserialize, Serialize};
@@ -393,8 +393,9 @@ impl Engine {
         birth_jd: f64,
         depth: Option<u32>,
         year_type: Option<String>,
+        tz_offset_hours: Option<f64>,
     ) -> Result<JsValue, JsValue> {
-        calc_vimshottari_dasha_js(moon_lon, birth_jd, depth, year_type)
+        calc_vimshottari_dasha_js(moon_lon, birth_jd, depth, year_type, tz_offset_hours)
     }
 
     /// Compute Panchanga (five limbs) from Sun and Moon longitudes and Julian Day.
@@ -693,16 +694,19 @@ pub fn calc_vimshottari_dasha_js(
     birth_jd: f64,
     depth: Option<u32>,
     year_type: Option<String>,
+    tz_offset_hours: Option<f64>,
 ) -> Result<JsValue, JsValue> {
     let yt = match year_type.as_deref() {
+        Some("tssy") => YearType::Tssy,
         Some("savana") => YearType::Savana,
         Some("tropical") => YearType::Tropical,
         Some("julian") => YearType::Julian,
         Some("sidereal") => YearType::Sidereal,
-        _ => YearType::Tssy,
+        _ => YearType::Calendar,
     };
     let d = depth.unwrap_or(3);
-    let tree = calc_vimshottari_dasha(moon_lon, birth_jd, d, yt);
+    let tz = tz_offset_hours.unwrap_or(0.0);
+    let tree = calc_vimshottari_dasha_tz(moon_lon, birth_jd, d, yt, tz);
     to_js(&tree)
 }
 

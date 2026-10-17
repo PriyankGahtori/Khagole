@@ -39,32 +39,32 @@ fn sripati_and_geometric_mode() {
 
     // Find Sun placement
     let sun = chart.planets.iter().find(|p| p.name == "Sun").unwrap();
-    // JHora Sun: 150.53918°, SwissEph Truepos: 150.53914°
+    // Reference Sun: 150.53918°, SwissEph Truepos: 150.53914°
     // In geometric mode, Sun longitude must be ~150.5393° (within 1 arcsecond = ~0.0003°)
     let diff_arcsec = (sun.ecliptic_longitude - 150.53918).abs() * 3600.0;
     assert!(
         diff_arcsec < 1.0,
-        "Sun geometric longitude is off from JHora: diff is {diff_arcsec}\" (lon = {})",
+        "Sun geometric longitude is off from reference: diff is {diff_arcsec}\" (lon = {})",
         sun.ecliptic_longitude
     );
 
     // Find Mars placement
     let mars = chart.planets.iter().find(|p| p.name == "Mars").unwrap();
-    // JHora Mars: 210.89571°
+    // Reference Mars: 210.89571°
     let mars_diff = (mars.ecliptic_longitude - 210.89571).abs() * 3600.0;
     assert!(
         mars_diff < 1.0,
-        "Mars geometric longitude is off from JHora: diff is {mars_diff}\" (lon = {})",
+        "Mars geometric longitude is off from reference: diff is {mars_diff}\" (lon = {})",
         mars.ecliptic_longitude
     );
 
     // Find Venus placement
     let venus = chart.planets.iter().find(|p| p.name == "Venus").unwrap();
-    // JHora Venus: 135.62509°
+    // Reference Venus: 135.62509°
     let venus_diff = (venus.ecliptic_longitude - 135.62509).abs() * 3600.0;
     assert!(
         venus_diff < 1.5,
-        "Venus geometric longitude is off from JHora: diff is {venus_diff}\" (lon = {})",
+        "Venus geometric longitude is off from reference: diff is {venus_diff}\" (lon = {})",
         venus.ecliptic_longitude
     );
 

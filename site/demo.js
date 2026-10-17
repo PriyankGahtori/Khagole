@@ -6,6 +6,7 @@ import {
   renderPanchang,
   renderVedicPlanetsTable,
   renderVimshottariDasha,
+  parseTzOffsetHours,
   formatDegMin,
   formatDms,
   VARGA_LIST,
@@ -578,8 +579,9 @@ async function compute() {
     }
 
     const panchang = calcPanchang(sunLon, moonLon, jd, localWeekday, isBeforeSunrise);
-    const yearType = data.get("vedic_year_type") || "tssy";
-    const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType);
+    const yearType = data.get("vedic_year_type") || "calendar";
+    const tzOffsetHours = parseTzOffsetHours(tzOffset);
+    const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType, tzOffsetHours);
 
     lastVedicData = { d1, d9, panchang, dasha, chart, moonLon, jd, ascLon, timings, tzOffset };
     renderVedicView(lastVedicData);
@@ -1133,6 +1135,18 @@ form.elements.time.addEventListener("change", () => {
       tzOffset: newOffset,
     });
   }
+});
+
+form.elements.vedic_year_type?.addEventListener("change", () => {
+  compute();
+});
+
+form.elements.vedic_ayanamsa?.addEventListener("change", () => {
+  compute();
+});
+
+form.elements.vedic_node_type?.addEventListener("change", () => {
+  compute();
 });
 
 $("copy-vedic-json").addEventListener("click", async (e) => {

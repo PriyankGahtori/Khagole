@@ -5,7 +5,7 @@ use std::path::Path;
 use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
 use astroceleste_engine::{
     calc_divisional_chart, calc_divisional_point, calc_panchang, calc_vimshottari_dasha,
-    calculate_chart, ChartRequest, UtcInstant, YearType,
+    calc_vimshottari_dasha_tz, calculate_chart, ChartRequest, UtcInstant, YearType,
 };
 
 fn full_kernel() -> Option<KernelSet> {
@@ -67,13 +67,16 @@ fn test_modi_chart_divisional_d9_and_dasha() {
     assert_eq!(d9_sun.sign, 10, "Modi D9 Sun is Capricorn (10)");
     assert_eq!(d9_sun.house, 1);
 
-    // 2. Test Vimshottari Dasha (Default YearType is TSSY)
+    // 2. Test Vimshottari Dasha
     let moon = chart.planets.iter().find(|p| p.name == "Moon").unwrap();
-    let dasha = calc_vimshottari_dasha(
+
+    // A. Default YearType::Calendar (Standard Parashari Calendar - exact anniversary dates)
+    let dasha = calc_vimshottari_dasha_tz(
         moon.ecliptic_longitude,
         instant.julian_day(),
         3,
-        YearType::default(),
+        YearType::Calendar,
+        5.5,
     );
 
     assert_eq!(dasha.len(), 9);
@@ -88,13 +91,45 @@ fn test_modi_chart_divisional_d9_and_dasha() {
     assert_eq!(dasha[7].planet, "Rahu");
     assert_eq!(dasha[8].planet, "Jupiter");
 
-    // Exact TSSY dates matching JHora ground truth
-    assert_eq!(dasha[1].start_date, "1963-02-15");
-    assert_eq!(dasha[2].start_date, "1980-02-15");
-    assert_eq!(dasha[3].start_date, "1987-02-15");
-    assert_eq!(dasha[4].start_date, "2007-02-15");
-    assert_eq!(dasha[6].start_date, "2023-02-15");
-    assert_eq!(dasha[7].start_date, "2030-02-15");
+    // Standard Parashari calendar addition dates (all Mahadashas end on exact anniversary 02-18)
+    assert_eq!(dasha[0].end_date, "1963-02-18");
+    assert_eq!(dasha[1].start_date, "1963-02-18");
+    assert_eq!(dasha[1].end_date, "1980-02-18");
+    assert_eq!(dasha[2].start_date, "1980-02-18");
+    assert_eq!(dasha[2].end_date, "1987-02-18");
+    assert_eq!(dasha[3].start_date, "1987-02-18");
+    assert_eq!(dasha[3].end_date, "2007-02-18");
+    assert_eq!(dasha[4].start_date, "2007-02-18");
+    assert_eq!(dasha[4].end_date, "2013-02-18");
+    assert_eq!(dasha[5].start_date, "2013-02-18");
+    assert_eq!(dasha[5].end_date, "2023-02-18");
+    assert_eq!(dasha[6].start_date, "2023-02-18");
+    assert_eq!(dasha[6].end_date, "2030-02-18");
+    assert_eq!(dasha[7].start_date, "2030-02-18");
+    assert_eq!(dasha[7].end_date, "2048-02-18");
+    assert_eq!(dasha[8].start_date, "2048-02-18");
+    assert_eq!(dasha[8].end_date, "2064-02-18");
+
+    // Zero 1-day variance in calendar mode!
+    for i in 1..9 {
+        assert_eq!(&dasha[i].end_date[5..], "02-18", "MD {} must end on 02-18", dasha[i].planet);
+    }
+
+    // B. TSSY Mode (True Sidereal Solar Year) with IST (+5:30) timezone adjustment
+    let dasha_tssy = calc_vimshottari_dasha_tz(
+        moon.ecliptic_longitude,
+        instant.julian_day(),
+        1,
+        YearType::Tssy,
+        5.5,
+    );
+    assert_eq!(dasha_tssy[1].start_date, "1963-02-15");
+    assert_eq!(dasha_tssy[2].start_date, "1980-02-15");
+    assert_eq!(dasha_tssy[3].start_date, "1987-02-15");
+    assert_eq!(dasha_tssy[4].start_date, "2007-02-15");
+    assert_eq!(dasha_tssy[5].start_date, "2013-02-15"); // Correct 2013-02-15 in IST (+5:30)
+    assert_eq!(dasha_tssy[6].start_date, "2023-02-15");
+    assert_eq!(dasha_tssy[7].start_date, "2030-02-15");
 
     // Sub-periods: Saturn Mahadasha has 9 Antardashas
     assert_eq!(dasha[0].children.len(), 9);

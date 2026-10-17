@@ -28,7 +28,7 @@ fn days_from_civil(year: i64, month: i64, day: i64) -> i64 {
     era * 146_097 + doe - 719_468
 }
 
-fn days_in_month(year: i32, month: u32) -> u32 {
+pub fn days_in_month(year: i32, month: u32) -> u32 {
     match month {
         2 if year % 4 == 0 && (year % 100 != 0 || year % 400 == 0) => 29,
         2 => 28,

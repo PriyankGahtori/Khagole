@@ -32,7 +32,9 @@ pub const TOTAL_YEARS: f64 = 120.0;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum YearType {
-    /// True Sidereal Solar Year (TSSY - default): 1 year = Sun completes 360° of sidereal transit via solar return solver.
+    /// Standard Vedic Calendar Year (365.25d civil calendar addition - default): Mahadashas end on exact calendar anniversaries without 1-day variance.
+    Calendar,
+    /// True Sidereal Solar Year (TSSY): 1 year = Sun completes 360° of sidereal transit via solar return solver.
     Tssy,
     /// Linear sidereal solar year (365.256363004 days per year).
     Sidereal,
@@ -40,13 +42,13 @@ pub enum YearType {
     Savana,
     /// Tropical solar year (365.242190 days).
     Tropical,
-    /// Julian year (365.25 days).
+    /// Julian year (365.25 days continuous).
     Julian,
 }
 
 impl Default for YearType {
     fn default() -> Self {
-        YearType::Tssy
+        YearType::Calendar
     }
 }
 
@@ -54,10 +56,10 @@ impl YearType {
     /// Nominal number of days per year.
     pub fn days_per_year(&self) -> f64 {
         match self {
+            YearType::Calendar | YearType::Julian => 365.25,
             YearType::Tssy | YearType::Sidereal => 365.256363004,
             YearType::Savana => 360.0,
             YearType::Tropical => 365.242190,
-            YearType::Julian => 365.25,
         }
     }
 }
@@ -86,9 +88,16 @@ pub struct DashaNode {
     pub full_duration_days: Option<f64>,
 }
 
-fn jd_to_date_string(jd: f64) -> String {
-    let (y, m, d, ..) = UtcInstant::from_julian_day(jd).civil();
+/// Convert a Julian Day to civil "YYYY-MM-DD" adjusted by timezone offset hours.
+pub fn jd_to_civil_date_string(jd: f64, tz_offset_hours: f64) -> String {
+    let local_jd = jd + tz_offset_hours / 24.0;
+    let (y, m, d, ..) = UtcInstant::from_julian_day(local_jd).civil();
     format!("{y:04}-{m:02}-{d:02}")
+}
+
+/// Convert a Julian Day to civil "YYYY-MM-DD" in UTC (0.0 offset).
+pub fn jd_to_date_string(jd: f64) -> String {
+    jd_to_civil_date_string(jd, 0.0)
 }
 
 /// Normalized angular difference in [-180.0, 180.0).
@@ -163,12 +172,13 @@ pub fn advance_tssy<F: Fn(f64) -> f64>(jd_start: f64, years: f64, sun_fn: &F) ->
     find_solar_return(target_lon, seed_jd, sun_fn)
 }
 
-fn build_dasha_children_linear(
+fn build_dasha_children_linear_tz(
     start_idx: usize,
     start_jd: f64,
     parent_years: f64,
     depth: u32,
     parent_days: f64,
+    tz_offset_hours: f64,
 ) -> Vec<DashaNode> {
     if depth == 0 {
         return Vec::new();
@@ -185,7 +195,7 @@ fn build_dasha_children_linear(
         let end = cur + sub_days;
 
         let sub_children = if depth > 1 {
-            build_dasha_children_linear(idx, cur, sub_years, depth - 1, sub_days)
+            build_dasha_children_linear_tz(idx, cur, sub_years, depth - 1, sub_days, tz_offset_hours)
         } else {
             Vec::new()
         };
@@ -194,8 +204,8 @@ fn build_dasha_children_linear(
             planet: seq.name.to_string(),
             start_jd: cur,
             end_jd: end,
-            start_date: jd_to_date_string(cur),
-            end_date: jd_to_date_string(end),
+            start_date: jd_to_civil_date_string(cur, tz_offset_hours),
+            end_date: jd_to_civil_date_string(end, tz_offset_hours),
             children: sub_children,
             bhukta_days: None,
             full_duration_days: Some(sub_days),
@@ -207,12 +217,13 @@ fn build_dasha_children_linear(
     children
 }
 
-fn build_dasha_children_tssy<F: Fn(f64) -> f64>(
+fn build_dasha_children_tssy_tz<F: Fn(f64) -> f64>(
     start_idx: usize,
     start_jd: f64,
     parent_years: f64,
     depth: u32,
     sun_fn: &F,
+    tz_offset_hours: f64,
 ) -> Vec<DashaNode> {
     if depth == 0 {
         return Vec::new();
@@ -228,7 +239,7 @@ fn build_dasha_children_tssy<F: Fn(f64) -> f64>(
         let end_jd = advance_tssy(cur_jd, ad_years, sun_fn);
 
         let sub_children = if depth > 1 {
-            build_dasha_children_tssy(idx, cur_jd, ad_years, depth - 1, sun_fn)
+            build_dasha_children_tssy_tz(idx, cur_jd, ad_years, depth - 1, sun_fn, tz_offset_hours)
         } else {
             Vec::new()
         };
@@ -237,8 +248,8 @@ fn build_dasha_children_tssy<F: Fn(f64) -> f64>(
             planet: seq.name.to_string(),
             start_jd: cur_jd,
             end_jd,
-            start_date: jd_to_date_string(cur_jd),
-            end_date: jd_to_date_string(end_jd),
+            start_date: jd_to_civil_date_string(cur_jd, tz_offset_hours),
+            end_date: jd_to_civil_date_string(end_jd, tz_offset_hours),
             children: sub_children,
             bhukta_days: None,
             full_duration_days: Some(end_jd - cur_jd),
@@ -250,12 +261,103 @@ fn build_dasha_children_tssy<F: Fn(f64) -> f64>(
     children
 }
 
+/// Calculate Vimshottari dasha with the Standard Vedic Calendar Year method.
+/// In classical Parashari tradition, Mahadashas are whole calendar years added to the first
+/// Mahadasha's transition date, guaranteeing consistent anniversary dates without 1-day variance.
+pub fn calc_vimshottari_dasha_calendar(
+    moon_lon: f64,
+    birth_jd: f64,
+    depth: u32,
+    tz_offset_hours: f64,
+) -> Vec<DashaNode> {
+    let norm_lon = moon_lon.rem_euclid(360.0);
+    let nakshatra_span = 360.0 / 27.0;
+    let nakshatra_idx = ((norm_lon / nakshatra_span).floor() as usize).min(26);
+    let dasha_start_index = nakshatra_idx % 9;
+    let fraction_elapsed = (norm_lon % nakshatra_span) / nakshatra_span;
+
+    let balance_years = DASHA_SEQUENCE[dasha_start_index].years * (1.0 - fraction_elapsed);
+    let elapsed_years = DASHA_SEQUENCE[dasha_start_index].years * fraction_elapsed;
+
+    let local_birth_jd = birth_jd + tz_offset_hours / 24.0;
+
+    let balance_days = balance_years * 365.25;
+    let end1_local_jd = local_birth_jd + balance_days;
+    let (mut cur_y, mut cur_m, mut cur_d, cur_h, cur_min, cur_s, cur_us) =
+        UtcInstant::from_julian_day(end1_local_jd).civil();
+
+    let elapsed_days = elapsed_years * 365.25;
+    let start1_local_jd = local_birth_jd - elapsed_days;
+    let start1_utc_jd = start1_local_jd - tz_offset_hours / 24.0;
+    let end1_utc_jd = end1_local_jd - tz_offset_hours / 24.0;
+
+    let mut tree = Vec::with_capacity(9);
+    let mut prev_end_utc_jd = end1_utc_jd;
+
+    let anchor_m = cur_m;
+    let anchor_d = cur_d;
+
+    for i in 0..9 {
+        let idx = (dasha_start_index + i) % 9;
+        let seq = &DASHA_SEQUENCE[idx];
+
+        let (start_jd, end_jd, bhukta_days) = if i == 0 {
+            (start1_utc_jd, end1_utc_jd, Some(elapsed_days))
+        } else {
+            let start = prev_end_utc_jd;
+            cur_y += seq.years as i32;
+            cur_m = anchor_m;
+            let max_d = crate::instant::days_in_month(cur_y, cur_m);
+            cur_d = anchor_d.min(max_d);
+            let next_end_local = UtcInstant::from_civil(
+                cur_y, cur_m, cur_d, cur_h, cur_min, cur_s, cur_us,
+            );
+            let next_end_local_jd = next_end_local.julian_day();
+            let next_end_utc_jd = next_end_local_jd - tz_offset_hours / 24.0;
+            prev_end_utc_jd = next_end_utc_jd;
+            (start, next_end_utc_jd, None)
+        };
+
+        let full_days = end_jd - start_jd;
+
+        let children = if depth > 1 {
+            build_dasha_children_linear_tz(idx, start_jd, seq.years, depth - 1, full_days, tz_offset_hours)
+        } else {
+            Vec::new()
+        };
+
+        tree.push(DashaNode {
+            planet: seq.name.to_string(),
+            start_jd,
+            end_jd,
+            start_date: jd_to_civil_date_string(start_jd, tz_offset_hours),
+            end_date: jd_to_civil_date_string(end_jd, tz_offset_hours),
+            children,
+            bhukta_days,
+            full_duration_days: Some(full_days),
+        });
+    }
+
+    tree
+}
+
 /// Calculate Vimshottari dasha with the True Sidereal Solar Year (TSSY) solver.
 pub fn calc_vimshottari_dasha_tssy<F: Fn(f64) -> f64>(
     moon_lon: f64,
     birth_jd: f64,
     depth: u32,
     sun_fn: &F,
+) -> Vec<DashaNode> {
+    calc_vimshottari_dasha_tssy_tz(moon_lon, birth_jd, depth, sun_fn, 0.0)
+}
+
+/// Calculate Vimshottari dasha with the True Sidereal Solar Year (TSSY) solver with local civil timezone adjustment.
+pub fn calc_vimshottari_dasha_tssy_tz<F: Fn(f64) -> f64>(
+    moon_lon: f64,
+    birth_jd: f64,
+    depth: u32,
+    sun_fn: &F,
+    tz_offset_hours: f64,
 ) -> Vec<DashaNode> {
     let norm_lon = moon_lon.rem_euclid(360.0);
     let nakshatra_span = 360.0 / 27.0;
@@ -299,7 +401,7 @@ pub fn calc_vimshottari_dasha_tssy<F: Fn(f64) -> f64>(
         let full_days = end_jd - start_jd;
 
         let children = if depth > 1 {
-            build_dasha_children_tssy(idx, start_jd, seq.years, depth - 1, sun_fn)
+            build_dasha_children_tssy_tz(idx, start_jd, seq.years, depth - 1, sun_fn, tz_offset_hours)
         } else {
             Vec::new()
         };
@@ -314,8 +416,8 @@ pub fn calc_vimshottari_dasha_tssy<F: Fn(f64) -> f64>(
             planet: seq.name.to_string(),
             start_jd,
             end_jd,
-            start_date: jd_to_date_string(start_jd),
-            end_date: jd_to_date_string(end_jd),
+            start_date: jd_to_civil_date_string(start_jd, tz_offset_hours),
+            end_date: jd_to_civil_date_string(end_jd, tz_offset_hours),
             children,
             bhukta_days,
             full_duration_days: Some(full_days),
@@ -325,11 +427,12 @@ pub fn calc_vimshottari_dasha_tssy<F: Fn(f64) -> f64>(
     tree
 }
 
-fn calc_vimshottari_dasha_linear(
+fn calc_vimshottari_dasha_linear_tz(
     moon_lon: f64,
     birth_jd: f64,
     depth: u32,
     year_type: YearType,
+    tz_offset_hours: f64,
 ) -> Vec<DashaNode> {
     let norm_lon = moon_lon.rem_euclid(360.0);
     let nakshatra_span = 360.0 / 27.0;
@@ -361,7 +464,7 @@ fn calc_vimshottari_dasha_linear(
         };
 
         let children = if depth > 1 {
-            build_dasha_children_linear(idx, start_jd, seq.years, depth - 1, full_days)
+            build_dasha_children_linear_tz(idx, start_jd, seq.years, depth - 1, full_days, tz_offset_hours)
         } else {
             Vec::new()
         };
@@ -370,8 +473,8 @@ fn calc_vimshottari_dasha_linear(
             planet: seq.name.to_string(),
             start_jd,
             end_jd,
-            start_date: jd_to_date_string(start_jd),
-            end_date: jd_to_date_string(end_jd),
+            start_date: jd_to_civil_date_string(start_jd, tz_offset_hours),
+            end_date: jd_to_civil_date_string(end_jd, tz_offset_hours),
             children,
             bhukta_days,
             full_duration_days: Some(full_days),
@@ -382,21 +485,33 @@ fn calc_vimshottari_dasha_linear(
 }
 
 /// Calculate the Vimshottari dasha periods tree from Moon's sidereal longitude and birth JD.
-/// Defaults to True Sidereal Solar Year (TSSY) solver matching JHora and Hora Prakash.
+/// Defaults to Standard Vedic Calendar Year method matching canonical Parashari tradition.
 pub fn calc_vimshottari_dasha(
     moon_lon: f64,
     birth_jd: f64,
     depth: u32,
     year_type: YearType,
 ) -> Vec<DashaNode> {
+    calc_vimshottari_dasha_tz(moon_lon, birth_jd, depth, year_type, 0.0)
+}
+
+/// Calculate the Vimshottari dasha periods tree with local civil timezone adjustment.
+pub fn calc_vimshottari_dasha_tz(
+    moon_lon: f64,
+    birth_jd: f64,
+    depth: u32,
+    year_type: YearType,
+    tz_offset_hours: f64,
+) -> Vec<DashaNode> {
     match year_type {
+        YearType::Calendar => calc_vimshottari_dasha_calendar(moon_lon, birth_jd, depth, tz_offset_hours),
         YearType::Tssy => {
             let t_cent = (birth_jd - 2_451_545.0) / 36525.0;
-            let ayanamsa_approx = 23.85 + 1.396 * t_cent;
+            let ayanamsa_approx = 23.857092 + 1.39697 * t_cent;
             let sun_fn = |jd| keplerian_sun_sidereal_lon(jd, ayanamsa_approx, birth_jd);
-            calc_vimshottari_dasha_tssy(moon_lon, birth_jd, depth, &sun_fn)
+            calc_vimshottari_dasha_tssy_tz(moon_lon, birth_jd, depth, &sun_fn, tz_offset_hours)
         }
-        _ => calc_vimshottari_dasha_linear(moon_lon, birth_jd, depth, year_type),
+        _ => calc_vimshottari_dasha_linear_tz(moon_lon, birth_jd, depth, year_type, tz_offset_hours),
     }
 }
 
@@ -408,9 +523,22 @@ pub fn calc_vimshottari_dasha_with_sun<F: Fn(f64) -> f64>(
     year_type: YearType,
     sun_fn: &F,
 ) -> Vec<DashaNode> {
+    calc_vimshottari_dasha_with_sun_tz(moon_lon, birth_jd, depth, year_type, sun_fn, 0.0)
+}
+
+/// Calculate the Vimshottari dasha periods tree with a custom Sun longitude closure and local timezone offset.
+pub fn calc_vimshottari_dasha_with_sun_tz<F: Fn(f64) -> f64>(
+    moon_lon: f64,
+    birth_jd: f64,
+    depth: u32,
+    year_type: YearType,
+    sun_fn: &F,
+    tz_offset_hours: f64,
+) -> Vec<DashaNode> {
     match year_type {
-        YearType::Tssy => calc_vimshottari_dasha_tssy(moon_lon, birth_jd, depth, sun_fn),
-        _ => calc_vimshottari_dasha_linear(moon_lon, birth_jd, depth, year_type),
+        YearType::Calendar => calc_vimshottari_dasha_calendar(moon_lon, birth_jd, depth, tz_offset_hours),
+        YearType::Tssy => calc_vimshottari_dasha_tssy_tz(moon_lon, birth_jd, depth, sun_fn, tz_offset_hours),
+        _ => calc_vimshottari_dasha_linear_tz(moon_lon, birth_jd, depth, year_type, tz_offset_hours),
     }
 }
 
@@ -419,9 +547,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_vimshottari_dasha_tssy_defaults() {
+    fn test_vimshottari_dasha_calendar_defaults() {
         let birth_jd = 2451545.0; // J2000
-        // Moon at 0° Aries -> Ashwini -> Ketu dasha starts (TSSY is default)
+        // Moon at 0° Aries -> Ashwini -> Ketu dasha starts (Calendar is default)
         let tree = calc_vimshottari_dasha(0.0, birth_jd, 3, YearType::default());
         assert_eq!(tree.len(), 9);
         assert_eq!(tree[0].planet, "Ketu");
@@ -437,6 +565,49 @@ mod tests {
         // Sub-periods: Ketu Mahadasha has 9 Antardashas
         assert_eq!(tree[0].children.len(), 9);
         assert_eq!(tree[0].children[0].children.len(), 9);
+    }
+
+    #[test]
+    fn test_vimshottari_calendar_anniversary_consistency() {
+        // Birth date: 1950-09-17 04:04:00 UTC (09:34 IST, Vadnagar)
+        let birth_jd = 2433541.66944;
+        let moon_lon = 217.949567; // Anuradha
+        let tree = calc_vimshottari_dasha_tz(moon_lon, birth_jd, 1, YearType::Calendar, 5.5);
+        assert_eq!(tree.len(), 9);
+
+        // First Mahadasha ends on 1963-02-18
+        assert_eq!(tree[0].end_date, "1963-02-18");
+        // In canonical Parashari calendar addition, EVERY subsequent Mahadasha ends on February 18
+        assert_eq!(tree[1].start_date, "1963-02-18");
+        assert_eq!(tree[1].end_date, "1980-02-18"); // Mercury 17y
+        assert_eq!(tree[2].start_date, "1980-02-18");
+        assert_eq!(tree[2].end_date, "1987-02-18"); // Ketu 7y
+        assert_eq!(tree[3].start_date, "1987-02-18");
+        assert_eq!(tree[3].end_date, "2007-02-18"); // Venus 20y
+        assert_eq!(tree[4].start_date, "2007-02-18");
+        assert_eq!(tree[4].end_date, "2013-02-18"); // Sun 6y
+        assert_eq!(tree[5].start_date, "2013-02-18");
+        assert_eq!(tree[5].end_date, "2023-02-18"); // Moon 10y
+        assert_eq!(tree[6].start_date, "2023-02-18");
+        assert_eq!(tree[6].end_date, "2030-02-18"); // Mars 7y
+        assert_eq!(tree[7].start_date, "2030-02-18");
+        assert_eq!(tree[7].end_date, "2048-02-18"); // Rahu 18y
+        assert_eq!(tree[8].start_date, "2048-02-18");
+        assert_eq!(tree[8].end_date, "2064-02-18"); // Jupiter 16y
+
+        // Zero 1-day variance across all 9 Mahadashas!
+        for i in 1..9 {
+            assert_eq!(&tree[i].end_date[5..], "02-18", "MD {} must end on anniversary 02-18", tree[i].planet);
+        }
+    }
+
+    #[test]
+    fn test_vimshottari_dasha_tssy_mode() {
+        let birth_jd = 2451545.0; // J2000
+        let tree = calc_vimshottari_dasha(0.0, birth_jd, 2, YearType::Tssy);
+        assert_eq!(tree.len(), 9);
+        assert_eq!(tree[0].planet, "Ketu");
+        assert_eq!(tree[0].children.len(), 9);
     }
 
     #[test]
