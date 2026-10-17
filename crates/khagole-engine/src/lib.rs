@@ -1,6 +1,6 @@
 //! khagole-engine: astrological chart calculation on JPL ephemerides.
 //!
-//! One implementation shared by the Astroceleste server (Python bindings), desktop and
+//! One implementation shared by the Khagole server (Python bindings), desktop and
 //! mobile apps (native) and the web app (WASM), so every platform computes identical charts.
 //!
 //! **Experimental (0.0.x):** the API may change in any release.
@@ -44,7 +44,7 @@
 //! | [`zi_wei`] | the Zi Wei Dou Shu chart ([`ZiWei`]) of a birth from its Chinese calendar: palaces, bureau, the 14 major and 14 auxiliary stars with brightness, the Four Transformations, minor stars and cycles of gods, flying transformations, decade and small limits and a year's horoscope (no kernel needed) |
 //!
 //! Every result implements [`serde::Serialize`] and serializes to the JSON of the
-//! Astroceleste API, with the same key order and the same integer vs float types. The
+//! Khagole API, with the same key order and the same integer vs float types. The
 //! Python and WebAssembly bindings return exactly that JSON.
 //!
 //! # Loading kernels
@@ -72,7 +72,7 @@
 //! # Errors
 //!
 //! Calculations return [`EngineError`], whose [`code`](EngineError::code) is the stable
-//! error code of the Astroceleste API. A date that no loaded kernel covers is
+//! error code of the Khagole API. A date that no loaded kernel covers is
 //! [`EngineError::OutOfRange`]: the engine never extrapolates or approximates.
 //!
 //! ```no_run

@@ -3,6 +3,7 @@
 *.bsp
 !/tests/data/*.bsp
 __pycache__/
+/crates/khagole-engine-wasm/pkg*/
 /crates/astroceleste-engine-wasm/pkg*/
 /dist/
 .venv/

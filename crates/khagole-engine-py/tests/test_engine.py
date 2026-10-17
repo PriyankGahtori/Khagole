@@ -18,10 +18,10 @@ PRIVATE_KEYS = {"degree_symbol", "degree_symbols", "condition"}
 # Chart keys added after the reference implementation, absent from the fixtures.
 ADDED_CHART_KEYS = {"sect", "dignity_scheme", "receptions", "antiscia", "planetary_hours"}
 
-# Skipped without the full kernel, unless ASTROCELESTE_REQUIRE_KERNEL is set (as in CI): then
+# Skipped without the full kernel, unless KHAGOLE_REQUIRE_KERNEL is set (as in CI): then
 # the tests run, and fail on the missing file.
 needs_full_kernel = pytest.mark.skipif(
-    not FULL.exists() and not os.environ.get("ASTROCELESTE_REQUIRE_KERNEL"),
+    not FULL.exists() and not (os.environ.get("KHAGOLE_REQUIRE_KERNEL") or os.environ.get("ASTROCELESTE_REQUIRE_KERNEL")),
     reason="scripts/fetch-kernels.sh",
 )
 

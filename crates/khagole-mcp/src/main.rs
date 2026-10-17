@@ -1,4 +1,4 @@
-//! Astroceleste MCP (Model Context Protocol) Server
+//! Khagole MCP (Model Context Protocol) Server
 //!
 //! Provides high-precision NASA JPL DE440 ephemeris calculations, Vedic astrological charts,
 //! houses (including Sripati), true/mean lunar nodes, ayanamsas, and transits over JSON-RPC stdio.
@@ -36,7 +36,7 @@ struct JsonRpcResponse {
 }
 
 fn locate_kernel() -> Option<PathBuf> {
-    if let Ok(path) = env::var("ASTROCELESTE_KERNEL_PATH") {
+    if let Ok(path) = env::var("KHAGOLE_KERNEL_PATH").or_else(|_| env::var("ASTROCELESTE_KERNEL_PATH")) {
         let p = PathBuf::from(path);
         if p.exists() {
             return Some(p);
@@ -47,7 +47,10 @@ fn locate_kernel() -> Option<PathBuf> {
         "kernels/de440s.bsp",
         "../kernels/de440s.bsp",
         "../../kernels/de440s.bsp",
+        "/Users/priyankgahtori/Code/poc/astroceleste-engine/kernels/de440s.bsp",
         "/Users/priyankgahtori/Code/poc/khagole-engine/kernels/de440s.bsp",
+        "/Users/priyankgahtori/Code/poc/Khagole/kernels/de440s.bsp",
+        "/Users/priyankgahtori/Code/poc/khagole/kernels/de440s.bsp",
     ];
 
     for c in candidates {
@@ -547,7 +550,7 @@ fn main() {
                         "tools": {}
                     },
                     "serverInfo": {
-                        "name": "astroceleste-mcp",
+                        "name": "khagole-mcp",
                         "version": "0.1.0"
                     }
                 });

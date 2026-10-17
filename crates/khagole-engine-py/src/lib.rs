@@ -37,7 +37,7 @@ create_exception!(
     "No loaded kernel covers the requested date."
 );
 
-/// `err` with a `code` attribute: the stable error code of the Astroceleste API.
+/// `err` with a `code` attribute: the stable error code of the Khagole API.
 fn with_code(err: PyErr, code: &str) -> PyErr {
     Python::attach(|py| {
         // Setting an attribute on a fresh exception instance cannot fail.

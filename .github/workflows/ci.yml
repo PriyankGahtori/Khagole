@@ -87,6 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # A missing kernel fails the tests instead of skipping them.
+      KHAGOLE_REQUIRE_KERNEL: "1"
       ASTROCELESTE_REQUIRE_KERNEL: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -153,6 +154,7 @@ jobs:
     name: python bindings
     runs-on: ubuntu-latest
     env:
+      KHAGOLE_REQUIRE_KERNEL: "1"
       ASTROCELESTE_REQUIRE_KERNEL: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -183,6 +185,7 @@ jobs:
     name: wasm bindings
     runs-on: ubuntu-latest
     env:
+      KHAGOLE_REQUIRE_KERNEL: "1"
       ASTROCELESTE_REQUIRE_KERNEL: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

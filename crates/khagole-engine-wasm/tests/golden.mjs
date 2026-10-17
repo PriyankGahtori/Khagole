@@ -113,8 +113,8 @@ console.log("excerpt checks: ok");
 
 const full = join(root, "kernels/de440s.bsp");
 if (!existsSync(full)) {
-  if (process.env.ASTROCELESTE_REQUIRE_KERNEL) {
-    console.error("kernels/de440s.bsp not found and ASTROCELESTE_REQUIRE_KERNEL is set");
+  if (process.env.KHAGOLE_REQUIRE_KERNEL || process.env.ASTROCELESTE_REQUIRE_KERNEL) {
+    console.error("kernels/de440s.bsp not found and KHAGOLE_REQUIRE_KERNEL is set");
     process.exit(1);
   }
   console.log("golden checks skipped: kernels/de440s.bsp not found");

@@ -40,7 +40,7 @@ scripts/build-site.sh && python3 -m http.server -d target/site
 The golden tests (`golden_chart`, `golden_horary`, `golden_derived`) and the other
 kernel-dependent tests **silently skip** (print "skipping" and pass) when `kernels/de440s.bsp`
 is absent — a green run without the kernel does not validate charts. Fetch the kernel before
-trusting results. With `ASTROCELESTE_REQUIRE_KERNEL=1` (set in CI's kernel jobs, honoured by
+trusting results. With `KHAGOLE_REQUIRE_KERNEL=1` (set in CI's kernel jobs, honoured by
 `cargo test`, pytest and `golden.mjs`) a missing kernel fails instead. `fetch-kernels.sh`
 checks the kernel's SHA-256. The py crate is excluded from `cargo test` because it links
 against libpython; test it via maturin.

@@ -12,13 +12,16 @@ pub fn root() -> PathBuf {
 }
 
 /// The full de440s kernel, or `None` (test skipped) when it has not been fetched. With
-/// `ASTROCELESTE_REQUIRE_KERNEL` set (as in CI), a missing kernel fails instead.
+/// `KHAGOLE_REQUIRE_KERNEL` set (as in CI), a missing kernel fails instead.
 pub fn kernels() -> Option<KernelSet> {
     let path = root().join("kernels/de440s.bsp");
     if !path.exists() {
+        let required = std::env::var_os("KHAGOLE_REQUIRE_KERNEL")
+            .or_else(|| std::env::var_os("ASTROCELESTE_REQUIRE_KERNEL"))
+            .is_some();
         assert!(
-            std::env::var_os("ASTROCELESTE_REQUIRE_KERNEL").is_none(),
-            "{} not found and ASTROCELESTE_REQUIRE_KERNEL is set",
+            !required,
+            "{} not found and KHAGOLE_REQUIRE_KERNEL is set",
             path.display()
         );
         eprintln!(

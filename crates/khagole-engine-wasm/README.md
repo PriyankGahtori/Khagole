@@ -5,8 +5,8 @@
 > **Experimental (0.0.x):** the API may change in any release. Pin an exact version.
 
 Astrological chart calculation on NASA JPL ephemerides, compiled to WebAssembly from the
-Rust [khagole-engine](https://github.com/ffalcinelli/khagole-engine). Charts are
-computed entirely in the browser (or Node), identical to the Astroceleste server.
+Rust [khagole-engine](https://github.com/PriyankGahtori/Khagole). Charts are
+computed entirely in the browser (or Node), identical to the Khagole server.
 
 [Try the live demo](https://ffalcinelli.github.io/khagole-engine/) ·
 [API guide](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/api.md)

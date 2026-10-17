@@ -52,7 +52,7 @@ The Python crate is excluded from `cargo test` because it links against libpytho
 through maturin.
 
 Tests that need `kernels/de440s.bsp` print "skipping" and pass when it is missing. Set
-`ASTROCELESTE_REQUIRE_KERNEL=1` to make that a failure, as CI does. For a performance
+`KHAGOLE_REQUIRE_KERNEL=1` to make that a failure, as CI does. For a performance
 change, compare `cargo test --release --test timing -- --ignored --nocapture` before and
 after.
 
