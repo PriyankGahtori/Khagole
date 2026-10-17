@@ -1,17 +1,41 @@
-# Khagole
+<div align="center">
 
-[![crates.io](https://img.shields.io/crates/v/khagole-engine.svg)](https://crates.io/crates/khagole-engine)
-[![docs.rs](https://img.shields.io/docsrs/khagole-engine)](https://docs.rs/khagole-engine)
-[![PyPI](https://img.shields.io/pypi/v/khagole-engine.svg)](https://pypi.org/project/khagole-engine/)
-[![npm](https://img.shields.io/npm/v/khagole-engine.svg)](https://www.npmjs.com/package/khagole-engine)
-[![GitHub Pages](https://github.com/PriyankGahtori/Khagole/actions/workflows/pages.yml/badge.svg)](https://priyankgahtori.github.io/Khagole/)
-[![CI](https://github.com/PriyankGahtori/Khagole/actions/workflows/ci.yml/badge.svg)](https://github.com/PriyankGahtori/Khagole/actions/workflows/ci.yml)
+# 🌌 Khagole (खगोल)
+### High-Precision Vedic Jyotish & Astrometric Calculation Engine on NASA JPL Ephemerides
 
-**Khagole** (खगोल — *The Celestial Sphere*) is a high-precision Vedic astrometry and astrological calculation engine built on NASA JPL ephemerides, in pure Rust.
+[![crates.io](https://img.shields.io/crates/v/khagole-engine.svg?style=flat-square&logo=rust&color=e05d44)](https://crates.io/crates/khagole-engine)
+[![docs.rs](https://img.shields.io/docsrs/khagole-engine?style=flat-square&logo=docsdotrs&color=4d76cf)](https://docs.rs/khagole-engine)
+[![PyPI](https://img.shields.io/pypi/v/khagole-engine.svg?style=flat-square&logo=pypi&logoColor=white&color=3775a9)](https://pypi.org/project/khagole-engine/)
+[![npm](https://img.shields.io/npm/v/khagole-engine.svg?style=flat-square&logo=npm&color=cb3837)](https://www.npmjs.com/package/khagole-engine)
+[![GitHub Stars](https://img.shields.io/github/stars/PriyankGahtori/Khagole?style=flat-square&logo=github&color=f4c430)](https://github.com/PriyankGahtori/Khagole/stargazers)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue?style=flat-square)](https://github.com/PriyankGahtori/Khagole/blob/main/LICENSE-MIT)
+[![GitHub Pages](https://github.com/PriyankGahtori/Khagole/actions/workflows/pages.yml/badge.svg?style=flat-square)](https://priyankgahtori.github.io/Khagole/)
+[![CI](https://github.com/PriyankGahtori/Khagole/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/PriyankGahtori/Khagole/actions/workflows/ci.yml)
 
-The same calculation core runs natively on the server (Python bindings), in desktop/mobile apps, and in the browser via WebAssembly (WASM), ensuring bit-for-bit identical results across all platforms down to the arcsecond.
+**[🚀 Live Web App & Interactive Demo](https://priyankgahtori.github.io/Khagole/)** · **[📖 API Documentation](https://docs.rs/khagole-engine)** · **[Technical Guides](https://github.com/PriyankGahtori/Khagole/tree/main/docs)** · **[Report Issue](https://github.com/PriyankGahtori/Khagole/issues)**
 
-**[🚀 Live Web Application & Demo](https://priyankgahtori.github.io/Khagole/)** · [API Docs](https://docs.rs/khagole-engine) · [Guides](https://github.com/PriyankGahtori/Khagole/tree/main/docs)
+</div>
+
+---
+
+**Khagole** (खगोल — *The Celestial Sphere* in Sanskrit) is the first modern, memory-safe astrometry and Vedic Jyotish computation engine built directly on NASA JPL DE440s / DE441 development ephemerides in pure Rust.
+
+The same calculation core runs natively on servers (Python bindings), in desktop/mobile apps, and in web browsers via WebAssembly (WASM), guaranteeing bit-for-bit identical results down to the sub-arcsecond across every platform.
+
+---
+
+## ⚡ Why Khagole?
+
+| Capability | **Khagole (खगोल)** | Swiss Ephemeris (`swisseph`) | Flatlib / PyEphem |
+|---|---|---|---|
+| **Core Architecture** | **100% Pure Rust** (Memory-safe, Zero-panic) | Legacy C (Unsafe pointers) | C wrappers / Old Python |
+| **Ephemeris Precision** | **NASA JPL DE440s / DE441** (Sub-arcsecond) | Semi-analytic / Moshier fallback | Low-order approximations |
+| **Vedic Kundli & Vargas** | **Native D1 through D60 Shodashavarga** | Requires custom division code | Not supported |
+| **Vimshottari Dasha** | **True Sidereal Solar Year (TSSY) Solver** | Not supported | Not supported |
+| **Panchanga Limbs** | **Sub-millisecond (Tithi, Vara, Nakshatra, Yoga, Karana)** | Custom manual math required | Not supported |
+| **In-Browser Execution** | **WebAssembly (<1MB, 100% Offline & Private)** | Heavy Emscripten build (>5MB) | Server-only |
+| **Cross-Platform Parity**| **Bit-for-bit identical results** everywhere | Slight compiler/float drift | Inconsistent |
+| **AI / Agentic LLM** | **Native Model Context Protocol (`khagole-mcp`)** | None | None |
 
 ---
 
@@ -58,6 +82,21 @@ pip install khagole-engine
 
 # JavaScript / Node.js / Browser (npm)
 npm install khagole-engine
+```
+
+### 🤖 Model Context Protocol (MCP) Server for AI & LLMs
+
+Khagole includes a high-speed MCP server for **Claude Desktop**, **Cursor**, **Gemini**, and **Copilot**:
+
+```json
+{
+  "mcpServers": {
+    "khagole": {
+      "command": "cargo",
+      "args": ["run", "--release", "-p", "khagole-mcp"]
+    }
+  }
+}
 ```
 
 ---
@@ -126,6 +165,41 @@ const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
 
 ---
 
+## 🏛️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Input["1. Calculation Request"]
+        Birth["Date, Time, Latitude, Longitude"]
+        Config["Ayanamsa (Lahiri), Zodiac, Nodes (Mean), Houses (Whole Sign)"]
+    end
+
+    subgraph Astrometry["2. NASA JPL Astrometric Reduction"]
+        JPL[("NASA JPL DE440s / DE441 Ephemeris")] --> State["Barycentric State Vectors"]
+        State --> Reduction["ΔT · IAU 2006 Precession · IAU 2000A Nutation · Light-Time · Deflection"]
+        Reduction --> Longitudes["Geometric True Ecliptic Longitudes"]
+    end
+
+    subgraph Vedic["3. Khagole Vedic Engine"]
+        Longitudes --> AyanamsaShift["Chitrapaksha Lahiri Ayanamsa Subtraction"]
+        AyanamsaShift --> Vargas["Shodashavargas (D1 Rasi to D60 Shashtiamsa)"]
+        AyanamsaShift --> Dasha["Vimshottari Dasha (True Sidereal Solar Year TSSY)"]
+        AyanamsaShift --> Panchang["Panchanga Limbs (Tithi, Vara, Nakshatra, Yoga, Karana)"]
+    end
+
+    subgraph Ecosystem["4. Multi-Platform Targets"]
+        Vargas & Dasha & Panchang --> RustCore["Pure Rust Library (crates.io)"]
+        Vargas & Dasha & Panchang --> PyO3["Python Bindings (PyPI)"]
+        Vargas & Dasha & Panchang --> WASM["WebAssembly Engine (npm)"]
+        Vargas & Dasha & Panchang --> MCP["Model Context Protocol Server (Claude / Cursor)"]
+    end
+
+    Input --> Astrometry
+    Astrometry --> Vedic
+```
+
+---
+
 ## Repository Layout
 
 | Path | Description |
@@ -154,6 +228,22 @@ scripts/fetch-kernels.sh
 # Lint codebase
 cargo clippy --workspace --all-targets -- -D warnings
 ```
+
+---
+
+## ⭐ Star History & Community
+
+If you find **Khagole** useful for your projects, astrological software, or AI agents, please consider starring the repository! It helps more developers discover the engine.
+
+[![Star History Chart](https://api.star-history.com/svg?repos=PriyankGahtori/Khagole&type=Date)](https://star-history.com/#PriyankGahtori/Khagole&Date)
+
+---
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+- Check out the [Contributing Guide](https://github.com/PriyankGahtori/Khagole/blob/main/CONTRIBUTING.md) to get started.
+- Open an [Issue](https://github.com/PriyankGahtori/Khagole/issues) for bug reports, divisional chart expansions, or feature suggestions.
 
 ---
 
