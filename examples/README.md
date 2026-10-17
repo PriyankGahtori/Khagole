@@ -20,6 +20,7 @@ All examples compute high-precision Vedic Jyotish horoscopes for renowned celebr
 | [**`nodejs/`**](./nodejs) | Node.js | `npm install khagole-engine` | Modern ES Module / Node.js WebAssembly bindings |
 | [**`web-cdn/`**](./web-cdn) | Browser (Zero-Build) | jsDelivr CDN (`<script type="module">`) | Pure HTML/JS browser webapp running client-side with zero build tools |
 | [**`rest-api/`**](./rest-api) | REST Microservice | FastAPI / Uvicorn | Microservice exposing JSON endpoints and interactive Swagger UI |
+| [**`mcp-server/`**](./mcp-server) | AI Agent Server | MCP (SSE / stdio) | Model Context Protocol server for Claude, Cursor, LangChain, & Cloud Agents |
 
 ---
 
@@ -98,3 +99,28 @@ uvicorn examples.rest-api.app:app --port 8000
 curl http://localhost:8000/api/celebrity/jobs
 ```
 Interactive Swagger documentation available at `http://localhost:8000/docs`.
+
+---
+
+## 6. Quick Start: Model Context Protocol (MCP) Server for AI Agents
+
+Host an MCP server for AI Agents (**Claude Desktop**, **Cursor**, **LangChain**, **CrewAI**, **AutoGen**):
+
+```bash
+cd examples/mcp-server
+pip install -r requirements.txt
+
+# Run as hosted SSE server for remote / cloud agents:
+python server.py --transport sse --port 8000
+
+# Or run in stdio mode for local desktop apps (Claude Desktop / Cursor):
+python server.py --transport stdio
+```
+
+Or deploy as a Docker container to Fly.io, Railway, or Google Cloud Run:
+```bash
+docker build -t khagole-mcp -f examples/mcp-server/Dockerfile .
+docker run -d -p 8000:8000 khagole-mcp
+```
+👉 See [**`examples/mcp-server/README.md`**](./mcp-server/README.md) for Claude Desktop and Cursor configuration guides.
+

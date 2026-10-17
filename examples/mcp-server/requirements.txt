@@ -1,0 +1,3 @@
+khagole-engine>=0.0.12
+mcp>=2.3.0
+uvicorn>=0.30.0
