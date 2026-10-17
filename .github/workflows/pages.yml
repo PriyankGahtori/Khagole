@@ -9,8 +9,8 @@ on:
     branches: [main, feat/vedic-ephemeris-modes]
     paths:
       - "site/**"
-      - "crates/astroceleste-engine/**"
-      - "crates/astroceleste-engine-wasm/**"
+      - "crates/khagole-engine/**"
+      - "crates/khagole-engine-wasm/**"
       - "scripts/build-site.sh"
       - ".github/workflows/pages.yml"
   workflow_dispatch:

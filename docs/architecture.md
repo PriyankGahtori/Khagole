@@ -4,14 +4,14 @@
 
 | Crate | Role | Published to |
 |---|---|---|
-| `crates/astroceleste-engine` | the core library: everything that computes | crates.io |
-| `crates/astroceleste-engine-py` | Python bindings (PyO3, built with maturin) | PyPI |
-| `crates/astroceleste-engine-wasm` | WebAssembly bindings (wasm-bindgen, built with wasm-pack) | npm |
+| `crates/khagole-engine` | the core library: everything that computes | crates.io |
+| `crates/khagole-engine-py` | Python bindings (PyO3, built with maturin) | PyPI |
+| `crates/khagole-engine-wasm` | WebAssembly bindings (wasm-bindgen, built with wasm-pack) | npm |
 
 The bindings are thin. They build a `KernelSet`, call the core entry points and pass results
 across as JSON (`serde_json` with `preserve_order` and `float_roundtrip`). Floats stay exact,
 and the shape a binding returns is the Rust `Serialize` output, which is also the JSON of the
-Astroceleste API. The one crate shares a single version with both packages.
+Khagole API. The one crate shares a single version with both packages.
 
 The core has only two dependencies (`serde`, `serde_json`), no C code and no
 platform-specific I/O, so it builds for servers, desktop, `wasm32-unknown-unknown`, Android

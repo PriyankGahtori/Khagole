@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-astroceleste-engine is experimental (0.0.x). Security fixes go into a new patch release of
+khagole-engine is experimental (0.0.x). Security fixes go into a new patch release of
 the latest version only; older releases are not patched. This applies to the Rust crate,
 the Python wheels and the npm package alike, which share one version number.
 
@@ -14,7 +14,7 @@ the Python wheels and the npm package alike, which share one version number.
 ## Reporting a vulnerability
 
 Please **do not open a public issue**. Report it privately through GitHub:
-[Report a vulnerability](https://github.com/ffalcinelli/astroceleste-engine/security/advisories/new)
+[Report a vulnerability](https://github.com/PriyankGahtori/Khagole/security/advisories/new)
 (repository *Security* tab → *Report a vulnerability*).
 
 Please include:

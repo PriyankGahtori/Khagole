@@ -1,5 +1,5 @@
-// Live demo: astroceleste-engine compiled to WebAssembly, computing Vedic Jyotish charts in the browser.
-import init, * as wasm from "./pkg/astroceleste_engine_wasm.js?v=2.4.0";
+// Live demo: Khagole Engine compiled to WebAssembly, computing Vedic Jyotish charts in the browser.
+import init, * as wasm from "./pkg/khagole_engine_wasm.js?v=2.4.0";
 import {
   renderNorthIndianChart,
   renderSouthIndianChart,

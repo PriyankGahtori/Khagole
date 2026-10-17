@@ -1,6 +1,6 @@
 # Degree qualities: transcription notes
 
-The table in `crates/astroceleste-engine/src/catalog/degree_qualities.rs` is transcribed from
+The table in `crates/khagole-engine/src/catalog/degree_qualities.rs` is transcribed from
 William Lilly, *Christian Astrology*, second edition (London, 1659), p. 116: "Two necessary
 Tables of the Signs, fit to be understood by every Astrologer, or Practitioner". The work is
 in the public domain. The scan used is on Wikimedia Commons:

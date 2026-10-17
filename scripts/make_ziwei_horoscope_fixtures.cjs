@@ -1,5 +1,5 @@
 // Zi Wei Dou Shu horoscopes from iztro (MIT, https://github.com/SylarLong/iztro), as
-// regression fixtures for astroceleste-engine: tests/fixtures/ziwei_iztro_horoscope.json.
+// regression fixtures for khagole-engine: tests/fixtures/ziwei_iztro_horoscope.json.
 //
 //   mkdir /tmp/iztro && cd /tmp/iztro && npm install --ignore-scripts iztro@2.6.1
 //   node path/to/scripts/make_ziwei_horoscope_fixtures.cjs > path/to/tests/fixtures/ziwei_iztro_horoscope.json

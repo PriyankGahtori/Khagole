@@ -1,5 +1,5 @@
 // Zi Wei Dou Shu charts from iztro (MIT, https://github.com/SylarLong/iztro), as regression
-// fixtures for astroceleste-engine: tests/fixtures/ziwei_iztro.json.
+// fixtures for khagole-engine: tests/fixtures/ziwei_iztro.json.
 //
 //   mkdir /tmp/iztro && cd /tmp/iztro && npm install --ignore-scripts iztro@2.6.1
 //   node path/to/scripts/make_ziwei_fixtures.cjs > path/to/tests/fixtures/ziwei_iztro.json

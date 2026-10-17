@@ -17,16 +17,16 @@ mkdir -p "$OUT/ephemeris"
 cp -R site/. "$OUT/"
 
 scripts/fetch-kernels.sh >/dev/null
-cargo run --release --quiet -p astroceleste-engine --example excerpt -- \
+cargo run --release --quiet -p khagole-engine --example excerpt -- \
   kernels/de440s.bsp "$OUT/ephemeris/de440s-1920-2070.bsp" "$START_JD" "$END_JD"
 
-wasm-pack build --release --target web --out-dir "$OUT/pkg" crates/astroceleste-engine-wasm
-# Also sync to crates/astroceleste-engine-wasm/pkg for local tests and adapter consumers
-mkdir -p crates/astroceleste-engine-wasm/pkg
-cp "$OUT/pkg"/astroceleste_engine_wasm_bg.wasm crates/astroceleste-engine-wasm/pkg/
-cp "$OUT/pkg"/astroceleste_engine_wasm.js crates/astroceleste-engine-wasm/pkg/
-cp "$OUT/pkg"/astroceleste_engine_wasm.d.ts crates/astroceleste-engine-wasm/pkg/
-cp "$OUT/pkg"/astroceleste_engine_wasm_bg.wasm.d.ts crates/astroceleste-engine-wasm/pkg/
+wasm-pack build --release --target web --out-dir "$OUT/pkg" crates/khagole-engine-wasm
+# Also sync to crates/khagole-engine-wasm/pkg for local tests and adapter consumers
+mkdir -p crates/khagole-engine-wasm/pkg
+cp "$OUT/pkg"/khagole_engine_wasm_bg.wasm crates/khagole-engine-wasm/pkg/
+cp "$OUT/pkg"/khagole_engine_wasm.js crates/khagole-engine-wasm/pkg/
+cp "$OUT/pkg"/khagole_engine_wasm.d.ts crates/khagole-engine-wasm/pkg/
+cp "$OUT/pkg"/khagole_engine_wasm_bg.wasm.d.ts crates/khagole-engine-wasm/pkg/
 # Only the module and its bindings are served.
 rm -f "$OUT/pkg/.gitignore" "$OUT/pkg/package.json" "$OUT/pkg/README.md" \
   "$OUT/pkg"/LICENSE-* "$OUT/pkg/NOTICE"

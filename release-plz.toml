@@ -9,11 +9,11 @@ dependencies_update = false
 # The bindings are released through PyPI and npm by release.yml, not crates.io; they
 # share the workspace version.
 [[package]]
-name = "astroceleste-engine-py"
+name = "khagole-engine-py"
 release = false
 publish = false
 
 [[package]]
-name = "astroceleste-engine-wasm"
+name = "khagole-engine-wasm"
 release = false
 publish = false

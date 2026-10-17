@@ -3,45 +3,6 @@
 version = 4
 
 [[package]]
-name = "astroceleste-engine"
-version = "0.0.12"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "astroceleste-engine-py"
-version = "0.0.12"
-dependencies = [
- "astroceleste-engine",
- "pyo3",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "astroceleste-engine-wasm"
-version = "0.0.12"
-dependencies = [
- "astroceleste-engine",
- "js-sys",
- "serde",
- "serde-wasm-bindgen",
- "serde_json",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "astroceleste-mcp"
-version = "0.0.12"
-dependencies = [
- "astroceleste-engine",
- "serde",
- "serde_json",
-]
-
-[[package]]
 name = "bumpalo"
 version = "3.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -120,6 +81,45 @@ dependencies = [
  "cfg-if",
  "futures-util",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "khagole-engine"
+version = "0.0.12"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "khagole-engine-py"
+version = "0.0.12"
+dependencies = [
+ "khagole-engine",
+ "pyo3",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "khagole-engine-wasm"
+version = "0.0.12"
+dependencies = [
+ "js-sys",
+ "khagole-engine",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "khagole-mcp"
+version = "0.0.12"
+dependencies = [
+ "khagole-engine",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

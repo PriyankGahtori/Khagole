@@ -1,7 +1,7 @@
 # API guide
 
 The engine has the same entry points in every language. Requests and results have the
-same shape everywhere: results serialize to the JSON of the Astroceleste API, with
+same shape everywhere: results serialize to the JSON of the Khagole API, with
 snake_case keys.
 
 | Rust | Python | JavaScript |
@@ -49,8 +49,8 @@ in range is an `invalid_input` error. Koch falls back to Porphyry inside the pol
 where it is undefined. Morinus cusps 1 and 10 are not the Ascendant and Midheaven. Zodiac types other than `sidereal` are tropical.
 
 ```rust
-use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
-use astroceleste_engine::{calculate_chart, ChartRequest, UtcInstant};
+use khagole_engine::ephemeris::{Kernel, KernelSet, Spk};
+use khagole_engine::{calculate_chart, ChartRequest, UtcInstant};
 
 let mut kernels = KernelSet::new();
 kernels.push(Kernel::new("de440s.bsp", Spk::open("kernels/de440s.bsp")?)?);
@@ -63,7 +63,7 @@ let chart = calculate_chart(&kernels, &request)?;
 ```
 
 ```python
-import astroceleste_engine as ace
+import khagole_engine as ace
 
 engine = ace.Engine(["kernels/de440s.bsp"])
 chart = engine.chart("1987-05-17T14:30:00Z", 41.9, 12.5,
@@ -192,8 +192,8 @@ Longitudes are apparent geocentric ecliptic longitudes of date, in degrees (side
 subtract the ayanamsa). In Rust, the fields are typed: see [`Chart`] and [`Placement`] on
 docs.rs.
 
-[`Chart`]: https://docs.rs/astroceleste-engine/latest/astroceleste_engine/struct.Chart.html
-[`Placement`]: https://docs.rs/astroceleste-engine/latest/astroceleste_engine/struct.Placement.html
+[`Chart`]: https://docs.rs/khagole-engine/latest/khagole_engine/struct.Chart.html
+[`Placement`]: https://docs.rs/khagole-engine/latest/khagole_engine/struct.Placement.html
 
 ## Other entry points
 
@@ -356,7 +356,7 @@ the end of the previous run up to and including its `end` degree, and `pitted`, 
 
 ## Errors
 
-Each failure has a stable code, shared with the Astroceleste HTTP API:
+Each failure has a stable code, shared with the Khagole HTTP API:
 
 | Code | Cause | Rust | Python | JavaScript |
 |---|---|---|---|---|

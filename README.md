@@ -1,17 +1,17 @@
-# astroceleste-engine
+# Khagole
 
-[![crates.io](https://img.shields.io/crates/v/astroceleste-engine.svg)](https://crates.io/crates/astroceleste-engine)
-[![docs.rs](https://img.shields.io/docsrs/astroceleste-engine)](https://docs.rs/astroceleste-engine)
-[![PyPI](https://img.shields.io/pypi/v/astroceleste-engine.svg)](https://pypi.org/project/astroceleste-engine/)
-[![npm](https://img.shields.io/npm/v/astroceleste-engine.svg)](https://www.npmjs.com/package/astroceleste-engine)
-[![GitHub Pages](https://github.com/PriyankGahtori/astroceleste-engine/actions/workflows/pages.yml/badge.svg)](https://priyankgahtori.github.io/astroceleste-engine/)
-[![CI](https://github.com/PriyankGahtori/astroceleste-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/PriyankGahtori/astroceleste-engine/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/khagole-engine.svg)](https://crates.io/crates/khagole-engine)
+[![docs.rs](https://img.shields.io/docsrs/khagole-engine)](https://docs.rs/khagole-engine)
+[![PyPI](https://img.shields.io/pypi/v/khagole-engine.svg)](https://pypi.org/project/khagole-engine/)
+[![npm](https://img.shields.io/npm/v/khagole-engine.svg)](https://www.npmjs.com/package/khagole-engine)
+[![GitHub Pages](https://github.com/PriyankGahtori/Khagole/actions/workflows/pages.yml/badge.svg)](https://priyankgahtori.github.io/Khagole/)
+[![CI](https://github.com/PriyankGahtori/Khagole/actions/workflows/ci.yml/badge.svg)](https://github.com/PriyankGahtori/Khagole/actions/workflows/ci.yml)
 
-High-precision astrological and astronomical calculation engine built on NASA JPL ephemerides, in pure Rust.
+**Khagole** (खगोल — *The Celestial Sphere*) is a high-precision Vedic astrometry and astrological calculation engine built on NASA JPL ephemerides, in pure Rust.
 
 The same calculation core runs natively on the server (Python bindings), in desktop/mobile apps, and in the browser via WebAssembly (WASM), ensuring bit-for-bit identical results across all platforms down to the arcsecond.
 
-**[🚀 Live Web Application & Demo](https://priyankgahtori.github.io/astroceleste-engine/)** · [API Docs](https://docs.rs/astroceleste-engine) · [Guides](https://github.com/PriyankGahtori/astroceleste-engine/tree/main/docs)
+**[🚀 Live Web Application & Demo](https://priyankgahtori.github.io/Khagole/)** · [API Docs](https://docs.rs/khagole-engine) · [Guides](https://github.com/PriyankGahtori/Khagole/tree/main/docs)
 
 ---
 
@@ -48,8 +48,8 @@ The same calculation core runs natively on the server (Python bindings), in desk
 ## Rust Usage
 
 ```rust
-use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
-use astroceleste_engine::{calculate_chart, ChartRequest, UtcInstant};
+use khagole_engine::ephemeris::{Kernel, KernelSet, Spk};
+use khagole_engine::{calculate_chart, ChartRequest, UtcInstant};
 
 let mut kernels = KernelSet::new();
 kernels.push(Kernel::new("de440s.bsp", Spk::open("kernels/de440s.bsp")?)?);
@@ -62,7 +62,7 @@ println!("{}", serde_json::to_string_pretty(&chart)?);
 ### Vedic Chart Calculation (WASM / Browser)
 
 ```javascript
-import init, { Engine, calcDivisional, calcPanchang, calcVimshottariDasha, julianDay } from "astroceleste-engine";
+import init, { Engine, calcDivisional, calcPanchang, calcVimshottariDasha, julianDay } from "khagole-engine";
 
 await init();
 const engine = new Engine();
@@ -93,18 +93,18 @@ const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
 
 ## Language Bindings
 
-- **Python** (`pip install astroceleste-engine`, CPython ≥ 3.12): Fast PyO3 bindings with `.chart()`, `.horary()`, `.transit()`, `.election()`, `.chinese_calendar()`, `.bazi()`, and `.zi_wei()`. See [crates/astroceleste-engine-py](https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-py).
-- **JavaScript / WebAssembly** (`npm install astroceleste-engine`): In-browser and Node.js execution with zero network latency. See [crates/astroceleste-engine-wasm](https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-wasm).
+- **Python** (`pip install khagole-engine`, CPython ≥ 3.12): Fast PyO3 bindings with `.chart()`, `.horary()`, `.transit()`, `.election()`, `.chinese_calendar()`, `.bazi()`, and `.zi_wei()`. See [crates/khagole-engine-py](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-py).
+- **JavaScript / WebAssembly** (`npm install khagole-engine`): In-browser and Node.js execution with zero network latency. See [crates/khagole-engine-wasm](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-wasm).
 
 ---
 
 ## Documentation
 
-- [API Reference on docs.rs](https://docs.rs/astroceleste-engine)
-- [API Guide](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/api.md): Request parameters, options, chart JSON schema, and error codes
-- [Ephemerides Guide](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/ephemerides.md): SPK kernels, date spans, in-memory excerpts
-- [Accuracy Verification](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/accuracy.md): Stage-by-stage verification against JPL, Skyfield, and Swiss Ephemeris
-- [Architecture](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/architecture.md): Core engine and pipeline layout
+- [API Reference on docs.rs](https://docs.rs/khagole-engine)
+- [API Guide](https://github.com/PriyankGahtori/Khagole/blob/main/docs/api.md): Request parameters, options, chart JSON schema, and error codes
+- [Ephemerides Guide](https://github.com/PriyankGahtori/Khagole/blob/main/docs/ephemerides.md): SPK kernels, date spans, in-memory excerpts
+- [Accuracy Verification](https://github.com/PriyankGahtori/Khagole/blob/main/docs/accuracy.md): Stage-by-stage verification against JPL, Skyfield, and Swiss Ephemeris
+- [Architecture](https://github.com/PriyankGahtori/Khagole/blob/main/docs/architecture.md): Core engine and pipeline layout
 
 ---
 
@@ -112,9 +112,10 @@ const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
 
 | Path | Description |
 |---|---|
-| `crates/astroceleste-engine` | Core Rust calculation library |
-| `crates/astroceleste-engine-py` | Python bindings (PyO3 & maturin) |
-| `crates/astroceleste-engine-wasm` | WebAssembly bindings (wasm-bindgen & wasm-pack) |
+| `crates/khagole-engine` | Core Rust calculation library |
+| `crates/khagole-engine-py` | Python bindings (PyO3 & maturin) |
+| `crates/khagole-engine-wasm` | WebAssembly bindings (wasm-bindgen & wasm-pack) |
+| `crates/khagole-mcp` | Model Context Protocol (MCP) server |
 | `site/` | Modern client-side web application deployed to GitHub Pages |
 | `tests/fixtures/*.json` | Acceptance test golden charts |
 | `tests/data/de440s_2000.bsp` | One-year DE440s excerpt for automated test suites |
@@ -127,7 +128,7 @@ const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
 
 ```bash
 # Run test suite using the committed excerpt
-cargo test --workspace --exclude astroceleste-engine-py
+cargo test --workspace --exclude khagole-engine-py
 
 # Download full DE440s (1849–2150) to run full-range ephemeris verification tests
 scripts/fetch-kernels.sh
@@ -141,7 +142,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 ## License & Attribution
 
 Dual-licensed under either:
-- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/LICENSE-APACHE))
-- MIT License ([LICENSE-MIT](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/LICENSE-MIT))
+- Apache License, Version 2.0 ([LICENSE-APACHE](https://github.com/PriyankGahtori/Khagole/blob/main/LICENSE-APACHE))
+- MIT License ([LICENSE-MIT](https://github.com/PriyankGahtori/Khagole/blob/main/LICENSE-MIT))
 
-Astronomical reduction routines (ΔT, IAU 2000A nutation, IAU 2006 precession, aberration, and deflection) are ported from [Skyfield](https://github.com/skyfielders/python-skyfield) by Brandon Rhodes (MIT License). See [NOTICE](https://github.com/PriyankGahtori/astroceleste-engine/blob/main/NOTICE).
+Astronomical reduction routines (ΔT, IAU 2000A nutation, IAU 2006 precession, aberration, and deflection) are ported from [Skyfield](https://github.com/skyfielders/python-skyfield) by Brandon Rhodes (MIT License). See [NOTICE](https://github.com/PriyankGahtori/Khagole/blob/main/NOTICE).

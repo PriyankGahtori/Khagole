@@ -24,7 +24,7 @@ import skyfield
 from skyfield.api import load
 from skyfield.functions import load_bundled_npy
 
-CRATE = Path(__file__).resolve().parents[1] / "crates" / "astroceleste-engine" / "src"
+CRATE = Path(__file__).resolve().parents[1] / "crates" / "khagole-engine" / "src"
 
 
 def write_deltat() -> None:

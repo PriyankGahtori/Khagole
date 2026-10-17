@@ -1,0 +1,26 @@
+[package]
+name = "khagole-engine"
+description = "High-precision Vedic Jyotish & Astrometric calculation engine on JPL ephemerides"
+keywords = ["vedic", "jyotish", "astrology", "ephemeris", "astronomy"]
+categories = ["science"]
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/khagole-engine"
+readme = "../../README.md"
+# Tests read fixtures and kernels from the repository root: ship only the library.
+include = ["src/**/*.rs", "src/**/*.bin", "LICENSE-*", "NOTICE"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
+
+[dev-dependencies]
+
+[lints.rust]
+missing_docs = "warn"
+
+[lints.rustdoc]
+broken_intra_doc_links = "warn"

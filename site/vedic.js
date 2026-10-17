@@ -1,4 +1,4 @@
-// Vedic Astrology (Jyotish) module for astroceleste-engine.
+// Vedic Astrology (Jyotish) module for Khagole.
 // Implements D1 (Rasi) & D9 (Navamsha) SVG chart renderers (North & South Indian),
 // Planetary info table with Nakshatras & Padas, Panchanga display, and Vimshottari Dasha tree.
 

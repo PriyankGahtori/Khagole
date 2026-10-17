@@ -1,6 +1,6 @@
 # Essential dignities: tables and rules
 
-`crates/astroceleste-engine/src/dignities.rs` gives each of the seven planets a `condition`
+`crates/khagole-engine/src/dignities.rs` gives each of the seven planets a `condition`
 and each chart its `sect`, `receptions` and `antiscia`. These are additions to the
 reference implementation, so the golden fixtures do not cover them; `tests/dignities.rs` and
 the module's unit tests do. All tables are public domain.

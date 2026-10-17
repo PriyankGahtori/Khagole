@@ -156,6 +156,6 @@ version is 0.0.x the API is experimental and any release may break it.
 
 ### Added
 
-- Initial experimental release: the complete Astroceleste chart pipeline on JPL SPK
+- Initial experimental release: the complete Khagole chart pipeline on JPL SPK
   kernels (natal, horary, transit, synastry and derived charts), with Python and
   WebAssembly bindings.

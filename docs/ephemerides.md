@@ -27,7 +27,7 @@ kernel that covers it. A kernel's coverage is the span that *all* of its segment
 because a chart needs every body.
 
 ```rust
-use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
+use khagole_engine::ephemeris::{Kernel, KernelSet, Spk};
 
 let mut kernels = KernelSet::new();
 kernels.push(Kernel::new("de440s.bsp", Spk::open("kernels/de440s.bsp")?)?);    // preferred
@@ -73,7 +73,7 @@ Kernel data is dense floating point and barely compresses (gzip saves about 5%).
 From a checkout (dates are TDB Julian days):
 
 ```bash
-cargo run --release -p astroceleste-engine --example excerpt -- \
+cargo run --release -p khagole-engine --example excerpt -- \
     kernels/de440s.bsp de440s-1950-2050.bsp 2433282.5 2469807.5
 ```
 
@@ -81,16 +81,16 @@ In code, `Spk::excerpt(start_jd, end_jd)` returns the bytes of a new kernel, and
 bindings expose it:
 
 ```js
-import { excerptKernel } from "astroceleste-engine";
+import { excerptKernel } from "khagole-engine";
 const small = excerptKernel(fullKernelBytes, 2433282.5, 2469807.5); // 1950-2050
 ```
 
 ```python
-import astroceleste_engine as ace
+import khagole_engine as ace
 Path("de440s-1950-2050.bsp").write_bytes(ace.excerpt_kernel("kernels/de440s.bsp", 2433282.5, 2469807.5))
 ```
 
-The [live demo](https://priyankgahtori.github.io/astroceleste-engine/) runs on the 1950–2050
+The [live demo](https://priyankgahtori.github.io/Khagole/) runs on the 1950–2050
 excerpt.
 
 ## Time scales

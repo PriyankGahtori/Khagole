@@ -80,7 +80,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       # The Python extension is built and tested by maturin in the python job.
-      - run: cargo test --workspace --exclude astroceleste-engine-py
+      - run: cargo test --workspace --exclude khagole-engine-py
 
   full-kernel:
     # The committed excerpt covers one year; this runs the full-range and golden tests.
@@ -101,7 +101,7 @@ jobs:
           path: kernels
           key: jpl-kernels-de440s
       - run: scripts/fetch-kernels.sh
-      - run: cargo test --workspace --exclude astroceleste-engine-py --release
+      - run: cargo test --workspace --exclude khagole-engine-py --release
 
   targets:
     # Web (WASM) and mobile targets must keep compiling: the apps depend on them.
@@ -124,11 +124,11 @@ jobs:
           key: ${{ matrix.target }}
       - name: build
         if: matrix.target == 'wasm32-unknown-unknown'
-        run: cargo build -p astroceleste-engine -p astroceleste-engine-wasm --lib --target ${{ matrix.target }}
+        run: cargo build -p khagole-engine -p khagole-engine-wasm --lib --target ${{ matrix.target }}
       - name: check
         # Linking for mobile needs the NDK / Xcode; type-checking is what can break here.
         if: matrix.target != 'wasm32-unknown-unknown'
-        run: cargo check -p astroceleste-engine --lib --target ${{ matrix.target }}
+        run: cargo check -p khagole-engine --lib --target ${{ matrix.target }}
 
   package:
     # Builds the crate from its packaged tarball, as crates.io will, so a file missing from
@@ -142,10 +142,10 @@ jobs:
         with:
           toolchain: stable
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-      - run: cargo package -p astroceleste-engine
+      - run: cargo package -p khagole-engine
       - name: package size (crates.io limit is 10 MB)
         run: |
-          size=$(stat -c %s target/package/astroceleste-engine-*.crate)
+          size=$(stat -c %s target/package/khagole-engine-*.crate)
           echo "packaged crate: $size bytes"
           test "$size" -lt 10000000
 
@@ -174,10 +174,10 @@ jobs:
         run: |
           python -m venv .venv
           .venv/bin/pip install maturin==1.15.0 pytest
-          .venv/bin/maturin build --release -m crates/astroceleste-engine-py/Cargo.toml -o dist
-          .venv/bin/maturin sdist -m crates/astroceleste-engine-py/Cargo.toml -o sdist
+          .venv/bin/maturin build --release -m crates/khagole-engine-py/Cargo.toml -o dist
+          .venv/bin/maturin sdist -m crates/khagole-engine-py/Cargo.toml -o sdist
           .venv/bin/pip install dist/*.whl
-          .venv/bin/pytest -q crates/astroceleste-engine-py/tests
+          .venv/bin/pytest -q crates/khagole-engine-py/tests
 
   wasm:
     name: wasm bindings
@@ -204,12 +204,12 @@ jobs:
           key: jpl-kernels-de440s
       - run: scripts/fetch-kernels.sh
       - run: npm install --global wasm-pack@0.15.0
-      - run: wasm-pack build --release --target nodejs --out-dir pkg-node crates/astroceleste-engine-wasm
-      - run: node crates/astroceleste-engine-wasm/tests/golden.mjs
+      - run: wasm-pack build --release --target nodejs --out-dir pkg-node crates/khagole-engine-wasm
+      - run: node crates/khagole-engine-wasm/tests/golden.mjs
       - name: build and smoke-test the web package (the one published to npm)
         run: |
-          wasm-pack build --release --target web crates/astroceleste-engine-wasm
-          node crates/astroceleste-engine-wasm/tests/web_smoke.mjs
+          wasm-pack build --release --target web crates/khagole-engine-wasm
+          node crates/khagole-engine-wasm/tests/web_smoke.mjs
 
   deny:
     runs-on: ubuntu-latest

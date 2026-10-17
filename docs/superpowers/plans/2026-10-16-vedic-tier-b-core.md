@@ -2,13 +2,13 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Port Tier B Vedic astrological calculations (27 Nakshatras, Divisional charts D1–D60, Vimshottari Dasha, and Panchanga) natively into Rust within `astroceleste-engine`, exposing them to WebAssembly and the native MCP server.
+**Goal:** Port Tier B Vedic astrological calculations (27 Nakshatras, Divisional charts D1–D60, Vimshottari Dasha, and Panchanga) natively into Rust within `khagole-engine`, exposing them to WebAssembly and the native MCP server.
 
-**Architecture:** Implement a modular `vedic` subsystem inside `crates/astroceleste-engine/src/vedic/` that is pure Rust, `no_std`-ready (using standard math and serde), with zero external C dependencies. Expose these calculations as idiomatic Rust APIs, export them through `crates/astroceleste-engine-wasm` for web/mobile/Hora Prakash consumption, and register them as JSON-RPC tools in `crates/astroceleste-mcp`.
+**Architecture:** Implement a modular `vedic` subsystem inside `crates/khagole-engine/src/vedic/` that is pure Rust, `no_std`-ready (using standard math and serde), with zero external C dependencies. Expose these calculations as idiomatic Rust APIs, export them through `crates/khagole-engine-wasm` for web/mobile/Hora Prakash consumption, and register them as JSON-RPC tools in `crates/khagole-mcp`.
 
 **Tech Stack:** Rust (2021 edition), `serde`, `serde_json`, `wasm-bindgen`, `wasm-pack`, JSON-RPC 2.0 stdio MCP.
 
-**Spec:** Port of `hora-prakash/src/core/{calculations.ts, divisional.ts, dasha.ts, panchang.ts}` into `astroceleste-engine`.
+**Spec:** Port of `hora-prakash/src/core/{calculations.ts, divisional.ts, dasha.ts, panchang.ts}` into `khagole-engine`.
 
 ## Global Constraints
 
@@ -30,10 +30,10 @@
 ### Task 1: Vedic Nakshatras Subsystem
 
 **Files:**
-- Create: `crates/astroceleste-engine/src/vedic/nakshatra.rs`
-- Create: `crates/astroceleste-engine/src/vedic/mod.rs`
-- Modify: `crates/astroceleste-engine/src/lib.rs`
-- Test: `crates/astroceleste-engine/src/vedic/nakshatra.rs` (inline test module)
+- Create: `crates/khagole-engine/src/vedic/nakshatra.rs`
+- Create: `crates/khagole-engine/src/vedic/mod.rs`
+- Modify: `crates/khagole-engine/src/lib.rs`
+- Test: `crates/khagole-engine/src/vedic/nakshatra.rs` (inline test module)
 
 **Interfaces:**
 - Produces:
@@ -49,7 +49,7 @@
 
 - [ ] **Step 1: Write the failing test for nakshatra calculation**
 
-In `crates/astroceleste-engine/src/vedic/nakshatra.rs`:
+In `crates/khagole-engine/src/vedic/nakshatra.rs`:
 ```rust
 #[cfg(test)]
 mod tests {
@@ -79,7 +79,7 @@ mod tests {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cargo test --package astroceleste-engine vedic::nakshatra`
+Run: `cargo test --package khagole-engine vedic::nakshatra`
 Expected: FAIL with "cannot find module or file"
 
 - [ ] **Step 3: Implement `nakshatra.rs` and connect to `vedic/mod.rs` & `lib.rs`**
@@ -91,13 +91,13 @@ Implement:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `cargo test --package astroceleste-engine vedic::nakshatra`
+Run: `cargo test --package khagole-engine vedic::nakshatra`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/astroceleste-engine/src/vedic
+git add crates/khagole-engine/src/vedic
 git commit -m "feat(vedic): implement 27 nakshatras, lords, and pada calculations"
 ```
 
@@ -106,9 +106,9 @@ git commit -m "feat(vedic): implement 27 nakshatras, lords, and pada calculation
 ### Task 2: Divisional Charts Engine (D1 to D60)
 
 **Files:**
-- Create: `crates/astroceleste-engine/src/vedic/divisional.rs`
-- Modify: `crates/astroceleste-engine/src/vedic/mod.rs`
-- Test: `crates/astroceleste-engine/src/vedic/divisional.rs` (inline test module)
+- Create: `crates/khagole-engine/src/vedic/divisional.rs`
+- Modify: `crates/khagole-engine/src/vedic/mod.rs`
+- Test: `crates/khagole-engine/src/vedic/divisional.rs` (inline test module)
 
 **Interfaces:**
 - Consumes: `nakshatra_info` from Task 1.
@@ -174,7 +174,7 @@ fn test_divisional_d30() {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cargo test --package astroceleste-engine vedic::divisional`
+Run: `cargo test --package khagole-engine vedic::divisional`
 Expected: FAIL with "cannot find function `calc_divisional_point`"
 
 - [ ] **Step 3: Implement `divisional.rs`**
@@ -186,13 +186,13 @@ Implement:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `cargo test --package astroceleste-engine vedic::divisional`
+Run: `cargo test --package khagole-engine vedic::divisional`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/astroceleste-engine/src/vedic/divisional.rs crates/astroceleste-engine/src/vedic/mod.rs
+git add crates/khagole-engine/src/vedic/divisional.rs crates/khagole-engine/src/vedic/mod.rs
 git commit -m "feat(vedic): implement D1 to D60 divisional chart calculations"
 ```
 
@@ -201,9 +201,9 @@ git commit -m "feat(vedic): implement D1 to D60 divisional chart calculations"
 ### Task 3: Vimshottari Dasha Engine
 
 **Files:**
-- Create: `crates/astroceleste-engine/src/vedic/dasha.rs`
-- Modify: `crates/astroceleste-engine/src/vedic/mod.rs`
-- Test: `crates/astroceleste-engine/src/vedic/dasha.rs` (inline test module)
+- Create: `crates/khagole-engine/src/vedic/dasha.rs`
+- Modify: `crates/khagole-engine/src/vedic/mod.rs`
+- Test: `crates/khagole-engine/src/vedic/dasha.rs` (inline test module)
 
 **Interfaces:**
 - Consumes: `nakshatra_info` from Task 1.
@@ -242,7 +242,7 @@ git commit -m "feat(vedic): implement D1 to D60 divisional chart calculations"
 
 - [ ] **Step 1: Write the failing test for Vimshottari dasha**
 
-In `crates/astroceleste-engine/src/vedic/dasha.rs`:
+In `crates/khagole-engine/src/vedic/dasha.rs`:
 ```rust
 #[test]
 fn test_vimshottari_dasha_structure() {
@@ -273,7 +273,7 @@ fn test_vimshottari_dasha_structure() {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cargo test --package astroceleste-engine vedic::dasha`
+Run: `cargo test --package khagole-engine vedic::dasha`
 Expected: FAIL with "cannot find function `calc_vimshottari_dasha`"
 
 - [ ] **Step 3: Implement `dasha.rs`**
@@ -291,13 +291,13 @@ Implement:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `cargo test --package astroceleste-engine vedic::dasha`
+Run: `cargo test --package khagole-engine vedic::dasha`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/astroceleste-engine/src/vedic/dasha.rs crates/astroceleste-engine/src/vedic/mod.rs
+git add crates/khagole-engine/src/vedic/dasha.rs crates/khagole-engine/src/vedic/mod.rs
 git commit -m "feat(vedic): implement Vimshottari dasha calculation with configurable depths and year standards"
 ```
 
@@ -306,9 +306,9 @@ git commit -m "feat(vedic): implement Vimshottari dasha calculation with configu
 ### Task 4: Panchanga Calculations Engine
 
 **Files:**
-- Create: `crates/astroceleste-engine/src/vedic/panchang.rs`
-- Modify: `crates/astroceleste-engine/src/vedic/mod.rs`
-- Test: `crates/astroceleste-engine/src/vedic/panchang.rs` (inline test module)
+- Create: `crates/khagole-engine/src/vedic/panchang.rs`
+- Modify: `crates/khagole-engine/src/vedic/mod.rs`
+- Test: `crates/khagole-engine/src/vedic/panchang.rs` (inline test module)
 
 **Interfaces:**
 - Consumes: `nakshatra_info` from Task 1.
@@ -372,7 +372,7 @@ git commit -m "feat(vedic): implement Vimshottari dasha calculation with configu
 
 - [ ] **Step 1: Write the failing test for Panchang**
 
-In `crates/astroceleste-engine/src/vedic/panchang.rs`:
+In `crates/khagole-engine/src/vedic/panchang.rs`:
 ```rust
 #[test]
 fn test_panchang_limbs() {
@@ -388,7 +388,7 @@ fn test_panchang_limbs() {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cargo test --package astroceleste-engine vedic::panchang`
+Run: `cargo test --package khagole-engine vedic::panchang`
 Expected: FAIL with "cannot find function `calc_panchang`"
 
 - [ ] **Step 3: Implement `panchang.rs`**
@@ -401,13 +401,13 @@ Implement:
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `cargo test --package astroceleste-engine vedic::panchang`
+Run: `cargo test --package khagole-engine vedic::panchang`
 Expected: PASS
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add crates/astroceleste-engine/src/vedic/panchang.rs crates/astroceleste-engine/src/vedic/mod.rs
+git add crates/khagole-engine/src/vedic/panchang.rs crates/khagole-engine/src/vedic/mod.rs
 git commit -m "feat(vedic): implement five Panchanga angas and Samvatsara cycle"
 ```
 
@@ -416,12 +416,12 @@ git commit -m "feat(vedic): implement five Panchanga angas and Samvatsara cycle"
 ### Task 5: Integration Tests & Golden Validation in Core Engine
 
 **Files:**
-- Create: `crates/astroceleste-engine/tests/vedic_tier_b.rs`
-- Modify: `crates/astroceleste-engine/src/lib.rs`
+- Create: `crates/khagole-engine/tests/vedic_tier_b.rs`
+- Modify: `crates/khagole-engine/src/lib.rs`
 
 - [ ] **Step 1: Write the integration test suite**
 
-In `crates/astroceleste-engine/tests/vedic_tier_b.rs`:
+In `crates/khagole-engine/tests/vedic_tier_b.rs`:
 - Load Narendra Modi chart (1950-09-17 04:04:00 UTC) with Lahiri ayanamsa.
 - Test Navamsha (D9) positions for all 9 planets and Lagna against reference ephemeris fixture values.
 - Test Vimshottari dasha starting balance (Saturn Mahadasha at birth).
@@ -429,13 +429,13 @@ In `crates/astroceleste-engine/tests/vedic_tier_b.rs`:
 
 - [ ] **Step 2: Run integration tests to verify they pass**
 
-Run: `cargo test --package astroceleste-engine --test vedic_tier_b`
+Run: `cargo test --package khagole-engine --test vedic_tier_b`
 Expected: PASS
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git add crates/astroceleste-engine/tests/vedic_tier_b.rs crates/astroceleste-engine/src/lib.rs
+git add crates/khagole-engine/tests/vedic_tier_b.rs crates/khagole-engine/src/lib.rs
 git commit -m "test(vedic): add comprehensive golden tests for Tier B calculations"
 ```
 
@@ -444,9 +444,9 @@ git commit -m "test(vedic): add comprehensive golden tests for Tier B calculatio
 ### Task 6: WebAssembly Bindings for Tier B Calculations
 
 **Files:**
-- Modify: `crates/astroceleste-engine-wasm/src/lib.rs`
-- Modify: `crates/astroceleste-engine-wasm/Cargo.toml`
-- Test: `crates/astroceleste-engine-wasm/tests/web_smoke.mjs`
+- Modify: `crates/khagole-engine-wasm/src/lib.rs`
+- Modify: `crates/khagole-engine-wasm/Cargo.toml`
+- Test: `crates/khagole-engine-wasm/tests/web_smoke.mjs`
 
 **Interfaces:**
 - Exposes on `Engine`:
@@ -454,21 +454,21 @@ git commit -m "test(vedic): add comprehensive golden tests for Tier B calculatio
   - `calc_vimshottari_dasha(moon_lon: f64, birth_jd: f64, depth: Option<u32>, year_type: Option<String>) -> Result<JsValue, JsValue>`
   - `calc_panchang(sun_lon: f64, moon_lon: f64, jd: f64, weekday: Option<u8>) -> Result<JsValue, JsValue>`
 
-- [ ] **Step 1: Add methods to `Engine` in `crates/astroceleste-engine-wasm/src/lib.rs`**
+- [ ] **Step 1: Add methods to `Engine` in `crates/khagole-engine-wasm/src/lib.rs`**
 - [ ] **Step 2: Build WASM package using `wasm-pack`**
 
-Run: `wasm-pack build crates/astroceleste-engine-wasm --target web`
+Run: `wasm-pack build crates/khagole-engine-wasm --target web`
 Expected: SUCCESS
 
 - [ ] **Step 3: Add WASM test verifying Tier B methods in `tests/web_smoke.mjs`**
 
-Run: `node crates/astroceleste-engine-wasm/tests/web_smoke.mjs`
+Run: `node crates/khagole-engine-wasm/tests/web_smoke.mjs`
 Expected: PASS
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/astroceleste-engine-wasm
+git add crates/khagole-engine-wasm
 git commit -m "feat(wasm): export calc_divisional, calc_vimshottari_dasha, and calc_panchang in WASM"
 ```
 
@@ -477,7 +477,7 @@ git commit -m "feat(wasm): export calc_divisional, calc_vimshottari_dasha, and c
 ### Task 7: MCP Server Tools for Vedic Calculations
 
 **Files:**
-- Modify: `crates/astroceleste-mcp/src/main.rs`
+- Modify: `crates/khagole-mcp/src/main.rs`
 - Test: Integration test over stdio
 
 **Interfaces:**
@@ -486,10 +486,10 @@ git commit -m "feat(wasm): export calc_divisional, calc_vimshottari_dasha, and c
   - `calculate_vimshottari_dasha`
   - `calculate_panchanga`
 
-- [ ] **Step 1: Implement tool declarations and handlers in `crates/astroceleste-mcp/src/main.rs`**
-- [ ] **Step 2: Run `cargo check` and `cargo test` on `astroceleste-mcp`**
+- [ ] **Step 1: Implement tool declarations and handlers in `crates/khagole-mcp/src/main.rs`**
+- [ ] **Step 2: Run `cargo check` and `cargo test` on `khagole-mcp`**
 
-Run: `cargo test --package astroceleste-mcp`
+Run: `cargo test --package khagole-mcp`
 Expected: PASS
 
 - [ ] **Step 3: Test MCP stdio tool calling with JSON-RPC payload**
@@ -500,6 +500,6 @@ Expected: Valid JSON results with status 200.
 - [ ] **Step 4: Commit**
 
 ```bash
-git add crates/astroceleste-mcp/src/main.rs
+git add crates/khagole-mcp/src/main.rs
 git commit -m "feat(mcp): add calculate_divisional_chart, calculate_vimshottari_dasha, and calculate_panchanga tools"
 ```

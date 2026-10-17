@@ -1,4 +1,4 @@
-# astroceleste-engine documentation
+# khagole-engine documentation
 
 - **[API guide](api.md)**: requests, options (house systems, zodiacs, ayanamsas, orbs),
   the result shape and error codes, for Rust, Python and JavaScript.
@@ -15,9 +15,9 @@
 
 Elsewhere:
 
-- Rust API reference: [docs.rs/astroceleste-engine](https://docs.rs/astroceleste-engine)
-- Python bindings: [crates/astroceleste-engine-py](../crates/astroceleste-engine-py)
-- WebAssembly bindings: [crates/astroceleste-engine-wasm](../crates/astroceleste-engine-wasm)
-- Website and live demo: [priyankgahtori.github.io/astroceleste-engine](https://priyankgahtori.github.io/astroceleste-engine/)
+- Rust API reference: [docs.rs/khagole-engine](https://docs.rs/khagole-engine)
+- Python bindings: [crates/khagole-engine-py](../crates/khagole-engine-py)
+- WebAssembly bindings: [crates/khagole-engine-wasm](../crates/khagole-engine-wasm)
+- Website and live demo: [priyankgahtori.github.io/khagole-engine](https://priyankgahtori.github.io/Khagole/)
 - Contributing: [CONTRIBUTING.md](../CONTRIBUTING.md) · Security: [SECURITY.md](../SECURITY.md)
   · Releasing: [RELEASING.md](../RELEASING.md)

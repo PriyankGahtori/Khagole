@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in astroceleste-engine! Bug reports, fixes, documentation and
+Thanks for your interest in khagole-engine! Bug reports, fixes, documentation and
 ports of missing features are all welcome.
 
 ## Reporting bugs
@@ -27,22 +27,22 @@ ports of missing features are all welcome.
 ## Everyday commands
 
 ```bash
-cargo test --workspace --exclude astroceleste-engine-py     # fast: committed excerpt
-cargo test -p astroceleste-engine --release                 # with the kernel: golden + full range
+cargo test --workspace --exclude khagole-engine-py     # fast: committed excerpt
+cargo test -p khagole-engine --release                 # with the kernel: golden + full range
 cargo fmt --all && cargo clippy --workspace --all-targets -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps
 
 # Targets the apps depend on must keep compiling
-cargo build -p astroceleste-engine -p astroceleste-engine-wasm --lib --target wasm32-unknown-unknown
-cargo check -p astroceleste-engine --lib --target aarch64-linux-android   # and aarch64-apple-ios
+cargo build -p khagole-engine -p khagole-engine-wasm --lib --target wasm32-unknown-unknown
+cargo check -p khagole-engine --lib --target aarch64-linux-android   # and aarch64-apple-ios
 
 # Python bindings (in a virtualenv)
-maturin develop -m crates/astroceleste-engine-py/Cargo.toml
-pytest crates/astroceleste-engine-py/tests
+maturin develop -m crates/khagole-engine-py/Cargo.toml
+pytest crates/khagole-engine-py/tests
 
 # WebAssembly bindings
-wasm-pack build --target nodejs --out-dir pkg-node crates/astroceleste-engine-wasm
-node crates/astroceleste-engine-wasm/tests/golden.mjs
+wasm-pack build --target nodejs --out-dir pkg-node crates/khagole-engine-wasm
+node crates/khagole-engine-wasm/tests/golden.mjs
 
 # Landing site with the live demo, served at http://localhost:8000
 scripts/build-site.sh && python3 -m http.server -d target/site
@@ -60,7 +60,7 @@ after.
 
 ## Correctness first
 
-The engine is a port of the Astroceleste reference implementation (Python on Skyfield), and
+The engine is a port of the Khagole reference implementation (Python on Skyfield), and
 every number it produces is checked against a reference:
 
 - `tests/fixtures/{natal,horary,transits,synastry,derived,errors}.json`: complete charts
@@ -97,7 +97,7 @@ See [docs/accuracy.md](docs/accuracy.md) for the full picture.
 - `missing_docs` is enabled and CI denies warnings: every public item needs a doc comment.
 - Public enums that may grow (`EngineError`, `SpkError`, `HouseSystem`) are
   `#[non_exhaustive]`.
-- A change to the bindings updates the Python type stub (`astroceleste_engine.pyi`), the
+- A change to the bindings updates the Python type stub (`khagole_engine.pyi`), the
   binding READMEs and both binding test suites.
 
 ## Dependencies and portability

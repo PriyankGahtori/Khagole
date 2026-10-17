@@ -1,6 +1,6 @@
 # Roadmap
 
-Where `astroceleste-engine` stands and what could come next. Nothing here is a commitment
+Where `khagole-engine` stands and what could come next. Nothing here is a commitment
 or has a date; items move into issues when someone picks them up.
 
 ## Principles
@@ -10,7 +10,7 @@ These shape every item below and are not up for change without a deliberate deci
 - **JPL ephemerides only, never approximated.** Positions come from JPL SPK kernels
   (DE440s, DE441). A date no loaded kernel covers is an `ephemeris_out_of_range` error,
   never an extrapolation.
-- **The reference implementation is the spec.** The golden fixtures (Astroceleste's
+- **The reference implementation is the spec.** The golden fixtures (Khagole's
   Python on Skyfield) must be reproduced to 1e-9 with the same JSON shape. Additions to the
   reference are tested on their own and kept out of the fixture comparison.
 - **One pure-Rust core, everywhere.** No C code, no platform I/O, only `serde` and

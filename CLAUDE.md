@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A pure-Rust port of the Astroceleste chart calculation (originally Python on Skyfield). The Python
+A pure-Rust port of the Khagole chart calculation (originally Python on Skyfield). The Python
 "reference implementation" is the spec: golden fixtures in `tests/fixtures/*.json` are its exact
 output, and the engine must reproduce them (floats within 1e-9, identical key order, identical
 int-vs-float number types). The same core runs on the server (Python bindings), native apps and
@@ -13,25 +13,25 @@ the browser (WASM).
 ## Commands
 
 ```bash
-cargo test --workspace --exclude astroceleste-engine-py     # fast: uses committed 1-year excerpt
+cargo test --workspace --exclude khagole-engine-py     # fast: uses committed 1-year excerpt
 scripts/fetch-kernels.sh                                    # downloads kernels/de440s.bsp (~32 MB)
-cargo test -p astroceleste-engine --release                 # with the kernel: golden + full-range tests
-cargo test -p astroceleste-engine --test golden_chart       # one integration test file
-cargo test -p astroceleste-engine pyfloat                   # tests matching a name filter
+cargo test -p khagole-engine --release                 # with the kernel: golden + full-range tests
+cargo test -p khagole-engine --test golden_chart       # one integration test file
+cargo test -p khagole-engine pyfloat                   # tests matching a name filter
 cargo fmt --all && cargo clippy --workspace --all-targets -- -D warnings
 cargo doc --workspace --no-deps                             # CI runs with RUSTDOCFLAGS=-D warnings
 
 # Targets CI requires to keep compiling
-cargo build -p astroceleste-engine -p astroceleste-engine-wasm --lib --target wasm32-unknown-unknown
-cargo check -p astroceleste-engine --lib --target aarch64-linux-android   # also aarch64-apple-ios
+cargo build -p khagole-engine -p khagole-engine-wasm --lib --target wasm32-unknown-unknown
+cargo check -p khagole-engine --lib --target aarch64-linux-android   # also aarch64-apple-ios
 
 # Python bindings (in a venv)
-pip install maturin pytest && maturin develop -m crates/astroceleste-engine-py/Cargo.toml
-pytest crates/astroceleste-engine-py/tests
+pip install maturin pytest && maturin develop -m crates/khagole-engine-py/Cargo.toml
+pytest crates/khagole-engine-py/tests
 
 # WASM bindings
-wasm-pack build --target nodejs --out-dir pkg-node crates/astroceleste-engine-wasm
-node crates/astroceleste-engine-wasm/tests/golden.mjs
+wasm-pack build --target nodejs --out-dir pkg-node crates/khagole-engine-wasm
+node crates/khagole-engine-wasm/tests/golden.mjs
 
 # Landing site + live demo (needs wasm-pack): builds target/site, deployed by pages.yml
 scripts/build-site.sh && python3 -m http.server -d target/site
@@ -47,12 +47,12 @@ against libpython; test it via maturin.
 
 ## Architecture
 
-Workspace crates: `crates/astroceleste-engine` (core), `-py` (PyO3), `-wasm` (wasm-bindgen).
+Workspace crates: `crates/khagole-engine` (core), `-py` (PyO3), `-wasm` (wasm-bindgen).
 Bindings are thin: they build a `KernelSet`, call the core entry points, and pass results across
 as JSON (`serde_json` with `preserve_order` + `float_roundtrip`) so floats stay exact and the
-shape equals the Rust `Serialize` output, which equals the Astroceleste API JSON.
+shape equals the Rust `Serialize` output, which equals the Khagole API JSON.
 
-Core pipeline (`crates/astroceleste-engine/src`):
+Core pipeline (`crates/khagole-engine/src`):
 
 - `ephemeris/` — `spk.rs` reads JPL SPK kernels (file or `Spk::from_bytes` for WASM/mobile);
   `kernels.rs` `KernelSet` holds kernels in preference order (first covering a date wins; dates
@@ -85,7 +85,7 @@ Core pipeline (`crates/astroceleste-engine/src`):
 
 Docs outside rustdoc: `docs/` (API guide, ephemerides, accuracy, architecture), `CONTRIBUTING.md`,
 `SECURITY.md`, `RELEASING.md`. `site/` is the static landing page with a WASM demo (`demo.js`
-imports `pkg/astroceleste_engine_wasm.js` and loads a 1950–2050 excerpt; the range is set in
+imports `pkg/khagole_engine_wasm.js` and loads a 1950–2050 excerpt; the range is set in
 `scripts/build-site.sh`). When options, ayanamsas, entry points or the result shape change,
 update `docs/api.md` and the demo form too. README is also the crates.io readme: link repo files
 with absolute GitHub URLs.

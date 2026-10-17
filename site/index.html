@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>astroceleste-engine</title>
-  <meta name="description" content="Astrological chart calculation on NASA JPL ephemerides, in pure Rust. The same chart on the server, in native apps and in the browser, with Python and WebAssembly bindings.">
+  <title>Khagole — Vedic Jyotish &amp; Vimshottari Dasha Engine</title>
+  <meta name="description" content="Khagole: High-precision Vedic Jyotish &amp; Astrometric chart calculation on NASA JPL ephemerides, in pure Rust &amp; WebAssembly.">
   <meta name="color-scheme" content="dark light">
-  <meta property="og:title" content="astroceleste-engine">
-  <meta property="og:description" content="Astrological charts on NASA JPL ephemerides, in pure Rust: identical results in Rust, Python and the browser.">
+  <meta property="og:title" content="Khagole — Vedic Jyotish &amp; Vimshottari Dasha Engine">
+  <meta property="og:description" content="Khagole: Vedic charts on NASA JPL ephemerides in pure Rust: identical results in Rust, WebAssembly, and native MCP.">
   <meta property="og:type" content="website">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=2.4.0">
@@ -16,15 +16,15 @@
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
-      <a class="brand" href="#top" aria-label="AstroCeleste home">
+      <a class="brand" href="#top" aria-label="Khagole home">
         <img src="favicon.svg" alt="" width="26" height="26">
-        <span>AstroCeleste <span class="brand-badge">Vedic Jyotish · DE440s</span></span>
+        <span>Khagole <span class="brand-badge">Vedic Jyotish · DE440s</span></span>
       </a>
       <nav aria-label="Main">
         <a href="#features">Features</a>
         <a href="#about">About</a>
         <a href="#docs">API</a>
-        <a href="https://github.com/PriyankGahtori/astroceleste-engine" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/PriyankGahtori/Khagole" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </div>
   </header>
@@ -35,7 +35,7 @@
         <div class="app-hero-header">
           <div class="hero-text-block">
             <span class="hero-eyebrow">NASA JPL DE440s · Pure Rust WebAssembly · Sub-Arcsecond Precision</span>
-            <h1>Vedic Chart &amp; Vimshottari Dasha Engine</h1>
+            <h1>Khagole: Vedic Chart &amp; Vimshottari Dasha Engine</h1>
             <p class="hero-lede">
               Compute D1 (Rashi) &amp; D9 (Navamsha) divisional charts, Panchanga five limbs, and True Sidereal Solar Year (TSSY) Vimshottari dasha in under 2ms — computed 100% on your device with complete privacy.
             </p>
@@ -306,9 +306,9 @@
         <div class="code-grid">
           <figure class="code-card">
             <figcaption>Rust</figcaption>
-<pre><code>use astroceleste_engine::ephemeris::{Kernel, KernelSet, Spk};
-use astroceleste_engine::{calculate_chart, ChartRequest, UtcInstant};
-use astroceleste_engine::vedic::{calculate_divisional, calculate_panchang};
+<pre><code>use khagole_engine::ephemeris::{Kernel, KernelSet, Spk};
+use khagole_engine::{calculate_chart, ChartRequest, UtcInstant};
+use khagole_engine::vedic::{calculate_divisional, calculate_panchang};
 
 let mut kernels = KernelSet::new();
 kernels.push(Kernel::new("de440s.bsp",
@@ -323,7 +323,7 @@ let d1 = calculate_divisional(&amp;chart, chart.houses[0].ecliptic_longitude, "D
           </figure>
           <figure class="code-card">
             <figcaption>Python</figcaption>
-<pre><code>import astroceleste_engine as ace
+<pre><code>import khagole_engine as ace
 
 engine = ace.Engine(["de440s.bsp"])
 chart = engine.chart(
@@ -337,7 +337,7 @@ d1["lagna"]["sign"]   # 'Scorpio'</code></pre>
           </figure>
           <figure class="code-card">
             <figcaption>JavaScript</figcaption>
-<pre><code>import init, { Engine, calcDivisional, calcPanchang } from "astroceleste-engine";
+<pre><code>import init, { Engine, calcDivisional, calcPanchang } from "khagole-engine";
 
 await init();
 const engine = new Engine();
@@ -399,7 +399,7 @@ const d1 = calcDivisional(chart, chart.houses[0].ecliptic_longitude, "D1");</cod
     <!-- About Section -->
     <section id="about" class="section alt">
       <div class="wrap">
-        <h2>About AstroCeleste Engine</h2>
+        <h2>About Khagole Engine</h2>
         <div class="feature-grid three">
           <article>
             <h3>Canonical Parashari Calibration</h3>
@@ -416,8 +416,8 @@ const d1 = calcDivisional(chart, chart.houses[0].ecliptic_longitude, "D1");</cod
         </div>
         <p class="section-foot">
           Open-source under MIT and Apache-2.0 licenses. Deployed live on GitHub Pages at
-          <a href="https://priyankgahtori.github.io/astroceleste-engine/">priyankgahtori.github.io/astroceleste-engine</a>.
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine">View on GitHub →</a>
+          <a href="https://priyankgahtori.github.io/Khagole/">priyankgahtori.github.io/Khagole</a>.
+          <a href="https://github.com/PriyankGahtori/Khagole">View on GitHub →</a>
         </p>
       </div>
     </section>
@@ -442,7 +442,7 @@ const d1 = calcDivisional(chart, chart.houses[0].ecliptic_longitude, "D1");</cod
         <p class="section-foot">
           Pure Rust with no C code and two dependencies (serde, serde_json). Builds for servers,
           <code>wasm32-unknown-unknown</code>, Android and iOS.
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/accuracy.md">How accuracy is verified →</a>
+          <a href="https://github.com/PriyankGahtori/Khagole/blob/main/docs/accuracy.md">How accuracy is verified →</a>
         </p>
       </div>
     </section>
@@ -451,20 +451,20 @@ const d1 = calcDivisional(chart, chart.houses[0].ecliptic_longitude, "D1");</cod
       <div class="wrap">
         <h2>Documentation</h2>
         <div class="link-grid">
-          <a href="https://docs.rs/astroceleste-engine"><strong>API reference</strong><span>Rust API on docs.rs</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/api.md"><strong>API guide</strong><span>Options, chart JSON and errors, for all three languages</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/ephemerides.md"><strong>Ephemerides</strong><span>Kernels, date coverage and smaller excerpts</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/docs/architecture.md"><strong>Architecture</strong><span>Crates and the calculation pipeline</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-py"><strong>Python</strong><span>The Python bindings</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/tree/main/crates/astroceleste-engine-wasm"><strong>JavaScript</strong><span>The WebAssembly bindings</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Setup, tests and guidelines</span></a>
-          <a href="https://github.com/PriyankGahtori/astroceleste-engine/blob/main/SECURITY.md"><strong>Security</strong><span>Reporting vulnerabilities</span></a>
+          <a href="https://docs.rs/khagole-engine"><strong>API reference</strong><span>Rust API on docs.rs</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/blob/main/docs/api.md"><strong>API guide</strong><span>Options, chart JSON and errors, for all three languages</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/blob/main/docs/ephemerides.md"><strong>Ephemerides</strong><span>Kernels, date coverage and smaller excerpts</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/blob/main/docs/architecture.md"><strong>Architecture</strong><span>Crates and the calculation pipeline</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-py"><strong>Python</strong><span>The Python bindings</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-wasm"><strong>JavaScript</strong><span>The WebAssembly bindings</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/blob/main/CONTRIBUTING.md"><strong>Contributing</strong><span>Setup, tests and guidelines</span></a>
+          <a href="https://github.com/PriyankGahtori/Khagole/blob/main/SECURITY.md"><strong>Security</strong><span>Reporting vulnerabilities</span></a>
         </div>
         <ul class="registries">
-          <li><a href="https://crates.io/crates/astroceleste-engine">crates.io</a></li>
-          <li><a href="https://pypi.org/project/astroceleste-engine/">PyPI</a></li>
-          <li><a href="https://www.npmjs.com/package/astroceleste-engine">npm</a></li>
-          <li><a href="https://github.com/PriyankGahtori/astroceleste-engine">GitHub</a></li>
+          <li><a href="https://crates.io/crates/khagole-engine">crates.io</a></li>
+          <li><a href="https://pypi.org/project/khagole-engine/">PyPI</a></li>
+          <li><a href="https://www.npmjs.com/package/khagole-engine">npm</a></li>
+          <li><a href="https://github.com/PriyankGahtori/Khagole">GitHub</a></li>
         </ul>
       </div>
     </section>
@@ -473,11 +473,11 @@ const d1 = calcDivisional(chart, chart.houses[0].ecliptic_longitude, "D1");</cod
   <footer class="footer">
     <div class="wrap">
       <p>
-        <strong>AstroCeleste Engine</strong> · High-precision astronomical and astrological calculation engine.
+        <strong>Khagole Engine</strong> · High-precision Vedic astrometry &amp; astrological calculation engine.
         Licensed under MIT or Apache-2.0.
       </p>
       <p class="dim">
-        Live application: <a href="https://priyankgahtori.github.io/astroceleste-engine/">priyankgahtori.github.io/astroceleste-engine</a>.
+        Live application: <a href="https://priyankgahtori.github.io/Khagole/">priyankgahtori.github.io/Khagole</a>.
         Planetary ephemerides by NASA JPL. Time scales, frames and apparent positions are
         ported from <a href="https://rhodesmill.org/skyfield/">Skyfield</a> (MIT).
       </p>

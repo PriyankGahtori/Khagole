@@ -1,6 +1,6 @@
 # Accuracy
 
-astroceleste-engine is a port of the Astroceleste reference implementation (Python on
+khagole-engine is a port of the Khagole reference implementation (Python on
 Skyfield). The goal is not just "accurate", but **identical**: the server, the apps and the
 browser must return the same chart, down to the last digit of every number and the order of
 every key. Three independent references check that.
