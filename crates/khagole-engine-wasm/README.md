@@ -8,8 +8,8 @@ Astrological chart calculation on NASA JPL ephemerides, compiled to WebAssembly 
 Rust [khagole-engine](https://github.com/PriyankGahtori/Khagole). Charts are
 computed entirely in the browser (or Node), identical to the Khagole server.
 
-[Try the live demo](https://ffalcinelli.github.io/khagole-engine/) ·
-[API guide](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/api.md)
+[Try the live demo](https://priyankgahtori.github.io/Khagole/) ·
+[API guide](https://github.com/PriyankGahtori/Khagole/blob/main/docs/api.md)
 
 ```js
 import init, { Engine, synastry, derivedChart, bazi, ziWei, timeLords } from "khagole-engine";

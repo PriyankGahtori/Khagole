@@ -101,13 +101,13 @@
 //!
 //! # Further reading
 //!
-//! - [API guide](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/api.md):
+//! - [API guide](https://github.com/PriyankGahtori/Khagole/blob/main/docs/api.md):
 //!   request options (house systems, ayanamsas, orb settings) and the chart JSON
-//! - [Ephemerides](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/ephemerides.md):
+//! - [Ephemerides](https://github.com/PriyankGahtori/Khagole/blob/main/docs/ephemerides.md):
 //!   kernels, coverage and excerpts
-//! - [Accuracy](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/accuracy.md):
+//! - [Accuracy](https://github.com/PriyankGahtori/Khagole/blob/main/docs/accuracy.md):
 //!   how results are verified against the reference implementation
-//! - [Live demo](https://ffalcinelli.github.io/khagole-engine/): this crate compiled
+//! - [Live demo](https://priyankgahtori.github.io/Khagole/): this crate compiled
 //!   to WebAssembly, computing charts in your browser
 //!
 //! [`Spk::open`]: ephemeris::Spk::open

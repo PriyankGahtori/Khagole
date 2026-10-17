@@ -7,8 +7,8 @@
 Python bindings for [khagole-engine](https://github.com/ffalcinelli/khagole-engine),
 astrological chart calculation on NASA JPL ephemerides, written in Rust.
 
-[Website and live demo](https://ffalcinelli.github.io/khagole-engine/) ·
-[API guide](https://github.com/ffalcinelli/khagole-engine/blob/main/docs/api.md)
+[Website and live demo](https://priyankgahtori.github.io/Khagole/) ·
+[API guide](https://github.com/PriyankGahtori/Khagole/blob/main/docs/api.md)
 
 ```python
 from datetime import datetime, timezone
