@@ -697,12 +697,12 @@ pub fn calc_vimshottari_dasha_js(
     tz_offset_hours: Option<f64>,
 ) -> Result<JsValue, JsValue> {
     let yt = match year_type.as_deref() {
-        Some("tssy") => YearType::Tssy,
+        Some("calendar") => YearType::Calendar,
         Some("savana") => YearType::Savana,
         Some("tropical") => YearType::Tropical,
         Some("julian") => YearType::Julian,
         Some("sidereal") => YearType::Sidereal,
-        _ => YearType::Calendar,
+        _ => YearType::Tssy,
     };
     let d = depth.unwrap_or(3);
     let tz = tz_offset_hours.unwrap_or(0.0);

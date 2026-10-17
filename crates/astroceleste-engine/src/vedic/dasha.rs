@@ -48,7 +48,7 @@ pub enum YearType {
 
 impl Default for YearType {
     fn default() -> Self {
-        YearType::Calendar
+        YearType::Tssy
     }
 }
 
@@ -485,7 +485,7 @@ fn calc_vimshottari_dasha_linear_tz(
 }
 
 /// Calculate the Vimshottari dasha periods tree from Moon's sidereal longitude and birth JD.
-/// Defaults to Standard Vedic Calendar Year method matching canonical Parashari tradition.
+/// Defaults to True Sidereal Solar Year (TSSY) solver matching canonical Vedic astronomy.
 pub fn calc_vimshottari_dasha(
     moon_lon: f64,
     birth_jd: f64,

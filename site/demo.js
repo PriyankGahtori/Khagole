@@ -579,7 +579,7 @@ async function compute() {
     }
 
     const panchang = calcPanchang(sunLon, moonLon, jd, localWeekday, isBeforeSunrise);
-    const yearType = data.get("vedic_year_type") || "calendar";
+    const yearType = data.get("vedic_year_type") || "tssy";
     const tzOffsetHours = parseTzOffsetHours(tzOffset);
     const dasha = calcVimshottariDasha(moonLon, jd, 3, yearType, tzOffsetHours);
 

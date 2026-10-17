@@ -910,7 +910,7 @@ export function formatDashaDate(jd, tzOffset = 0) {
   return `${y}-${m}-${day}`;
 }
 
-export function formatDashaDateTime(jd, tzOffset = 0) {
+export function formatDashaDateTime(jd, tzOffset = 0, includeSeconds = false) {
   const offH = parseTzOffsetHours(tzOffset);
   const d = new Date((jd - 2440587.5) * 86400000 + offH * 3600000);
   const y = d.getUTCFullYear();
@@ -918,7 +918,23 @@ export function formatDashaDateTime(jd, tzOffset = 0) {
   const day = String(d.getUTCDate()).padStart(2, "0");
   const hh = String(d.getUTCHours()).padStart(2, "0");
   const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  if (includeSeconds) {
+    const ss = String(d.getUTCSeconds()).padStart(2, "0");
+    return `${y}-${m}-${day} ${hh}:${mm}:${ss}`;
+  }
   return `${y}-${m}-${day} ${hh}:${mm}`;
+}
+
+export function formatDashaTimeOnly(jd, tzOffset = 0, includeSeconds = false) {
+  const offH = parseTzOffsetHours(tzOffset);
+  const d = new Date((jd - 2440587.5) * 86400000 + offH * 3600000);
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mm = String(d.getUTCMinutes()).padStart(2, "0");
+  if (includeSeconds) {
+    const ss = String(d.getUTCSeconds()).padStart(2, "0");
+    return `${hh}:${mm}:${ss}`;
+  }
+  return `${hh}:${mm}`;
 }
 
 export function formatDashaDuration(days) {
@@ -1090,7 +1106,7 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
         <div class="dasha-timeline-seg ${isMdActive ? 'active' : ''} ${isSelected ? 'selected' : ''}" 
              data-dasha-md="${md.planet}"
              style="width:${pct.toFixed(2)}%; background-color:${info.color}28; border-color:${info.color}88"
-             title="${md.planet} Mahadasha (${formatDashaDate(md.start_jd, tzOffset)} to ${formatDashaDate(md.end_jd, tzOffset)}) · Click to explore">
+             title="${md.planet} Mahadasha (${formatDashaDateTime(md.start_jd, tzOffset)} to ${formatDashaDateTime(md.end_jd, tzOffset)}) · Click to explore">
           <span class="seg-label" style="color:${info.color}">${info.abbr}</span>
         </div>
       `;
@@ -1173,10 +1189,14 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
           code: "MD",
           start_jd: m.start_jd,
           end_jd: m.end_jd,
-          start_date: formatDashaDate(m.start_jd, tzOffset),
-          end_date: formatDashaDate(m.end_jd, tzOffset),
-          start_time: formatDashaDateTime(m.start_jd, tzOffset),
-          end_time: formatDashaDateTime(m.end_jd, tzOffset),
+          start_date_val: formatDashaDate(m.start_jd, tzOffset),
+          end_date_val: formatDashaDate(m.end_jd, tzOffset),
+          start_time_val: formatDashaTimeOnly(m.start_jd, tzOffset, false),
+          end_time_val: formatDashaTimeOnly(m.end_jd, tzOffset, false),
+          start_date: formatDashaDateTime(m.start_jd, tzOffset, false),
+          end_date: formatDashaDateTime(m.end_jd, tzOffset, false),
+          start_time: formatDashaDateTime(m.start_jd, tzOffset, false),
+          end_time: formatDashaDateTime(m.end_jd, tzOffset, false),
           duration: dur,
           status,
           statusText: isMdActive ? `★ Active Now · ${rem}` : isPast ? "✓ Past" : "› Upcoming",
@@ -1196,8 +1216,9 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
 
       const parentMeta = DASHA_LEVEL_META[state.activeLevel - 1];
       const currentMeta = DASHA_LEVEL_META[state.activeLevel];
+      const withSec = state.activeLevel >= 4;
       parentTitle = `${state.focusedPath.slice(0, state.activeLevel).join(" → ")} (${currentMeta.name})`;
-      parentRange = `${formatDashaDateTime(parentNode.start_jd, tzOffset)} to ${formatDashaDateTime(parentNode.end_jd, tzOffset)}`;
+      parentRange = `${formatDashaDateTime(parentNode.start_jd, tzOffset, withSec)} to ${formatDashaDateTime(parentNode.end_jd, tzOffset, withSec)}`;
 
       const children = (parentNode.children && parentNode.children.length === 9)
         ? parentNode.children
@@ -1209,17 +1230,20 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
         const status = isActive ? "active" : isPast ? "past" : "future";
         const rem = isActive ? formatDashaRemaining(c.end_jd, nowJd) : "";
         const dur = formatDashaDuration(c.end_jd - c.start_jd);
-        const showTime = state.activeLevel >= 2;
         return {
           planet: c.planet,
           level: state.activeLevel,
           code: currentMeta.code,
           start_jd: c.start_jd,
           end_jd: c.end_jd,
-          start_date: showTime ? formatDashaDateTime(c.start_jd, tzOffset) : formatDashaDate(c.start_jd, tzOffset),
-          end_date: showTime ? formatDashaDateTime(c.end_jd, tzOffset) : formatDashaDate(c.end_jd, tzOffset),
-          start_time: formatDashaDateTime(c.start_jd, tzOffset),
-          end_time: formatDashaDateTime(c.end_jd, tzOffset),
+          start_date_val: formatDashaDate(c.start_jd, tzOffset),
+          end_date_val: formatDashaDate(c.end_jd, tzOffset),
+          start_time_val: formatDashaTimeOnly(c.start_jd, tzOffset, withSec),
+          end_time_val: formatDashaTimeOnly(c.end_jd, tzOffset, withSec),
+          start_date: formatDashaDateTime(c.start_jd, tzOffset, withSec),
+          end_date: formatDashaDateTime(c.end_jd, tzOffset, withSec),
+          start_time: formatDashaDateTime(c.start_jd, tzOffset, withSec),
+          end_time: formatDashaDateTime(c.end_jd, tzOffset, withSec),
           duration: dur,
           status,
           statusText: isActive ? `★ Active Now · ${rem}` : isPast ? "✓ Past" : "› Upcoming",
@@ -1246,9 +1270,15 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
             </span>
           </td>
           <td class="dasha-col-dates">
-            <span class="dasha-date-start">${r.start_date}</span>
+            <span class="dasha-date-start">
+              <span class="d-date">${r.start_date_val}</span>
+              <span class="d-time">${r.start_time_val}</span>
+            </span>
             <span class="dasha-date-sep">→</span>
-            <span class="dasha-date-end">${r.end_date}</span>
+            <span class="dasha-date-end">
+              <span class="d-date">${r.end_date_val}</span>
+              <span class="d-time">${r.end_time_val}</span>
+            </span>
           </td>
           <td class="dasha-col-duration">
             <span class="dasha-duration-badge">${r.duration}</span>
@@ -1285,7 +1315,7 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
               ${info.devanagari ? info.devanagari + ' ' : ''}${md.planet}
             </span>
             <span class="dasha-period-name"><strong>${md.planet} Mahadasha</strong></span>
-            <span class="dasha-dates">${formatDashaDate(md.start_jd, tzOffset)} → ${formatDashaDate(md.end_jd, tzOffset)}</span>
+            <span class="dasha-dates">${formatDashaDateTime(md.start_jd, tzOffset)} → ${formatDashaDateTime(md.end_jd, tzOffset)}</span>
             <span class="dasha-status-tag ${statusClass}">${statusLabel}</span>
           </summary>
           <div class="dasha-children">
@@ -1305,7 +1335,7 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
                 ${adInfo.devanagari ? adInfo.devanagari + ' ' : ''}${ad.planet}
               </span>
               <span class="dasha-period-name">${md.planet} – ${ad.planet} (AD)</span>
-              <span class="dasha-dates">${formatDashaDate(ad.start_jd, tzOffset)} → ${formatDashaDate(ad.end_jd, tzOffset)}</span>
+              <span class="dasha-dates">${formatDashaDateTime(ad.start_jd, tzOffset)} → ${formatDashaDateTime(ad.end_jd, tzOffset)}</span>
               <span class="dasha-status-tag ${adStatusClass}">${isAdActive ? "Active" : ""}</span>
             </summary>
             <div class="dasha-children sub">
@@ -1322,7 +1352,7 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
                 <span class="pd-name" style="color:${pdInfo.color}"><strong>${pd.planet}</strong> <small>PD</small></span>
                 ${isPdActive ? '<span class="pd-active-dot">● Active</span>' : ""}
               </div>
-              <span class="pd-dates">${formatDashaDate(pd.start_jd, tzOffset)} → ${formatDashaDate(pd.end_jd, tzOffset)}</span>
+              <span class="pd-dates">${formatDashaDateTime(pd.start_jd, tzOffset)} → ${formatDashaDateTime(pd.end_jd, tzOffset)}</span>
               <span class="pd-dur">${formatDashaDuration(pd.end_jd - pd.start_jd)}</span>
             </div>
           `;
@@ -1356,7 +1386,7 @@ export function renderVimshottariDasha(containerEl, dashaList, moonLon, birthJd,
               ${heroPillsHtml}
             </div>
             <p class="dasha-hero-sub">
-              Mahadasha: <strong>${hierarchy[0].planet}</strong> (${formatDashaDate(hierarchy[0].start_jd, tzOffset)} to ${formatDashaDate(hierarchy[0].end_jd, tzOffset)}) · 
+              Mahadasha: <strong>${hierarchy[0].planet}</strong> (${formatDashaDateTime(hierarchy[0].start_jd, tzOffset)} to ${formatDashaDateTime(hierarchy[0].end_jd, tzOffset)}) · 
               Antardasha: <strong>${hierarchy[1].planet}</strong> · 
               Pratyantar: <strong>${hierarchy[2].planet}</strong> · 
               Sookshma: <strong>${hierarchy[3].planet}</strong> · 

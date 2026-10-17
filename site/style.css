@@ -1201,7 +1201,16 @@ td.num { text-align: right; }
 }
 
 .dasha-col-dates {
-  color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.84rem;
+  color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 0.82rem;
+}
+.dasha-date-start, .dasha-date-end {
+  display: inline-flex; align-items: baseline; gap: 4px;
+}
+.d-date {
+  color: var(--text); font-weight: 500;
+}
+.d-time {
+  color: var(--accent); font-weight: 600; font-size: 0.85em; opacity: 0.95;
 }
 .dasha-date-sep { color: var(--dim); margin: 0 4px; }
 .dasha-col-duration { white-space: nowrap; }
@@ -1446,7 +1455,18 @@ td.num { text-align: right; }
     display: none;
   }
   .dasha-col-dates {
-    font-size: 0.78rem;
+    font-size: 0.76rem;
+  }
+  .dasha-date-start, .dasha-date-end {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    line-height: 1.15;
+  }
+  .d-time {
+    font-size: 0.72rem;
+    margin-left: 0;
   }
   .dasha-hero-pill-btn {
     font-size: 0.85rem;
