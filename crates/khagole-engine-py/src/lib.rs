@@ -16,6 +16,17 @@ use khagole_engine::{
     ChartRequest, ChineseCalendar, ElectionCriteria, EngineError as CoreError, UtcInstant,
     ZiWeiOptions,
 };
+use khagole_engine::vedic::{
+    calc_divisional_chart as core_calc_divisional_chart,
+    calc_divisional_point as core_calc_divisional_point,
+    calc_panchang as core_calc_panchang,
+    calc_vimshottari_dasha_tz as core_calc_vimshottari_dasha_tz,
+    nakshatra_info as core_nakshatra_info,
+    YearType,
+};
+use khagole_engine::{
+    ayanamsa as core_ayanamsa, ayanamsa_info as core_ayanamsa_info,
+};
 use pyo3::create_exception;
 use pyo3::exceptions::{PyException, PyValueError};
 use pyo3::prelude::*;
@@ -614,6 +625,128 @@ fn zi_wei(
     to_py(py, &chart)
 }
 
+/// Compute Vedic Panchanga (Tithi, Vara, Nakshatra, Yoga, Karana, Masa, Samvat).
+#[pyfunction]
+#[pyo3(signature = (sun_longitude, moon_longitude, jd, weekday=None, is_before_sunrise=None))]
+fn calc_panchang(
+    py: Python<'_>,
+    sun_longitude: f64,
+    moon_longitude: f64,
+    jd: f64,
+    weekday: Option<u8>,
+    is_before_sunrise: Option<bool>,
+) -> PyResult<Py<PyAny>> {
+    let panchang = core_calc_panchang(sun_longitude, moon_longitude, jd, weekday, is_before_sunrise);
+    to_py(py, &panchang)
+}
+
+/// Compute a Vedic divisional chart (D1 to D60) from a natal chart or planets list.
+#[pyfunction]
+#[pyo3(signature = (chart_or_planets, varga="D9", lagna_longitude=None))]
+fn calc_divisional_chart(
+    py: Python<'_>,
+    chart_or_planets: &Bound<'_, PyAny>,
+    varga: &str,
+    lagna_longitude: Option<f64>,
+) -> PyResult<Py<PyAny>> {
+    let val = to_value(chart_or_planets)?;
+    let mut planets_vec: Vec<(String, f64)> = Vec::new();
+    let mut resolved_lagna_lon = lagna_longitude;
+
+    if let Value::Object(obj) = &val {
+        if resolved_lagna_lon.is_none() {
+            if let Some(lagna_val) = obj.get("lagna") {
+                resolved_lagna_lon = lagna_val.get("lon").or_else(|| lagna_val.get("ecliptic_longitude")).and_then(|v| v.as_f64());
+            }
+        }
+        if let Some(Value::Array(planets_arr)) = obj.get("planets") {
+            for p in planets_arr {
+                if let Value::Object(p_obj) = p {
+                    let name = p_obj.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                    let lon = p_obj.get("ecliptic_longitude")
+                        .or_else(|| p_obj.get("lon"))
+                        .and_then(|v| v.as_f64())
+                        .unwrap_or(0.0);
+                    if name == "Ascendant" && resolved_lagna_lon.is_none() {
+                        resolved_lagna_lon = Some(lon);
+                    }
+                    if !name.is_empty() {
+                        planets_vec.push((name, lon));
+                    }
+                }
+            }
+        }
+    } else if let Value::Array(arr) = &val {
+        for p in arr {
+            if let Value::Object(p_obj) = p {
+                let name = p_obj.get("name").and_then(|v| v.as_str()).unwrap_or("").to_string();
+                let lon = p_obj.get("ecliptic_longitude")
+                    .or_else(|| p_obj.get("lon"))
+                    .and_then(|v| v.as_f64())
+                    .unwrap_or(0.0);
+                if name == "Ascendant" && resolved_lagna_lon.is_none() {
+                    resolved_lagna_lon = Some(lon);
+                }
+                if !name.is_empty() {
+                    planets_vec.push((name, lon));
+                }
+            }
+        }
+    }
+
+    let lagna = resolved_lagna_lon.unwrap_or(0.0);
+    let div_chart = core_calc_divisional_chart(&planets_vec, lagna, varga).map_err(to_py_err)?;
+    to_py(py, &div_chart)
+}
+
+/// Transform a single longitude to its divisional position.
+#[pyfunction]
+#[pyo3(signature = (longitude, varga="D9"))]
+fn calc_divisional_point(py: Python<'_>, longitude: f64, varga: &str) -> PyResult<Py<PyAny>> {
+    let p = core_calc_divisional_point(longitude, varga).map_err(to_py_err)?;
+    to_py(py, &p)
+}
+
+/// Compute Vimshottari dasha periods tree from Moon's sidereal longitude and birth JD.
+#[pyfunction]
+#[pyo3(signature = (moon_longitude, birth_jd, depth=3, year_type="tssy", tz_offset_hours=0.0))]
+fn calc_vimshottari_dasha(
+    py: Python<'_>,
+    moon_longitude: f64,
+    birth_jd: f64,
+    depth: u32,
+    year_type: &str,
+    tz_offset_hours: f64,
+) -> PyResult<Py<PyAny>> {
+    let yt = match year_type {
+        "calendar" => YearType::Calendar,
+        "savana" => YearType::Savana,
+        "tropical" => YearType::Tropical,
+        "julian" => YearType::Julian,
+        "sidereal" => YearType::Sidereal,
+        _ => YearType::Tssy,
+    };
+    let tree = core_calc_vimshottari_dasha_tz(moon_longitude, birth_jd, depth, yt, tz_offset_hours);
+    to_py(py, &tree)
+}
+
+/// Compute Nakshatra, Pada, and Lord for any sidereal longitude (0°-360°).
+#[pyfunction]
+#[pyo3(signature = (longitude,))]
+fn nakshatra_info(py: Python<'_>, longitude: f64) -> PyResult<Py<PyAny>> {
+    let info = core_nakshatra_info(longitude);
+    to_py(py, &info)
+}
+
+/// Precise ayanamsa information for a Julian Day.
+#[pyfunction]
+#[pyo3(signature = (jd, ayanamsa_name="lahiri"))]
+fn ayanamsa_info(py: Python<'_>, jd: f64, ayanamsa_name: &str) -> PyResult<Py<PyAny>> {
+    let code = core_ayanamsa(ayanamsa_name).code;
+    let info = core_ayanamsa_info(jd, code);
+    to_py(py, &info)
+}
+
 #[pymodule(name = "khagole_engine")]
 fn py_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
@@ -628,6 +761,12 @@ fn py_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(chart_dignities, m)?)?;
     m.add_function(wrap_pyfunction!(bazi, m)?)?;
     m.add_function(wrap_pyfunction!(zi_wei, m)?)?;
+    m.add_function(wrap_pyfunction!(calc_panchang, m)?)?;
+    m.add_function(wrap_pyfunction!(calc_divisional_chart, m)?)?;
+    m.add_function(wrap_pyfunction!(calc_divisional_point, m)?)?;
+    m.add_function(wrap_pyfunction!(calc_vimshottari_dasha, m)?)?;
+    m.add_function(wrap_pyfunction!(nakshatra_info, m)?)?;
+    m.add_function(wrap_pyfunction!(ayanamsa_info, m)?)?;
     m.add("EngineError", m.py().get_type::<EngineError>())?;
     m.add(
         "EphemerisRangeError",

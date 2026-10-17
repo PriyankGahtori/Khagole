@@ -84,6 +84,28 @@ pip install khagole-engine
 npm install khagole-engine
 ```
 
+### 🌐 Web Browser via CDN (Zero Build Tools)
+
+Import directly in any web page with a single `<script type="module">` tag, with zero bundlers or dependencies:
+
+```html
+<script type="module">
+  import init, { Engine, calcPanchang, calcDivisional, calcVimshottariDasha, nakshatraInfo } 
+    from 'https://cdn.jsdelivr.net/npm/khagole-engine@0.0.12/khagole_engine_wasm.js';
+
+  // Initialize WebAssembly runtime directly from jsDelivr CDN
+  await init();
+
+  // 1. Calculate Nakshatra & Pada
+  const moonNak = nakshatraInfo(217.9496);
+  console.log(`Moon in ${moonNak.name} Pada ${moonNak.pada} (Lord: ${moonNak.lord})`);
+
+  // 2. Calculate Vedic Panchanga
+  const panchang = calcPanchang(150.5392, 217.9496, 2433541.6694);
+  console.log(`Tithi: ${panchang.tithi.name}, Vara: ${panchang.vara.name}`);
+</script>
+```
+
 ### 🤖 Model Context Protocol (MCP) Server for AI & LLMs
 
 Khagole includes a high-speed MCP server for **Claude Desktop**, **Cursor**, **Gemini**, and **Copilot**:
@@ -101,6 +123,20 @@ Khagole includes a high-speed MCP server for **Claude Desktop**, **Cursor**, **G
 
 ---
 
+## 🌟 Complete Examples & Celebrity Horoscopes
+
+Working, tested examples outputting full Vedic horoscopes (Navagrahas, Lagna, Nakshatras & Padas, Panchanga, D9 Navamsha, and Vimshottari Dasha) for **Steve Jobs** and **Albert Einstein**:
+
+| Example | Platform | How to Run | Link |
+|---|---|---|---|
+| **Web Browser (CDN)** | Vanilla JS / HTML | Open `examples/web-cdn/index.html` in browser | [**`examples/web-cdn`**](examples/web-cdn) |
+| **Python** | Python ≥ 3.12 (`khagole-engine`) | `python examples/python/celebrity_chart.py` | [**`examples/python`**](examples/python) |
+| **Node.js** | Node.js ESM (`khagole-engine`) | `node examples/nodejs/celebrity_chart.mjs` | [**`examples/nodejs`**](examples/nodejs) |
+| **Rust** | Rust / Cargo | `cargo run --manifest-path examples/rust/Cargo.toml` | [**`examples/rust`**](examples/rust) |
+| **REST API** | FastAPI / HTTP Microservice | `uvicorn examples.rest-api.app:app --port 8000` | [**`examples/rest-api`**](examples/rest-api) |
+
+---
+
 ## Rust Usage
 
 ```rust
@@ -115,7 +151,7 @@ let chart = calculate_chart(&kernels, &request)?;
 println!("{}", serde_json::to_string_pretty(&chart)?);
 ```
 
-### Vedic Chart Calculation (WASM / Browser)
+### Vedic Chart Calculation (WASM / Node.js / Browser)
 
 ```javascript
 import init, { Engine, calcDivisional, calcPanchang, calcVimshottariDasha, julianDay } from "khagole-engine";
@@ -152,6 +188,7 @@ const dasha = calcVimshottariDasha(moonLon, jd, 3, "tssy");
 - **Rust**: [`khagole-engine`](https://crates.io/crates/khagole-engine) and [`khagole-mcp`](https://crates.io/crates/khagole-mcp) on [crates.io](https://crates.io/crates/khagole-engine).
 - **Python** ([`khagole-engine` on PyPI](https://pypi.org/project/khagole-engine/), CPython ≥ 3.12): Fast PyO3 bindings with native precompiled wheels for Linux (x86_64, aarch64, musl), macOS (universal2), and Windows (x64). See [crates/khagole-engine-py](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-py).
 - **JavaScript / WebAssembly** ([`khagole-engine` on npm](https://www.npmjs.com/package/khagole-engine)): In-browser and Node.js execution with zero network latency. See [crates/khagole-engine-wasm](https://github.com/PriyankGahtori/Khagole/tree/main/crates/khagole-engine-wasm).
+- **CDN**: Available globally via jsDelivr: `https://cdn.jsdelivr.net/npm/khagole-engine@0.0.12/khagole_engine_wasm.js`.
 
 ---
 

@@ -1,0 +1,11 @@
+[package]
+name = "khagole-rust-example"
+version = "0.1.0"
+edition = "2021"
+description = "Vedic Jyotish celebrity chart calculation example in Rust using Khagole"
+
+[dependencies]
+khagole-engine = { path = "../../crates/khagole-engine" }
+
+[workspace]
+

@@ -1,0 +1,12 @@
+{
+  "name": "khagole-nodejs-example",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Vedic Jyotish celebrity chart calculation in Node.js using Khagole",
+  "scripts": {
+    "start": "node celebrity_chart.mjs"
+  },
+  "dependencies": {
+    "khagole-engine": "^0.0.12"
+  }
+}

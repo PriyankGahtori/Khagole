@@ -15,7 +15,7 @@ const { Engine, synastry, derivedChart, julianDay, excerptKernel, degreeQualitie
 
 const PRIVATE = new Set(["degree_symbol", "degree_symbols", "condition"]);
 // Chart keys added after the reference implementation, absent from the fixtures.
-const ADDED = new Set(["sect", "dignity_scheme", "receptions", "antiscia", "planetary_hours"]);
+const ADDED = new Set(["sect", "dignity_scheme", "receptions", "antiscia", "planetary_hours", "position_mode"]);
 const stripNested = (v) =>
   Array.isArray(v) ? v.map(stripNested)
   : v && typeof v === "object" ? Object.fromEntries(Object.entries(v).filter(([k]) => !PRIVATE.has(k)).map(([k, x]) => [k, stripNested(x)]))
@@ -48,7 +48,7 @@ function same(actual, expected, path, tol = 1e-9) {
 }
 
 const fixture = (name) => JSON.parse(readFileSync(join(root, "tests/fixtures", name), "utf8"));
-const request = (i) => ({ utc: i.utc, latitude: i.lat, longitude: i.lon, house_system: i.house_system, zodiac_type: i.zodiac_type, ayanamsa: i.ayanamsa });
+const request = (i) => ({ utc: i.utc, latitude: i.lat, longitude: i.lon, house_system: i.house_system, zodiac_type: i.zodiac_type, ayanamsa: i.ayanamsa, position_mode: i.position_mode || "apparent" });
 
 // Excerpt (always available): API behaviour.
 const small = new Engine();
