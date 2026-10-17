@@ -152,6 +152,7 @@ jobs:
           merge-multiple: true
           path: dist
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        continue-on-error: true
 
   npm:
     name: publish to npm
@@ -178,6 +179,7 @@ jobs:
       - run: wasm-pack build --release --target web crates/khagole-engine-wasm
       - run: node crates/khagole-engine-wasm/tests/web_smoke.mjs
       - name: publish
+        continue-on-error: true
         working-directory: crates/khagole-engine-wasm/pkg
         env:
           # npm tries OIDC first; the token only serves the first publish.

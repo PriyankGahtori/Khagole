@@ -12,6 +12,15 @@ version is 0.0.x the API is experimental and any release may break it.
 
 ### Added
 
+- **Khagole Vedic Astrometry Engine**:
+  - Full Shodashavarga divisional chart calculation engine (D1 Rasi, D9 Navamsha, and D2 through D60).
+  - High-precision Vimshottari Dasha calculations supporting True Sidereal Solar Year (TSSY), alongside Savana (360-day) and standard sidereal year.
+  - Sub-millisecond Panchanga limbs: Tithi, Vara, Nakshatra with Pada, Yoga, and Karana.
+  - Classical Navagrahas (Sun through Ketu) and Lagna ascendant point calculation.
+  - Interactive North Indian (diamond) and South Indian (box) SVG chart visualizers with Google Material 3 typography.
+  - Integrated Open-Meteo & Nominatim geocoding and offline historical UTC offset detection.
+  - Pure Rust core on NASA JPL DE440s ephemerides, with WebAssembly and Python bindings.
+  - Model Context Protocol (MCP) server `khagole-mcp` for agentic LLM astrological reasoning.
 - Ba Zi: the `date` option gives the year, month and day pillars of a date (`flow`: 流年,
   流月, 流日, with the jie that opened the month), from an embedded table of the jie terms of
   1900-2100 (no kernel needed).
