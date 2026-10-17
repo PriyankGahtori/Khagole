@@ -25,7 +25,7 @@ All examples compute high-precision Vedic Jyotish horoscopes for renowned celebr
 
 ## 1. Quick Start: Web Browser via CDN (Zero Build Step)
 
-Just like [swisseph-wasm](https://github.com/prolaxu/swisseph-wasm), you can include Khagole in any web page with zero bundlers or build steps:
+You can include Khagole in any web page with zero bundlers or build steps directly via CDN:
 
 ```html
 <script type="module">

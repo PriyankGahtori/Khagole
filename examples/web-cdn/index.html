@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Khagole — Vedic Jyotish & Astrometric Engine (CDN Web Demo)</title>
+  <title>Khagole — Vedic Jyotish & Astrometric Engine (Browser CDN Demo)</title>
   <style>
     :root {
       --bg: #0b0f19;
@@ -28,16 +28,19 @@
     
     .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1rem; }
     label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight: 500; }
-    select, input { width: 100%; padding: 0.65rem 0.8rem; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
+    select, input[type="text"], input[type="number"] { width: 100%; padding: 0.65rem 0.8rem; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: #fff; font-size: 0.95rem; }
     select:focus, input:focus { outline: none; border-color: var(--accent); }
     
     .btn-calc { background: linear-gradient(135deg, #ff9933, #e67e22); color: #000; font-weight: 700; border: none; padding: 0.8rem 1.8rem; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: all 0.2s; margin-top: 1.2rem; display: inline-flex; align-items: center; gap: 0.5rem; }
     .btn-calc:hover { transform: translateY(-1px); box-shadow: 0 4px 15px var(--accent-glow); }
-    .btn-calc:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-calc:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .status-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; font-size: 0.85rem; background: var(--code-bg); border: 1px solid var(--border); margin-bottom: 1.5rem; }
+    .status-bar { display: flex; flex-direction: column; gap: 0.5rem; padding: 1rem; border-radius: 8px; font-size: 0.85rem; background: var(--code-bg); border: 1px solid var(--border); margin-bottom: 1.5rem; }
+    .status-header { display: flex; align-items: center; gap: 0.75rem; }
     .dot { width: 10px; height: 10px; border-radius: 50%; background: #64748b; }
     .dot.ready { background: var(--success); box-shadow: 0 0 8px var(--success); }
+    .progress-bar-bg { width: 100%; height: 6px; background: #1e293b; border-radius: 3px; overflow: hidden; margin-top: 0.25rem; }
+    .progress-bar-fill { width: 0%; height: 100%; background: var(--accent); transition: width 0.2s; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
     th { text-align: left; padding: 0.75rem 0.5rem; color: var(--text-muted); border-bottom: 2px solid var(--border); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -54,6 +57,8 @@
     .panchang-item .val { font-weight: 600; color: #fff; }
 
     pre code { display: block; padding: 1rem; background: var(--code-bg); border-radius: 8px; color: #38bdf8; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; overflow-x: auto; border: 1px solid var(--border); }
+    
+    .file-input-wrapper { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem; font-size: 0.85rem; }
   </style>
 </head>
 <body>
@@ -62,27 +67,36 @@
   <header>
     <div class="badge">Model Context Protocol & WebAssembly</div>
     <h1>Khagole <span>Browser CDN</span> Demo</h1>
-    <p class="subtitle">Professional Vedic Jyotish calculations running 100% client-side via jsDelivr CDN</p>
+    <p class="subtitle">Live client-side Vedic Jyotish calculations running on NASA JPL DE440s ephemerides</p>
   </header>
 
-  <!-- Liveness Status -->
+  <!-- Liveness Status & Ephemeris Progress -->
   <div class="status-bar">
-    <div class="dot" id="wasm-dot"></div>
-    <span id="wasm-status">Loading Khagole WebAssembly from jsDelivr CDN...</span>
+    <div class="status-header">
+      <div class="dot" id="wasm-dot"></div>
+      <span id="wasm-status">Initializing WebAssembly engine from jsDelivr CDN...</span>
+    </div>
+    <div class="progress-bar-bg" id="progress-wrapper" style="display: none;">
+      <div class="progress-bar-fill" id="progress-bar"></div>
+    </div>
+    <div class="file-input-wrapper">
+      <span style="color: var(--text-muted);">Or load local ephemeris kernel:</span>
+      <input type="file" id="local-kernel-input" accept=".bsp" style="color: var(--text-muted); font-size: 0.8rem;">
+    </div>
   </div>
 
   <!-- Celebrity Picker & Custom Input -->
   <div class="card">
     <h3>Celebrity Horoscope Calculator</h3>
-    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">Choose a famous celebrity or enter custom birth coordinates.</p>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.2rem;">Select a celebrity profile or enter custom birth coordinates.</p>
     
     <div class="form-grid">
       <div>
-        <label for="celebrity-select">Select Celebrity</label>
+        <label for="celebrity-select">Celebrity Profile</label>
         <select id="celebrity-select">
           <option value="jobs">Steve Jobs (1955-02-24 19:15 PST, San Francisco)</option>
-          <option value="einstein">Albert Einstein (1879-03-14 11:30 LMT, Ulm, Germany)</option>
           <option value="modi">Narendra Modi (1950-09-17 09:34 IST, Vadnagar, India)</option>
+          <option value="sagan">Carl Sagan (1934-11-09 17:05 EST, Brooklyn, NY)</option>
           <option value="custom">-- Custom Birth Details --</option>
         </select>
       </div>
@@ -101,16 +115,16 @@
     </div>
 
     <button id="btn-calculate" class="btn-calc" disabled>
-      <span>Calculate Vedic Horoscope</span>
+      <span>Calculate Live Vedic Horoscope</span>
     </button>
   </div>
 
-  <!-- Results Section -->
+  <!-- Live Output Area -->
   <div id="results-area" style="display: none;">
     <!-- Planetary Positions Table -->
     <div class="card">
-      <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <h3>[1] Navagraha & Lagna Positions</h3>
+      <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.5rem;">
+        <h3>[1] Navagraha & Lagna Positions (True Sidereal Lahiri)</h3>
         <span id="ayanamsa-display" style="font-size: 0.85rem; color: var(--accent); font-weight: 600;"></span>
       </div>
       <div style="overflow-x: auto;">
@@ -135,7 +149,7 @@
     <!-- Panchang & D9 -->
     <div class="grid-2">
       <div class="card">
-        <h3>[2] Vedic Panchanga (Five Limbs)</h3>
+        <h3>[2] Vedic Panchanga (Five Limbs of Vedic Time)</h3>
         <div id="panchang-content" style="margin-top: 1rem;"></div>
       </div>
 
@@ -154,7 +168,7 @@
             <th>Mahadasha</th>
             <th>Start Date</th>
             <th>End Date</th>
-            <th>Sub-Periods</th>
+            <th>Antardashas</th>
           </tr>
         </thead>
         <tbody id="dasha-body"></tbody>
@@ -164,30 +178,40 @@
 
   <!-- CDN Usage Guide -->
   <div class="card">
-    <h3>Quick Start: Add to any Webapp with 1 &lt;script&gt; Tag</h3>
+    <h3>Direct CDN Integration</h3>
     <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0.5rem 0 1rem 0;">
-      No bundlers, no build steps, zero node_modules. Import directly in any browser:
+      Load the engine directly from jsDelivr in any browser application:
     </p>
     <pre><code>&lt;script type="module"&gt;
   import init, { Engine, calcPanchang, calcDivisional, calcVimshottariDasha, nakshatraInfo } 
     from 'https://cdn.jsdelivr.net/npm/khagole-engine@0.0.12/khagole_engine_wasm.js';
 
-  // 1. Initialize WebAssembly from CDN
+  // 1. Initialize WebAssembly runtime directly from jsDelivr CDN
   await init();
 
-  // 2. Compute Nakshatra & Pada
-  const moonNak = nakshatraInfo(217.9496);
-  console.log(`Moon is in ${moonNak.name} Pada ${moonNak.pada} (Lord: ${moonNak.lord})`);
+  // 2. Fetch NASA JPL ephemeris kernel
+  const res = await fetch('https://priyankgahtori.github.io/Khagole/ephemeris/de440s-1920-2070.bsp');
+  const kernelBytes = new Uint8Array(await res.arrayBuffer());
 
-  // 3. Compute Panchanga
-  const panchang = calcPanchang(150.5392, 217.9496, 2433541.6694);
-  console.log(`Tithi: ${panchang.tithi.name}, Vara: ${panchang.vara.name}`);
+  const engine = new Engine();
+  engine.addKernel('de440s-1920-2070.bsp', kernelBytes);
+
+  // 3. Compute chart with canonical Parashari defaults
+  const chart = engine.chart({
+    utc: '1955-02-25T03:15:00Z',
+    latitude: 37.7749,
+    longitude: -122.4194,
+    zodiac_type: 'sidereal',
+    ayanamsa: 'lahiri',
+    position_mode: 'true',
+    node_type: 'mean',
+    house_system: 'W',
+  });
 &lt;/script&gt;</code></pre>
   </div>
 </div>
 
 <script type="module">
-  // Load Khagole directly from jsDelivr CDN!
   import init, {
     Engine,
     calcPanchang,
@@ -199,181 +223,254 @@
 
   const dot = document.getElementById('wasm-dot');
   const status = document.getElementById('wasm-status');
+  const progressBar = document.getElementById('progress-bar');
+  const progressWrapper = document.getElementById('progress-wrapper');
   const btn = document.getElementById('btn-calculate');
   const celebSelect = document.getElementById('celebrity-select');
   const inputUtc = document.getElementById('input-utc');
   const inputLat = document.getElementById('input-lat');
   const inputLon = document.getElementById('input-lon');
+  const fileInput = document.getElementById('local-kernel-input');
 
-  const CELEB_PRESETS = {
+  let engine = null;
+
+  const PRESETS = {
     jobs: { utc: '1955-02-25T03:15:00Z', lat: 37.7749, lon: -122.4194 },
-    einstein: { utc: '1879-03-14T10:50:00Z', lat: 48.4011, lon: 9.9876 },
     modi: { utc: '1950-09-17T04:04:00Z', lat: 23.7840, lon: 72.6360 },
+    sagan: { utc: '1934-11-09T22:05:00Z', lat: 40.6782, lon: -73.9442 },
   };
 
   celebSelect.addEventListener('change', () => {
     const val = celebSelect.value;
-    if (val in CELEB_PRESETS) {
-      const p = CELEB_PRESETS[val];
-      inputUtc.value = p.utc;
-      inputLat.value = p.lat;
-      inputLon.value = p.lon;
+    if (val in PRESETS) {
+      inputUtc.value = PRESETS[val].utc;
+      inputLat.value = PRESETS[val].lat;
+      inputLon.value = PRESETS[val].lon;
     }
   });
 
-  // Sample verified planetary coordinates for instant offline demonstration
-  const CELEB_CHARTS = {
-    jobs: {
-      ayanamsa_name: "Lahiri (Chitra Paksha)",
-      ayanamsa_formatted: "23° 13' 50\"",
-      ayanamsa_value: 23.230654,
-      planets: [
-        { name: "Sun", sign: "Aquarius", ecliptic_longitude: 312.5233, degree: 12, minute: 31, house: 7, is_retrograde: false },
-        { name: "Moon", sign: "Pisces", ecliptic_longitude: 344.5167, degree: 14, minute: 31, house: 8, is_retrograde: false },
-        { name: "Mercury", sign: "Capricorn", ecliptic_longitude: 291.1475, degree: 21, minute: 8, house: 6, is_retrograde: true },
-        { name: "Venus", sign: "Sagittarius", ecliptic_longitude: 267.9639, degree: 27, minute: 57, house: 5, is_retrograde: false },
-        { name: "Mars", sign: "Aries", ecliptic_longitude: 5.8675, degree: 5, minute: 52, house: 8, is_retrograde: false },
-        { name: "Jupiter", sign: "Gemini", ecliptic_longitude: 87.2922, degree: 27, minute: 17, house: 11, is_retrograde: true },
-        { name: "Saturn", sign: "Libra", ecliptic_longitude: 207.9492, degree: 27, minute: 56, house: 3, is_retrograde: false },
-        { name: "North Node", sign: "Sagittarius", ecliptic_longitude: 249.2692, degree: 9, minute: 16, house: 5, is_retrograde: true },
-        { name: "South Node", sign: "Gemini", ecliptic_longitude: 69.2692, degree: 9, minute: 16, house: 11, is_retrograde: true },
-        { name: "Ascendant", sign: "Leo", ecliptic_longitude: 149.0772, degree: 29, minute: 4, house: 1, is_retrograde: false },
-      ]
-    },
-    einstein: {
-      ayanamsa_name: "Lahiri (Chitra Paksha)",
-      ayanamsa_formatted: "22° 10' 12\"",
-      ayanamsa_value: 22.170106,
-      planets: [
-        { name: "Sun", sign: "Pisces", ecliptic_longitude: 331.3600, degree: 1, minute: 21, house: 9, is_retrograde: false },
-        { name: "Moon", sign: "Scorpio", ecliptic_longitude: 232.3561, degree: 22, minute: 21, house: 6, is_retrograde: false },
-        { name: "Mercury", sign: "Pisces", ecliptic_longitude: 340.9881, degree: 10, minute: 59, house: 10, is_retrograde: false },
-        { name: "Venus", sign: "Pisces", ecliptic_longitude: 354.8422, degree: 24, minute: 50, house: 10, is_retrograde: false },
-        { name: "Mars", sign: "Capricorn", ecliptic_longitude: 274.7514, degree: 4, minute: 45, house: 7, is_retrograde: false },
-        { name: "Jupiter", sign: "Aquarius", ecliptic_longitude: 305.3217, degree: 5, minute: 19, house: 8, is_retrograde: false },
-        { name: "Saturn", sign: "Pisces", ecliptic_longitude: 342.0439, degree: 12, minute: 2, house: 10, is_retrograde: false },
-        { name: "North Node", sign: "Capricorn", ecliptic_longitude: 279.3061, degree: 9, minute: 18, house: 8, is_retrograde: true },
-        { name: "South Node", sign: "Cancer", ecliptic_longitude: 99.3061, degree: 9, minute: 18, house: 2, is_retrograde: true },
-        { name: "Ascendant", sign: "Gemini", ecliptic_longitude: 79.4819, degree: 19, minute: 28, house: 1, is_retrograde: false },
-      ]
-    },
-    modi: {
-      ayanamsa_name: "Lahiri (Chitra Paksha)",
-      ayanamsa_formatted: "23° 10' 07\"",
-      ayanamsa_value: 23.168635,
-      planets: [
-        { name: "Sun", sign: "Virgo", ecliptic_longitude: 150.5392, degree: 0, minute: 32, house: 11, is_retrograde: false },
-        { name: "Moon", sign: "Scorpio", ecliptic_longitude: 217.9496, degree: 7, minute: 57, house: 1, is_retrograde: false },
-        { name: "Mercury", sign: "Virgo", ecliptic_longitude: 173.8821, degree: 23, minute: 52, house: 11, is_retrograde: false },
-        { name: "Venus", sign: "Leo", ecliptic_longitude: 135.5391, degree: 15, minute: 32, house: 10, is_retrograde: false },
-        { name: "Mars", sign: "Scorpio", ecliptic_longitude: 210.8958, degree: 0, minute: 54, house: 1, is_retrograde: false },
-        { name: "Jupiter", sign: "Aquarius", ecliptic_longitude: 308.2015, degree: 8, minute: 12, house: 4, is_retrograde: true },
-        { name: "Saturn", sign: "Leo", ecliptic_longitude: 149.6521, degree: 29, minute: 39, house: 10, is_retrograde: false },
-        { name: "North Node", sign: "Pisces", ecliptic_longitude: 334.8210, degree: 4, minute: 49, house: 5, is_retrograde: true },
-        { name: "South Node", sign: "Virgo", ecliptic_longitude: 154.8210, degree: 4, minute: 49, house: 11, is_retrograde: true },
-        { name: "Ascendant", sign: "Libra", ecliptic_longitude: 192.2897, degree: 12, minute: 17, house: 1, is_retrograde: false },
-      ]
-    }
+  const VEDIC_GRAHAS = {
+    "Sun": "Sun",
+    "Moon": "Moon",
+    "Mars": "Mars",
+    "Mercury": "Mercury",
+    "Jupiter": "Jupiter",
+    "Venus": "Venus",
+    "Saturn": "Saturn",
+    "North Node": "Rahu",
+    "South Node": "Ketu",
+    "Ascendant": "Lagna (Asc)"
   };
 
-  const DISPLAY_NAMES = {
-    "Sun": "Sun", "Moon": "Moon", "Mars": "Mars", "Mercury": "Mercury",
-    "Jupiter": "Jupiter", "Venus": "Venus", "Saturn": "Saturn",
-    "North Node": "Rahu", "South Node": "Ketu", "Ascendant": "Lagna (Asc)"
-  };
+  async function fetchKernelWithProgress(url) {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`HTTP ${response.status} loading ephemeris from ${url}`);
+    
+    const contentLength = Number(response.headers.get('content-length')) || 0;
+    if (!response.body) {
+      return new Uint8Array(await response.arrayBuffer());
+    }
+
+    const reader = response.body.getReader();
+    const chunks = [];
+    let received = 0;
+
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      if (contentLength > 0) {
+        const pct = Math.min(100, (received / contentLength) * 100);
+        progressBar.style.width = `${pct.toFixed(1)}%`;
+        const mb = (received / (1024 * 1024)).toFixed(1);
+        const totalMb = (contentLength / (1024 * 1024)).toFixed(1);
+        status.textContent = `Downloading NASA JPL Ephemeris… ${mb} MB of ${totalMb} MB (${pct.toFixed(0)}%)`;
+      }
+    }
+
+    const result = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return result;
+  }
+
+  async function loadEphemeris() {
+    progressWrapper.style.display = 'block';
+    
+    // Priority order: local path if hosted with site, relative site root, or official GitHub Pages CDN
+    const candidateUrls = [
+      'ephemeris/de440s-1920-2070.bsp',
+      '../ephemeris/de440s-1920-2070.bsp',
+      '../../ephemeris/de440s-1920-2070.bsp',
+      '/Khagole/ephemeris/de440s-1920-2070.bsp',
+      'https://priyankgahtori.github.io/Khagole/ephemeris/de440s-1920-2070.bsp'
+    ];
+
+    let kernelBytes = null;
+    let loadedFrom = '';
+
+    for (const url of candidateUrls) {
+      try {
+        status.textContent = `Connecting to ephemeris at ${url}…`;
+        kernelBytes = await fetchKernelWithProgress(url);
+        loadedFrom = url;
+        break;
+      } catch (err) {
+        console.warn(`Failed to fetch from ${url}, trying next…`, err);
+      }
+    }
+
+    if (!kernelBytes) {
+      throw new Error('Could not download ephemeris automatically. Please select a local .bsp file.');
+    }
+
+    engine = new Engine();
+    engine.addKernel('de440s.bsp', kernelBytes);
+    progressWrapper.style.display = 'none';
+    dot.classList.add('ready');
+    status.textContent = `Ready! NASA JPL Ephemeris loaded (${(kernelBytes.length / (1024*1024)).toFixed(1)} MB from ${loadedFrom.split('/').pop()})`;
+    btn.disabled = false;
+  }
+
+  // Allow manual file upload for offline / custom ephemeris
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    status.textContent = `Loading local ephemeris ${file.name}…`;
+    try {
+      const buffer = await file.arrayBuffer();
+      engine = new Engine();
+      engine.addKernel(file.name, new Uint8Array(buffer));
+      dot.classList.add('ready');
+      status.textContent = `Ready! Ephemeris loaded from local file: ${file.name} (${(buffer.byteLength / (1024*1024)).toFixed(1)} MB)`;
+      btn.disabled = false;
+    } catch (err) {
+      status.textContent = `Error loading file: ${err.message}`;
+    }
+  });
 
   (async () => {
     try {
+      status.textContent = 'Initializing WebAssembly from jsDelivr CDN…';
       await init();
-      dot.classList.add('ready');
-      status.textContent = 'Khagole WebAssembly Engine Ready (Loaded via jsDelivr CDN)';
-      btn.disabled = false;
-    } catch (e) {
-      status.textContent = 'Failed to load WebAssembly: ' + e.message;
-      console.error(e);
+      status.textContent = 'WebAssembly loaded! Fetching JPL ephemeris kernel…';
+      await loadEphemeris();
+    } catch (err) {
+      dot.classList.remove('ready');
+      progressWrapper.style.display = 'none';
+      status.textContent = `Setup failed: ${err.message}. (Select a .bsp file below to run offline).`;
+      console.error(err);
     }
   })();
 
   btn.addEventListener('click', () => {
-    const key = celebSelect.value;
-    const chart = CELEB_CHARTS[key] || CELEB_CHARTS.jobs;
-    const utc = inputUtc.value;
-    const jd = julianDay(utc);
+    if (!engine) return;
 
-    document.getElementById('results-area').style.display = 'block';
-    document.getElementById('ayanamsa-display').textContent = 
-      `Ayanamsa: ${chart.ayanamsa_name} (${chart.ayanamsa_formatted})`;
+    const utc = inputUtc.value.trim();
+    const lat = parseFloat(inputLat.value);
+    const lon = parseFloat(inputLon.value);
 
-    // 1. Table
-    const tbody = document.getElementById('planets-body');
-    tbody.innerHTML = '';
-    let sunLon = 0, moonLon = 0, lagnaLon = 0;
-    const planetsList = [];
+    try {
+      // Execute 100% live in WebAssembly!
+      const chart = engine.chart({
+        utc,
+        latitude: lat,
+        longitude: lon,
+        zodiac_type: 'sidereal',
+        ayanamsa: 'lahiri',
+        house_system: 'W',
+        position_mode: 'true',
+        node_type: 'mean',
+      });
 
-    for (const p of chart.planets) {
-      const displayName = DISPLAY_NAMES[p.name] || p.name;
-      const nak = nakshatraInfo(p.ecliptic_longitude);
-      const totalSec = Math.round(p.ecliptic_longitude * 3600);
-      const sec = totalSec % 60;
-      const dms = `${p.degree}° ${String(p.minute).padStart(2, '0')}′ ${String(sec).padStart(2, '0')}″`;
-      const motionClass = p.is_retrograde ? 'retro' : 'direct';
-      const motionText = p.is_retrograde ? 'Retro' : 'Direct';
+      document.getElementById('results-area').style.display = 'block';
+      const ayanName = chart.ayanamsa_name || 'Lahiri';
+      const ayanFmt = chart.ayanamsa_formatted || '';
+      document.getElementById('ayanamsa-display').textContent = 
+        `Precession Ayanamsa: ${ayanName} (${chart.ayanamsa_value.toFixed(6)}° = ${ayanFmt})`;
 
-      if (p.name === 'Sun') sunLon = p.ecliptic_longitude;
-      if (p.name === 'Moon') moonLon = p.ecliptic_longitude;
-      if (p.name === 'Ascendant') lagnaLon = p.ecliptic_longitude;
+      // 1. Planetary Table
+      const tbody = document.getElementById('planets-body');
+      tbody.innerHTML = '';
+      let sunLon = 0, moonLon = 0, lagnaLon = 0;
+      const planetsList = [];
 
-      planetsList.push({ name: displayName, ecliptic_longitude: p.ecliptic_longitude });
+      for (const p of chart.planets) {
+        if (!(p.name in VEDIC_GRAHAS)) continue;
+        const displayName = VEDIC_GRAHAS[p.name];
+        const pLon = p.ecliptic_longitude;
+        const nak = nakshatraInfo(pLon);
+        const totalSec = Math.round(pLon * 3600);
+        const sec = totalSec % 60;
+        const dms = `${p.degree}° ${String(p.minute).padStart(2, '0')}′ ${String(sec).padStart(2, '0')}″`;
+        const motionClass = p.is_retrograde ? 'retro' : 'direct';
+        const motionText = p.is_retrograde ? 'Retro' : 'Direct';
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-weight: 600;">${displayName}</td>
-        <td>${p.sign}</td>
-        <td>${dms}</td>
-        <td>H${p.house}</td>
-        <td>${nak.name}</td>
-        <td>${nak.pada}</td>
-        <td>${nak.lord}</td>
-        <td class="${motionClass}">${motionText}</td>
+        if (p.name === 'Sun') sunLon = pLon;
+        if (p.name === 'Moon') moonLon = pLon;
+        if (p.name === 'Ascendant') lagnaLon = pLon;
+
+        planetsList.push({ name: displayName, ecliptic_longitude: pLon });
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 600;">${displayName}</td>
+          <td>${p.sign}</td>
+          <td>${dms}</td>
+          <td>H${p.house}</td>
+          <td>${nak.name}</td>
+          <td>${nak.pada}</td>
+          <td>${nak.lord}</td>
+          <td class="${motionClass}">${motionText}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      // 2. Panchanga
+      const jd = julianDay(utc);
+      const panchang = calcPanchang(sunLon, moonLon, jd);
+      const pContainer = document.getElementById('panchang-content');
+      pContainer.innerHTML = `
+        <div class="panchang-item"><span class="label">Tithi (Lunar Day):</span><span class="val">${panchang.tithi.name} (${panchang.tithi.paksha}, #${panchang.tithi.number})</span></div>
+        <div class="panchang-item"><span class="label">Vara (Solar Weekday):</span><span class="val">${panchang.vara.name} (Lord: ${panchang.vara.lord})</span></div>
+        <div class="panchang-item"><span class="label">Nakshatra:</span><span class="val">${panchang.nakshatra.name} (Pada ${panchang.nakshatra.pada}, Lord: ${panchang.nakshatra.lord})</span></div>
+        <div class="panchang-item"><span class="label">Yoga:</span><span class="val">${panchang.yoga.name} (#${panchang.yoga.number})</span></div>
+        <div class="panchang-item"><span class="label">Karana:</span><span class="val">${panchang.karana.name} (#${panchang.karana.number})</span></div>
+        <div class="panchang-item"><span class="label">Lunar Month (Masa):</span><span class="val">${panchang.masa.amanta} (Amanta) / ${panchang.masa.purnimanta}</span></div>
+        <div class="panchang-item"><span class="label">Season & Course:</span><span class="val">${panchang.masa.ritu} | ${panchang.masa.ayana}</span></div>
+        <div class="panchang-item"><span class="label">Samvat Eras:</span><span class="val">Vikram ${panchang.samvat.vikram_year} | Shaka ${panchang.samvat.shaka_year}</span></div>
       `;
-      tbody.appendChild(tr);
-    }
 
-    // 2. Panchanga
-    const panchang = calcPanchang(sunLon, moonLon, jd);
-    const pContainer = document.getElementById('panchang-content');
-    pContainer.innerHTML = `
-      <div class="panchang-item"><span class="label">Tithi (Lunar Day):</span><span class="val">${panchang.tithi.name} (${panchang.tithi.paksha}, #${panchang.tithi.number})</span></div>
-      <div class="panchang-item"><span class="label">Vara (Solar Weekday):</span><span class="val">${panchang.vara.name} (Lord: ${panchang.vara.lord})</span></div>
-      <div class="panchang-item"><span class="label">Nakshatra:</span><span class="val">${panchang.nakshatra.name} (Pada ${panchang.nakshatra.pada}, Lord: ${panchang.nakshatra.lord})</span></div>
-      <div class="panchang-item"><span class="label">Yoga:</span><span class="val">${panchang.yoga.name} (#${panchang.yoga.number})</span></div>
-      <div class="panchang-item"><span class="label">Karana:</span><span class="val">${panchang.karana.name} (#${panchang.karana.number})</span></div>
-      <div class="panchang-item"><span class="label">Lunar Month (Masa):</span><span class="val">${panchang.masa.amanta} (Amanta) / ${panchang.masa.purnimanta}</span></div>
-      <div class="panchang-item"><span class="label">Season & Course:</span><span class="val">${panchang.masa.ritu} | ${panchang.masa.ayana}</span></div>
-      <div class="panchang-item"><span class="label">Samvat Eras:</span><span class="val">Vikram ${panchang.samvat.vikram_year} | Shaka ${panchang.samvat.shaka_year}</span></div>
-    `;
+      // 3. D9 Navamsha
+      const d9 = calcDivisional(planetsList, lagnaLon, "D9");
+      const d9Container = document.getElementById('d9-content');
+      d9Container.innerHTML = d9.planets.map(dp => 
+        `<span style="display: inline-block; background: var(--code-bg); padding: 0.2rem 0.6rem; border-radius: 6px; margin: 0.2rem; border: 1px solid var(--border);"><strong style="color: var(--accent);">${dp.name}</strong>: Sign #${dp.sign}</span>`
+      ).join(' ');
 
-    // 3. D9 Navamsha
-    const d9 = calcDivisional(planetsList, lagnaLon, "D9");
-    const d9Container = document.getElementById('d9-content');
-    d9Container.innerHTML = d9.planets.map(dp => 
-      `<span style="display: inline-block; background: var(--code-bg); padding: 0.2rem 0.6rem; border-radius: 6px; margin: 0.2rem; border: 1px solid var(--border);"><strong style="color: var(--accent);">${dp.name}</strong>: Sign #${dp.sign}</span>`
-    ).join(' ');
+      // 4. Vimshottari Dasha
+      const dashaTree = calcVimshottariDasha(moonLon, jd, 2, "tssy");
+      const dashaBody = document.getElementById('dasha-body');
+      dashaBody.innerHTML = '';
+      for (const d of dashaTree.slice(0, 5)) {
+        const subCount = d.children ? d.children.length : 0;
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="font-weight: 600; color: #fff;">${d.planet}</td>
+          <td>${d.start_date}</td>
+          <td>${d.end_date}</td>
+          <td>${subCount} Antardashas computed</td>
+        `;
+        dashaBody.appendChild(row);
+      }
 
-    // 4. Vimshottari Dasha
-    const dashaTree = calcVimshottariDasha(moonLon, jd, 2, "tssy");
-    const dashaBody = document.getElementById('dasha-body');
-    dashaBody.innerHTML = '';
-    for (const d of dashaTree.slice(0, 6)) {
-      const subCount = d.children ? d.children.length : 0;
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td style="font-weight: 600; color: #fff;">${d.planet}</td>
-        <td>${d.start_date}</td>
-        <td>${d.end_date}</td>
-        <td>${subCount} Antardashas computed</td>
-      `;
-      dashaBody.appendChild(row);
+    } catch (err) {
+      alert(`Calculation error: ${err.message}`);
+      console.error(err);
     }
   });
 </script>

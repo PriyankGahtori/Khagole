@@ -14,7 +14,9 @@ END_JD=2477103.5
 
 rm -rf "$OUT"
 mkdir -p "$OUT/ephemeris"
+mkdir -p "$OUT/examples/web-cdn"
 cp -R site/. "$OUT/"
+cp -R examples/web-cdn/index.html examples/web-cdn/README.md "$OUT/examples/web-cdn/"
 
 scripts/fetch-kernels.sh >/dev/null
 cargo run --release --quiet -p khagole-engine --example excerpt -- \
